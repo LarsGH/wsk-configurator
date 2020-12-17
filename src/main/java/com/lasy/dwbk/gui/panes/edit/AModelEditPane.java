@@ -1,6 +1,8 @@
-package com.lasy.dwbk.gui.panes;
+package com.lasy.dwbk.gui.panes.edit;
 
 import com.lasy.dwbk.app.model.IGtModel;
+import com.lasy.dwbk.gui.panes.ADwbkPane;
+import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 
 import javafx.scene.Scene;
@@ -38,20 +40,25 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
   private HBox createSaveCancelButtonBox()
   {
     
-    Button saveBtn = GuiUtil.createTextButton("Speichern");
+    Button saveBtn = GuiUtil.createIconButtonWithText(GuiIcon.SAVE, "Speichern", "Speichern");
     saveBtn.setOnAction(e -> {
       handleSave();
-      goToMainPane();
+      goToOverviewPane();
     });
     
-    Button cancelBtn = GuiUtil.createTextButton("Abbrechen");
+    Button cancelBtn = GuiUtil.createIconButtonWithText(GuiIcon.CANCEL, "Abbrechen", "Abbrechen");
     cancelBtn.setOnAction(e -> {
-      goToMainPane();
+      goToOverviewPane();
     });
     
     return new HBox(saveBtn, cancelBtn);
   }
   
+  /**
+   * Switches to the overview pane.
+   */
+  protected abstract void goToOverviewPane();
+
   /**
    * Save the model.
    */
@@ -80,7 +87,7 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
   {
     Alert alert = new Alert(
       AlertType.WARNING, 
-      "Bitte überprüfen Sie die Eingaben", 
+      "Bitte Ã¼berprÃ¼fen Sie die Eingaben", 
       ButtonType.YES, ButtonType.NO);
     alert.setTitle("Invalide Eingaben");
     alert.setHeaderText(null);

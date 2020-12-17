@@ -1,6 +1,7 @@
-package com.lasy.dwbk.gui.panes;
+package com.lasy.dwbk.gui.panes.edit;
 
 import com.lasy.dwbk.app.model.impl.LayerModel;
+import com.lasy.dwbk.gui.panes.overview.LayerOverviewPane;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -59,6 +60,15 @@ VBox attributes = new VBox(10);
     attributes.getChildren().add(new Label("test2"));
     
     return attributes;
+  }
+
+
+
+  @Override
+  protected void goToOverviewPane()
+  {
+    LayerOverviewPane pane = new LayerOverviewPane(getMainScene());
+    goToPane(pane);
   }
   
   

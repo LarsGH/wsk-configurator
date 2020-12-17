@@ -1,20 +1,28 @@
 package com.lasy.dwbk.gui.panes;
 
-import com.lasy.dwbk.gui.LayerOverviewComponent;
+import com.lasy.dwbk.gui.info.DwbkAppInfo;
+import com.lasy.dwbk.gui.panes.overview.LayerOverviewPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 
 public class MainPane extends ADwbkPane
 {
+  
+  private static final double BUTTON_WIDTH = 200;
 
   public MainPane(Scene mainScene)
   {
-    super(mainScene, "�bersicht");
+    super(mainScene, "Übersicht");
   }
   
   @Override
@@ -23,30 +31,65 @@ public class MainPane extends ADwbkPane
     // Nothing to do!
   }
   
-  private Button createNewLayerButton()
+  private Button createGoToLayerOverviewButton()
   {
-    Button btnAddLayer = GuiUtil.createIconButtonWithText(
-      GuiIcon.CREATE, 
-      "Erstellt einen neuen Layer",  
-      "Neuen Layer erstellen");
-
-    btnAddLayer.setOnMouseClicked(e -> {
-      goToPane(new LayerPane(getMainScene(), null));
-      System.out.println("TODO: Neuen Layer erzeugen GUI aufrufen!");
-    });
-    return btnAddLayer;
+    return createOverviewButton(
+      GuiIcon.LAYER,
+      "Wechselt zur Layer-Übersicht",
+      "Layer-Übersicht",
+      e -> {
+        goToPane(new LayerOverviewPane(getMainScene()));
+      });
+  }
+  
+  private Button createGoToBboxOverviewButton()
+  {    
+    return createOverviewButton(
+      GuiIcon.BOUNDING_BOX,
+      "Wechselt zur Boundingbox-Übersicht",
+      "Boundingbox-Übersicht",
+      e -> {
+        goToPane(new LayerOverviewPane(getMainScene()));
+      });
+  }
+  
+  private Button createInfoButton()
+  {    
+    return createOverviewButton( 
+      GuiIcon.INFO,
+      "Informationen zu dieser Anwendung",
+      "Anwendungs-Informationen",
+      e -> {
+        Alert info = DwbkAppInfo.getInfoAlert();
+        info.show();
+      });
+  }
+  
+  private Button createOverviewButton(Image icon, String help, String txt, EventHandler<? super MouseEvent> handler)
+  {
+    Button btn = GuiUtil.createIconButtonWithText(icon, help, txt);
+    btn.setPrefWidth(BUTTON_WIDTH);
+    btn.setAlignment(Pos.CENTER_LEFT);
+    btn.setOnMouseClicked(handler);
+    
+    return btn;
   }
 
   @Override
   protected Node createContent()
   {
-    BorderPane pane = new BorderPane();
-    pane.setTop(createNewLayerButton());
+    VBox box = new VBox(
+      20,
+      createGoToLayerOverviewButton(),
+      createGoToBboxOverviewButton(),
+      createInfoButton());
+    box.setAlignment(Pos.CENTER);
+    box.setPrefWidth(BUTTON_WIDTH);
     
-    LayerOverviewComponent layerTable = new LayerOverviewComponent(this);
-    pane.setCenter(layerTable.getTableView());
-    
-    return pane;
+    return box;
   }
+  
+  // TODO: HInweis ungespeicherte Aenderungen + Speichern
+  
 
 }

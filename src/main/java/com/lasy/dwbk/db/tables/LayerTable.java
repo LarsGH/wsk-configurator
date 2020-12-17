@@ -47,7 +47,7 @@ public class LayerTable implements IDwbkTable
     builder.nillable(false);
     builder.add(COL_URI, String.class);
     
-    // TODO: String Länge 1 funktioniert nicht!
+    // TODO: String Laenge 1 funktioniert nicht!
     // Store local boolean as 'Y' / 'N'
     builder.nillable(false);
     builder.length(1);

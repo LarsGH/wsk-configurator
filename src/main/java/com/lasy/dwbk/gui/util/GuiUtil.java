@@ -2,6 +2,7 @@ package com.lasy.dwbk.gui.util;
 
 import com.google.common.base.Preconditions;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,12 +12,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 
 public class GuiUtil
 {
 
   /**
-   * Returns the display value for the boolean.
+   * Returns the display value for the boolean. 
    * 
    * @param bool boolean value
    * @return "Ja" for {@code true} and "Nein" for {@code false}
@@ -39,12 +41,14 @@ public class GuiUtil
   public static Button createIconButtonWithText(Image icon, String tooltip, String txt)
   {
     Preconditions.checkNotNull(icon);
-    Preconditions.checkNotNull(tooltip);
-    Preconditions.checkNotNull(txt);
     
     Button btn = createTextButton(txt);
     btn.setGraphic(new ImageView(icon));
-    btn.setTooltip(new Tooltip(tooltip));
+    if(tooltip != null)
+    {
+      btn.setTooltip(new Tooltip(tooltip));
+    }
+    btn.setTextAlignment(TextAlignment.CENTER);
     return btn;
   }
   
@@ -57,13 +61,7 @@ public class GuiUtil
    */
   public static Button createIconButton(Image icon, String tooltip)
   {
-    Preconditions.checkNotNull(icon);
-    Preconditions.checkNotNull(tooltip);
-    
-    Button btn = new Button();
-    btn.setGraphic(new ImageView(icon));
-    btn.setTooltip(new Tooltip(tooltip));
-    return btn;
+    return createIconButtonWithText(icon, tooltip, null);
   }
   
   /**
@@ -72,11 +70,14 @@ public class GuiUtil
    * @param icon the button icon
    * @return new button
    */
-  public static Button createTextButton(String txt)
+  private static Button createTextButton(String txt)
   {
-    Preconditions.checkNotNull(txt);
-       
-    return new Button(txt);
+    Button btn = new Button();
+    if(txt != null)
+    {
+      btn.setText(txt);
+    }
+    return btn;
   }
   
   /**
@@ -91,6 +92,7 @@ public class GuiUtil
     header.setFont(Font.font(null, FontWeight.BOLD, 20));
     HBox box = new HBox(header);
     box.setAlignment(Pos.CENTER);
+    HBox.setMargin(header, new Insets(10));
     return box;
   }
   

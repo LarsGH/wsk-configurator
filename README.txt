@@ -8,3 +8,7 @@ mvn clean javafx:run
 # debug mode!
 mvn clean javafx:run@debug
 mvn clean javafx:run@run
+
+
+# load install jar
+java -jar dwbk-configurator.jar

@@ -40,6 +40,7 @@ public abstract class ADwbkPane extends BorderPane
    */
   public void goToMainPane()
   {
+    System.out.println("going to main pane...");
     MainPane mainPane = new MainPane(this.mainScene);
     goToPane(mainPane);
   }

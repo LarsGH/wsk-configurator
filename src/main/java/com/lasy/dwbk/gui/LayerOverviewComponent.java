@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions;
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.gui.panes.ADwbkPane;
-import com.lasy.dwbk.gui.panes.LayerPane;
+import com.lasy.dwbk.gui.panes.edit.LayerPane;
 import com.lasy.dwbk.gui.util.ButtonTableCell;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
@@ -62,8 +62,8 @@ public class LayerOverviewComponent
     Supplier<Button> btnEditLayer = () -> GuiUtil.createIconButton(GuiIcon.EDIT, "Layer editieren");
     editCol.setCellFactory(ButtonTableCell.<LayerModel> create(btnEditLayer, this::handleEditLayer));
 
-    TableColumn<LayerModel, Button> deleteCol = new TableColumn<>("Löschen");
-    Supplier<Button> btnDeleteLayer = () -> GuiUtil.createIconButton(GuiIcon.DELETE, "Layer löschen");
+    TableColumn<LayerModel, Button> deleteCol = new TableColumn<>("LÃ¶schen");
+    Supplier<Button> btnDeleteLayer = () -> GuiUtil.createIconButton(GuiIcon.DELETE, "Layer lï¿½schen");
     deleteCol.setCellFactory(ButtonTableCell.<LayerModel> create(btnDeleteLayer, this::handleDeleteLayer));
 
     return Arrays.asList(nameCol, storeLocalCol, editCol, deleteCol);
@@ -86,9 +86,9 @@ public class LayerOverviewComponent
     {
       System.out.println("TODO: delete layer... " + layer.getId());
 
-      String deleteMsg = String.format("Layer '%s' wirklich löschen?", layer.getName());
+      String deleteMsg = String.format("Layer '%s' wirklich lÃ¶schen?", layer.getName());
       Alert alert = new Alert(AlertType.CONFIRMATION, deleteMsg, ButtonType.YES, ButtonType.NO);
-      alert.setTitle("Layer löschen");
+      alert.setTitle("Layer lÃ¶schen");
       alert.setHeaderText(null);
 
       Optional<ButtonType> result = alert.showAndWait();
