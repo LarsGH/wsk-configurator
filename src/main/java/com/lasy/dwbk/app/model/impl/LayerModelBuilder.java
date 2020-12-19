@@ -3,29 +3,30 @@ package com.lasy.dwbk.app.model.impl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.db.tables.IDwbkTable;
 import com.lasy.dwbk.db.tables.LayerTable;
 import com.lasy.dwbk.db.util.DbBoolean;
+import com.lasy.dwbk.util.Check;
 
 public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
 {
   private static final IDwbkTable TABLE = new LayerTable();
   
   private String name;
+  private String description;
   private String uri;
   private boolean storeLocal;
+  private boolean isSaved;
   private Integer bboxId;
   private String user;
   private String pw;
 
   protected LayerModelBuilder(String name)
   {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
-    this.name = name;
+    this.name = Check.trimmedNotEmpty(name, "name");
     this.storeLocal = false;
+    this.isSaved = false;
   }
   
   @Override
@@ -34,8 +35,10 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(getTable().getSimpleFeatureType());
     
     featureBuilder.set(LayerTable.COL_NAME, this.name);
+    featureBuilder.set(LayerTable.COL_DESCRIPTION, this.description);
     featureBuilder.set(LayerTable.COL_URI, this.uri);
     featureBuilder.set(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(this.storeLocal));
+    featureBuilder.set(LayerTable.COL_IS_SAVED, DbBoolean.toDbValue(this.isSaved));
     featureBuilder.set(LayerTable.COL_BBOX_ID, this.bboxId);
     featureBuilder.set(LayerTable.COL_USER, this.user);
     featureBuilder.set(LayerTable.COL_PW, this.pw);
@@ -46,14 +49,24 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   }
   
   /**
+   * Sets the description
+   * @param description description
+   * @return builder
+   */
+  public LayerModelBuilder withDescription(String description)
+  {
+    this.description = description;
+    return this;
+  }
+  
+  /**
    * Sets the URI.
    * @param uri URI
    * @return builder
    */
   public LayerModelBuilder withUri(String uri)
   {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(uri));
-    this.uri = uri;
+    this.uri = Check.trimmedNotEmpty(uri, "uri");
     return this;
   }
   
@@ -65,6 +78,17 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   public LayerModelBuilder withStoreLocal(boolean storeLocal)
   {
     this.storeLocal = storeLocal;
+    return this;
+  }
+  
+  /**
+   * Sets the value for the saved status (necessary if layer is stored locally).
+   * @param isSaved {@code true} if layer is saved.
+   * @return builder
+   */
+  public LayerModelBuilder withIsSaved(boolean isSaved)
+  {
+    this.isSaved = isSaved;
     return this;
   }
   

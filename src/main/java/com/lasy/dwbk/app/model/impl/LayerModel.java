@@ -4,13 +4,12 @@ import java.util.Optional;
 
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.AGtModel;
 import com.lasy.dwbk.db.tables.LayerTable;
 import com.lasy.dwbk.db.util.DbBoolean;
 import com.lasy.dwbk.db.util.DbRowAccess;
+import com.lasy.dwbk.util.Check;
 
 /**
  * Entity for a row from {@link LayerTable}.
@@ -24,25 +23,13 @@ public class LayerModel extends AGtModel
    */
   public static LayerModelBuilder builder(String name)
   {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
+    Check.trimmedNotEmpty(name, "name");
     return new LayerModelBuilder(name);
   }
   
   public LayerModel(SimpleFeature feature)
   {
     super(feature);
-  }
-
-  public String getName()
-  {
-    String name = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_NAME, String.class);
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
-    this.getFeature().setAttribute(LayerTable.COL_NAME, name);
   }
 
   public String getUri()
@@ -53,7 +40,7 @@ public class LayerModel extends AGtModel
 
   public void setUri(String uri)
   {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(uri));
+    Check.trimmedNotEmpty(uri, "uri");
     this.getFeature().setAttribute(LayerTable.COL_URI, uri);
   }
 
@@ -66,6 +53,17 @@ public class LayerModel extends AGtModel
   public void setStoreLocal(boolean storeLocal)
   {
     this.getFeature().setAttribute(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(storeLocal));
+  }
+  
+  public boolean isSaved()
+  {
+    String isSaved = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_IS_SAVED, String.class);
+    return DbBoolean.fromDbValue(isSaved);
+  }
+
+  public void setSaved(boolean isSaved)
+  {
+    this.getFeature().setAttribute(LayerTable.COL_IS_SAVED, DbBoolean.toDbValue(isSaved));
   }
 
   public Optional<Integer> getBboxId()

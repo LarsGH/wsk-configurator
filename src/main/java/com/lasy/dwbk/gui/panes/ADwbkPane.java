@@ -1,7 +1,7 @@
 package com.lasy.dwbk.gui.panes;
 
-import com.google.common.base.Preconditions;
 import com.lasy.dwbk.gui.util.GuiUtil;
+import com.lasy.dwbk.util.Check;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -17,15 +17,28 @@ import javafx.scene.layout.BorderPane;
 public abstract class ADwbkPane extends BorderPane
 {
 
+  protected static <TDwbkPane extends ADwbkPane> TDwbkPane createInitializedPane(TDwbkPane pane)
+  {
+    pane.init();
+    return pane;
+  }
+  
   private Scene mainScene;
   
   public ADwbkPane(Scene mainScene, String header)
   {
     super();
-    this.mainScene = Preconditions.checkNotNull(mainScene);
-    Preconditions.checkNotNull(header);
+    this.mainScene = Check.notNull(mainScene, "mainScene");
+    Check.notNull(header, "header");
     
     setTop(GuiUtil.createHeader(header));
+  }
+  
+  /**
+   * Completes the Pane initialization.
+   */
+  public void init()
+  {
     setCenter(createContent());
   }
   
@@ -41,7 +54,7 @@ public abstract class ADwbkPane extends BorderPane
   public void goToMainPane()
   {
     System.out.println("going to main pane...");
-    MainPane mainPane = new MainPane(this.mainScene);
+    MainPane mainPane = MainPane.create(this.mainScene);
     goToPane(mainPane);
   }
   

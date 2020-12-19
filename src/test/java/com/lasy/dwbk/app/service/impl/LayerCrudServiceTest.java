@@ -1,6 +1,6 @@
 package com.lasy.dwbk.app.service.impl;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import org.assertj.core.api.Assertions;
@@ -9,12 +9,10 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.DwbkFramework;
+import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.impl.BboxModel;
 import com.lasy.dwbk.app.model.impl.LayerModel;
-import com.lasy.dwbk.app.service.impl.LayerCrudService;
-import com.lasy.dwbk.db.util.DwbkBigDecimal;
 
 /**
  * Testet {@link LayerCrudService}.
@@ -25,13 +23,15 @@ public class LayerCrudServiceTest
 {
   private static final String EXPECTED_BBOX_NAME = "Bbox-Name";
   private static final String EXPECTED_BBOX_DESCRIPTION = "Bbox description...";
-  private static final BigDecimal EXPECTED_BBOX_MIN_LON = DwbkBigDecimal.create("9.9");
-  private static final BigDecimal EXPECTED_BBOX_MIN_LAT = DwbkBigDecimal.create("1.1");
-  private static final BigDecimal EXPECTED_BBOX_MAX_LON = DwbkBigDecimal.create("99.9");
-  private static final BigDecimal EXPECTED_BBOX_MAX_LAT = DwbkBigDecimal.create("11.1");
+  private static final String EXPECTED_BBOX_MIN_LON = "9.99999";
+  private static final String EXPECTED_BBOX_MIN_LAT = "1.11111";
+  private static final String EXPECTED_BBOX_MAX_LON = "99.11111";
+  private static final String EXPECTED_BBOX_MAX_LAT = "11.99999";
   
+  private static final String EXPECTED_LAYER_DESCRIPTION = "My layer description...";
   private static final String EXPECTED_LAYER_URI = "https://my-test-uri.com";
   private static final boolean EXPECTED_STORE_LOCAL = true;
+  private static final boolean EXPECTED_IS_SAVED = true;
   private static final String EXPECTED_USER = "test-user";
   private static final String EXPECTED_PW = "test-pw-1234";
 
@@ -48,10 +48,10 @@ public class LayerCrudServiceTest
     bbox = DwbkServiceProvider.getInstance().getBboxService()
       .create(BboxModel.builder(EXPECTED_BBOX_NAME)
         .withDescription(EXPECTED_BBOX_DESCRIPTION)
-        .withMinLon(EXPECTED_BBOX_MIN_LON.toPlainString())
-        .withMinLat(EXPECTED_BBOX_MIN_LAT.toPlainString())
-        .withMaxLon(EXPECTED_BBOX_MAX_LON.toPlainString())
-        .withMaxLat(EXPECTED_BBOX_MAX_LAT.toPlainString()));
+        .withMinLon(EXPECTED_BBOX_MIN_LON)
+        .withMinLat(EXPECTED_BBOX_MIN_LAT)
+        .withMaxLon(EXPECTED_BBOX_MAX_LON)
+        .withMaxLat(EXPECTED_BBOX_MAX_LAT));
     
     DataStore store = DwbkFramework.getInstance().getGeoPackage().getDataStore();
     sut = new LayerCrudService(store);
@@ -60,7 +60,6 @@ public class LayerCrudServiceTest
   @Test
   public void testCrud()
   {
-    // TODO: HIER WEITER DEBUGGEN!
     // create
     LayerModel layerA = assertThatLayerIsCreatedWithExpectedContent("Test-Layer-A");
     Assertions.assertThat(layerA.getBbox().get()).isEqualTo(bbox);
@@ -68,6 +67,7 @@ public class LayerCrudServiceTest
     layerA.setName("changedName");
     layerA.setPw("changedPw");
     layerA.setStoreLocal(false);
+    layerA.setSaved(false);
     layerA.setBboxId(null);
     
     // save
@@ -99,17 +99,22 @@ public class LayerCrudServiceTest
   private LayerModel assertThatLayerIsCreatedWithExpectedContent(String name)
   {
     LayerModel newLayer = sut.create(LayerModel.builder(name)
+      .withDescription(EXPECTED_LAYER_DESCRIPTION)
       .withUri(EXPECTED_LAYER_URI)
       .withStoreLocal(EXPECTED_STORE_LOCAL)
+      .withIsSaved(EXPECTED_IS_SAVED)
       .withBboxId(bbox.getId())
       .withUser(EXPECTED_USER)
       .withPassword(EXPECTED_PW));
           
     Assertions.assertThat(newLayer.getId()).isNotNull();
     Assertions.assertThat(newLayer.getName()).isEqualTo(name);
+    Assertions.assertThat(newLayer.getDescription().get()).isEqualTo(EXPECTED_LAYER_DESCRIPTION);
     Assertions.assertThat(newLayer.isStoreLocal()).isTrue();
+    Assertions.assertThat(newLayer.isSaved()).isTrue();
     Assertions.assertThat(newLayer.getUser().get()).isEqualTo(EXPECTED_USER);
     Assertions.assertThat(newLayer.getPw().get()).isEqualTo(EXPECTED_PW);
+    Assertions.assertThat(newLayer.getLastChangedDate()).isEqualToIgnoringSeconds(LocalDateTime.now());
     
     return newLayer;
   }

@@ -9,12 +9,12 @@ import org.geotools.data.DataStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.geopkg.FeatureEntry;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.lasy.dwbk.db.DwbkGeoPackage;
 import com.lasy.dwbk.db.tables.BboxTable;
 import com.lasy.dwbk.db.tables.IDwbkTable;
 import com.lasy.dwbk.db.tables.LayerTable;
+import com.lasy.dwbk.util.Check;
+import com.lasy.dwbk.util.Is;
 
 /**
  * The framework makes sure that the {@link DwbkGeoPackage} exists with the basic configuration tables.
@@ -33,7 +33,7 @@ public class DwbkFramework implements AutoCloseable
   {
     String path = System.getenv(DB_FILE_DIRECTORY_ENV_NAME);
 
-    if (Strings.isNullOrEmpty(path))
+    if (Is.nullOrTrimmedEmpty(path))
     {
       String msg = String.format("Environment variable '%s' needs to be set!", DB_FILE_DIRECTORY_ENV_NAME);
       throw new IllegalStateException(msg);
@@ -68,7 +68,7 @@ public class DwbkFramework implements AutoCloseable
   
   private DwbkFramework(DwbkGeoPackage gpkg)
   {
-    this.gpkg = Preconditions.checkNotNull(gpkg);
+    this.gpkg = Check.notNull(gpkg, "gpkg");
     init();
   }
 

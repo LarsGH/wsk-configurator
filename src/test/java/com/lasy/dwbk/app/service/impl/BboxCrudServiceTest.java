@@ -1,6 +1,6 @@
 package com.lasy.dwbk.app.service.impl;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import org.assertj.core.api.Assertions;
@@ -11,8 +11,6 @@ import org.junit.Test;
 
 import com.lasy.dwbk.app.DwbkFramework;
 import com.lasy.dwbk.app.model.impl.BboxModel;
-import com.lasy.dwbk.app.service.impl.BboxCrudService;
-import com.lasy.dwbk.db.util.DwbkBigDecimal;
 
 /**
  * Testet {@link BboxCrudService}.
@@ -22,10 +20,10 @@ import com.lasy.dwbk.db.util.DwbkBigDecimal;
 public class BboxCrudServiceTest
 {
   private static final String EXPECTED_BBOX_DESCRIPTION = "Bbox description...";
-  private static final BigDecimal EXPECTED_BBOX_MIN_LON = DwbkBigDecimal.create("9.9");
-  private static final BigDecimal EXPECTED_BBOX_MIN_LAT = DwbkBigDecimal.create("1.1");
-  private static final BigDecimal EXPECTED_BBOX_MAX_LON = DwbkBigDecimal.create("99.9");
-  private static final BigDecimal EXPECTED_BBOX_MAX_LAT = DwbkBigDecimal.create("11.1");
+  private static final String EXPECTED_BBOX_MIN_LON = "9.99999";
+  private static final String EXPECTED_BBOX_MIN_LAT = "1.11111";
+  private static final String EXPECTED_BBOX_MAX_LON = "99.11111";
+  private static final String EXPECTED_BBOX_MAX_LAT = "11.99999";
 
   private static BboxCrudService sut;
   
@@ -77,18 +75,19 @@ public class BboxCrudServiceTest
   {
     BboxModel newBbox = sut.create(BboxModel.builder(name)
       .withDescription(EXPECTED_BBOX_DESCRIPTION)
-      .withMinLon(EXPECTED_BBOX_MIN_LON.toPlainString())
-      .withMinLat(EXPECTED_BBOX_MIN_LAT.toPlainString()) 
-      .withMaxLon(EXPECTED_BBOX_MAX_LON.toPlainString())
-      .withMaxLat(EXPECTED_BBOX_MAX_LAT.toPlainString()));
+      .withMinLon(EXPECTED_BBOX_MIN_LON)
+      .withMinLat(EXPECTED_BBOX_MIN_LAT) 
+      .withMaxLon(EXPECTED_BBOX_MAX_LON)
+      .withMaxLat(EXPECTED_BBOX_MAX_LAT));
     
     Assertions.assertThat(newBbox.getId()).isNotNull();
     Assertions.assertThat(newBbox.getName()).isEqualTo(name);
     Assertions.assertThat(newBbox.getDescription().get()).isEqualTo(EXPECTED_BBOX_DESCRIPTION);
-    Assertions.assertThat(newBbox.getMinLon()).isCloseTo(EXPECTED_BBOX_MIN_LON, DwbkBigDecimal.TEST_OFFSET);
-    Assertions.assertThat(newBbox.getMinLat()).isCloseTo(EXPECTED_BBOX_MIN_LAT, DwbkBigDecimal.TEST_OFFSET);
-    Assertions.assertThat(newBbox.getMaxLon()).isCloseTo(EXPECTED_BBOX_MAX_LON, DwbkBigDecimal.TEST_OFFSET);
-    Assertions.assertThat(newBbox.getMaxLat()).isCloseTo(EXPECTED_BBOX_MAX_LAT, DwbkBigDecimal.TEST_OFFSET);
+    Assertions.assertThat(newBbox.getMinLon()).isEqualTo(EXPECTED_BBOX_MIN_LON);
+    Assertions.assertThat(newBbox.getMinLat()).isEqualTo(EXPECTED_BBOX_MIN_LAT);
+    Assertions.assertThat(newBbox.getMaxLon()).isEqualTo(EXPECTED_BBOX_MAX_LON);
+    Assertions.assertThat(newBbox.getMaxLat()).isEqualTo(EXPECTED_BBOX_MAX_LAT);
+    Assertions.assertThat(newBbox.getLastChangedDate()).isEqualToIgnoringSeconds(LocalDateTime.now());
     
     return newBbox;
   }

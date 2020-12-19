@@ -14,6 +14,21 @@ public interface IDwbkTable
   String COL_ID = "fid";
   
   /**
+   * Standard name column name.
+   */
+  String COL_NAME = "name";
+  
+  /**
+   * Standard description column name.
+   */
+  String COL_DESCRIPTION = "description";
+  
+  /**
+   * Standard last changed column name.
+   */
+  String COL_LAST_CHANGED = "last_changed";
+  
+  /**
    * Returns the table name.
    * @return table name
    */

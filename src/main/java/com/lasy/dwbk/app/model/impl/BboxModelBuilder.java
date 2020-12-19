@@ -1,16 +1,12 @@
 package com.lasy.dwbk.app.model.impl;
 
-import java.math.BigDecimal;
-
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.db.tables.BboxTable;
 import com.lasy.dwbk.db.tables.IDwbkTable;
-import com.lasy.dwbk.db.util.DwbkBigDecimal;
+import com.lasy.dwbk.util.Check;
 
 public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
 {
@@ -18,18 +14,17 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
   
   private String name;
   private String description;
-  private BigDecimal minLon;
-  private BigDecimal minLat;
-  private BigDecimal maxLon;
-  private BigDecimal maxLat;
+  private String minLon;
+  private String minLat;
+  private String maxLon;
+  private String maxLat;
   
 //  private Point lowerLeft;
 //  private Point upperRight;
 
   protected BboxModelBuilder(String name)
   {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
-    this.name = name;
+    this.name = Check.trimmedNotEmpty(name, "name");
   }
   
   @Override
@@ -39,8 +34,6 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
     
     featureBuilder.set(BboxTable.COL_NAME, this.name);
     featureBuilder.set(BboxTable.COL_DESCRIPTION, this.description);
-//    featureBuilder.set(BboxTable.COL_LOWER_LEFT, this.lowerLeft);
-//    featureBuilder.set(BboxTable.COL_UPPER_RIGHT, this.upperRight);
     
     featureBuilder.set(BboxTable.COL_MIN_LON, this.minLon);
     featureBuilder.set(BboxTable.COL_MIN_LAT, this.minLat);
@@ -59,8 +52,7 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
    */
   public BboxModelBuilder withDescription(String description)
   {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(description));
-    this.description = description;
+    this.description = Check.trimmedNotEmpty(description, "desciption");
     return this;
   }
   
@@ -71,7 +63,7 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
    */
   public BboxModelBuilder withMinLon(String minLon)
   {
-    this.minLon = DwbkBigDecimal.create(minLon);
+    this.minLon = Check.validCoordinate(minLon, "minLon");
     return this;
   }
   
@@ -82,7 +74,7 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
    */
   public BboxModelBuilder withMinLat(String minLat)
   {
-    this.minLat = DwbkBigDecimal.create(minLat);
+    this.minLat = Check.validCoordinate(minLat, "minLat");
     return this;
   }
   
@@ -93,7 +85,7 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
    */
   public BboxModelBuilder withMaxLon(String maxLon)
   {
-    this.maxLon = DwbkBigDecimal.create(maxLon);
+    this.maxLon = Check.validCoordinate(maxLon, "maxLon");
     return this;
   }
   
@@ -104,41 +96,9 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
    */
   public BboxModelBuilder withMaxLat(String maxLat)
   {
-    this.maxLat = DwbkBigDecimal.create(maxLat);
+    this.maxLat = Check.validCoordinate(maxLat, "maxLat");
     return this;
   }
-  
-//  /**
-//   * Sets the lower left point.
-//   * @param lon longitude
-//   * @param lat latitude
-//   * @return builder
-//   */
-//  public BboxModelBuilder withLowerLeft(double lon, double lat)
-//  {
-//    this.lowerLeft = newPoint(lon, lat);
-//    return this;
-//  }
-//  
-//  /**
-//   * Sets the upper right point.
-//   * @param lon longitude
-//   * @param lat latitude
-//   * @return builder
-//   */
-//  public BboxModelBuilder withUpperRight(double lon, double lat)
-//  {
-//    this.upperRight = newPoint(lon, lat);
-//    return this;
-//  }
-//
-//  private Point newPoint(double lon, double lat)
-//  {
-//    Coordinate c = new Coordinate(lon, lat);
-//    Point p = new GeometryFactory()
-//      .createPoint(c);
-//    return p;
-//  }
   
   @Override
   public IDwbkTable getTable()

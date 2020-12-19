@@ -2,8 +2,7 @@ package com.lasy.dwbk.db.util;
 
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import com.lasy.dwbk.util.Check;
 
 public class DbRowAccess
 {
@@ -19,9 +18,9 @@ public class DbRowAccess
    */
   public static <T> T getValueElseNull(SimpleFeature feature, String columnLabel, Class<T> type)
   {
-    Preconditions.checkNotNull(feature);
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(columnLabel));
-    Preconditions.checkNotNull(type);
+    Check.notNull(feature, "feature");
+    Check.trimmedNotEmpty(columnLabel, "columnLabel");
+    Check.notNull(type, "type");
     
     try
     {
@@ -46,9 +45,9 @@ public class DbRowAccess
    */
   public static <T> T getMandatoryValue(SimpleFeature feature, String columnLabel, Class<T> type) throws IllegalStateException
   {
-    Preconditions.checkNotNull(feature);
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(columnLabel));
-    Preconditions.checkNotNull(type);
+    Check.notNull(feature, "feature");
+    Check.trimmedNotEmpty(columnLabel, "columnLabel");
+    Check.notNull(type, "type");
     
     Object value = feature.getAttribute(columnLabel);
     if(value == null)

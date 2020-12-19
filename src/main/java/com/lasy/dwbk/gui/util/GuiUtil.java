@@ -1,10 +1,13 @@
 package com.lasy.dwbk.gui.util;
 
-import com.google.common.base.Preconditions;
+import com.lasy.dwbk.util.Check;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -16,6 +19,8 @@ import javafx.scene.text.TextAlignment;
 
 public class GuiUtil
 {
+  
+  public static final double DEFAULT_SPACING = 10;
 
   /**
    * Returns the display value for the boolean. 
@@ -40,7 +45,7 @@ public class GuiUtil
    */
   public static Button createIconButtonWithText(Image icon, String tooltip, String txt)
   {
-    Preconditions.checkNotNull(icon);
+    Check.notNull(icon, "icon");
     
     Button btn = createTextButton(txt);
     btn.setGraphic(new ImageView(icon));
@@ -80,6 +85,29 @@ public class GuiUtil
     return btn;
   }
   
+  private static final double DEFAULT_LABEL_SIZE = 12;
+  
+  /**
+   * Creates a new bold label.
+   * @param txt the label text
+   * @return bold label
+   */
+  public static Label createBoldLabel(String txt)
+  {
+    Label lbl = new Label(txt);
+    lbl.setFont(Font.font(null, FontWeight.BOLD, DEFAULT_LABEL_SIZE));
+    return lbl;
+  }
+  
+  private static Label createBoldLabelWithSize(String txt, double size)
+  {
+    Label lbl = new Label(txt);
+    lbl.setFont(Font.font(null, FontWeight.BOLD, size));
+    return lbl;
+  }
+  
+  private static final double DEFAULT_HEADER_SIZE = 20;
+  
   /**
    * Creates a new Header.
    * 
@@ -88,14 +116,26 @@ public class GuiUtil
    */
   public static HBox createHeader(String txt)
   {
-    Label header = new Label(txt);
-    header.setFont(Font.font(null, FontWeight.BOLD, 20));
+    Label header = createBoldLabelWithSize(txt, DEFAULT_HEADER_SIZE);
     HBox box = new HBox(header);
     box.setAlignment(Pos.CENTER);
-    HBox.setMargin(header, new Insets(10));
+    HBox.setMargin(header, new Insets(DEFAULT_SPACING));
     return box;
   }
   
-  
+  /**
+   * Creates an alert with an OK-Option only.
+   * @param type alert type
+   * @param title alert title
+   * @param message alert message
+   * @return alert
+   */
+  public static Alert createOkAlert(AlertType type, String title, String message)
+  {
+    Alert alert = new Alert(type, message, ButtonType.OK);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    return alert;
+  }
   
 }

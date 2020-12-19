@@ -2,7 +2,7 @@ package com.lasy.dwbk.gui.util;
 
 import java.util.function.Function;
 
-import com.google.common.base.Preconditions;
+import com.lasy.dwbk.util.Check;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
@@ -21,7 +21,7 @@ public class ModelValueFactory<TModelType> implements Callback<CellDataFeatures<
   
   public ModelValueFactory(Function<TModelType, String> displayValueFunc)
   {
-    this.displayValueFunc = Preconditions.checkNotNull(displayValueFunc);
+    this.displayValueFunc = Check.notNull(displayValueFunc, "displayValueFunc");
   }
 
   @Override

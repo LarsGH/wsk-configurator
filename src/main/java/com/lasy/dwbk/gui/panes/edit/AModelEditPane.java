@@ -1,16 +1,22 @@
 package com.lasy.dwbk.gui.panes.edit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.lasy.dwbk.app.model.IGtModel;
 import com.lasy.dwbk.gui.panes.ADwbkPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
+import com.lasy.dwbk.util.Check;
 
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 /**
  * Adds standard buttons to the pane.
@@ -22,6 +28,7 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
 {
   
   private TModelType model;
+  private List<AttributeInputContainer<TModelType, ?, ?>> attributeContainers = new ArrayList<>();
 
   /**
    * Creates a new pane to create / edit models.
@@ -35,15 +42,42 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
     this.model = model;
     
     setBottom(createSaveCancelButtonBox());
+    doCreateAttributeInputContainers();
   }
   
+  @Override
+  public void init()
+  {
+    super.init();
+    
+    if(getModel() != null)
+    {
+      initAttributeContainerValues(getModel());
+    }
+  }
+  
+  /**
+   * Initializes the attribute container values.
+   * @param model the model to fetch the initial values.
+   */
+  private void initAttributeContainerValues(TModelType model)
+  {
+    for(AttributeInputContainer<TModelType, ?, ?> attributeContainer :  attributeContainers)
+    {
+      attributeContainer.initValueFromModel(model);
+    }
+  }
+
   private HBox createSaveCancelButtonBox()
   {
     
     Button saveBtn = GuiUtil.createIconButtonWithText(GuiIcon.SAVE, "Speichern", "Speichern");
     saveBtn.setOnAction(e -> {
-      handleSave();
-      goToOverviewPane();
+      boolean saveSuccessful = handleSave();
+      if(saveSuccessful)
+      {
+        goToOverviewPane();
+      }
     });
     
     Button cancelBtn = GuiUtil.createIconButtonWithText(GuiIcon.CANCEL, "Abbrechen", "Abbrechen");
@@ -51,47 +85,93 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
       goToOverviewPane();
     });
     
-    return new HBox(saveBtn, cancelBtn);
+    return new HBox(GuiUtil.DEFAULT_SPACING, saveBtn, cancelBtn);
+  }
+  
+  /**
+   * Returns the model
+   * @return the model
+   */
+  public TModelType getModel()
+  {
+    return this.model;
+  }
+  
+  /**
+   * Save the model.
+   * @return {@code true}, if saving was successful
+   */
+  private boolean handleSave()
+  {
+    if(hasInvalidUserInput())
+    {
+      showInvalidInputAlert();
+      return false;
+    }
+    else
+    {
+      if(getModel() == null)
+      {
+        doHandleCreateNewModel();
+      }
+      else
+      {
+        doHandleUpdateModel(getModel());
+      }
+      return true;
+    }
+  }
+  
+  private boolean hasInvalidUserInput()
+  {
+    boolean hasInvalidInput = false;
+    for(AttributeInputContainer<TModelType, ?, ?> container : attributeContainers)
+    {
+      // also generates error label content if invalid!
+      if(!container.isValid())
+      {
+        hasInvalidInput = true;
+      }
+    }
+    return hasInvalidInput;
+  }
+
+  private void showInvalidInputAlert()
+  {
+    Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Fehlerhafte Eingabe", "Bitte überprüfen Sie die Eingaben");
+    alert.show();
+  }
+  
+  @Override
+  protected Node createContent()
+  {
+    VBox box = new VBox(GuiUtil.DEFAULT_SPACING);
+    box.getChildren().addAll(attributeContainers);
+    box.setAlignment(Pos.TOP_LEFT);
+    return box;
   }
   
   /**
    * Switches to the overview pane.
    */
   protected abstract void goToOverviewPane();
-
+  
   /**
-   * Save the model.
+   * Initializes the input attribute containers. </p>
+   * Every container <b>needs to be added</b> using {@code AModelEditPane#addAttributeInputContainer(AttributeInputContainer)}.
+   * 
+   * @return input attribute containers
    */
-  protected void handleSave()
+  protected abstract void doCreateAttributeInputContainers();
+  
+  /**
+   * Adds the container.
+   * @param container attribute input container
+   */
+  protected void addAttributeInputContainer(AttributeInputContainer<TModelType, ?, ?> container)
   {
-    try
-    {
-      validateUserInput();
-    }
-    catch (IllegalArgumentException e)
-    {
-      showInvalidInputAlert();
-    }
-    
-    if(getModel() == null)
-    {
-      doHandleCreateNewModel();
-    }
-    else
-    {
-      doHandleUpdateModel(getModel());
-    }
-  }
-
-  private void showInvalidInputAlert()
-  {
-    Alert alert = new Alert(
-      AlertType.WARNING, 
-      "Bitte überprüfen Sie die Eingaben", 
-      ButtonType.YES, ButtonType.NO);
-    alert.setTitle("Invalide Eingaben");
-    alert.setHeaderText(null);
-    alert.show();
+    Check.notNull(container, "container");
+    this.attributeContainers.add(container);
   }
   
   /**
@@ -105,22 +185,5 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
    * Create new model using the CRUD service.
    */
   protected abstract void doHandleCreateNewModel();
-  
-  
-
-  /**
-   * Returns the model
-   * @return the model
-   */
-  public TModelType getModel()
-  {
-    return this.model;
-  }
-  
-  /**
-   * Validates the user input.
-   * @throws IllegalArgumentException if the user input is not valid
-   */
-  abstract void validateUserInput() throws IllegalArgumentException;
 
 }

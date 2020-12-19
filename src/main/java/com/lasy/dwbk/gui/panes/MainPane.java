@@ -18,11 +18,21 @@ import javafx.scene.layout.VBox;
 public class MainPane extends ADwbkPane
 {
   
+  /**
+   * Creates the main pane.
+   * @param mainScene the main scene
+   * @return main pane
+   */
+  public static MainPane create(Scene mainScene)
+  {
+    return createInitializedPane(new MainPane(mainScene));
+  }
+  
   private static final double BUTTON_WIDTH = 200;
 
-  public MainPane(Scene mainScene)
+  private MainPane(Scene mainScene)
   {
-    super(mainScene, "Übersicht");
+    super(mainScene, "Konfigurations-Übersicht");
   }
   
   @Override
@@ -38,7 +48,7 @@ public class MainPane extends ADwbkPane
       "Wechselt zur Layer-Übersicht",
       "Layer-Übersicht",
       e -> {
-        goToPane(new LayerOverviewPane(getMainScene()));
+        goToPane(LayerOverviewPane.create(getMainScene()));
       });
   }
   
@@ -49,7 +59,7 @@ public class MainPane extends ADwbkPane
       "Wechselt zur Boundingbox-Übersicht",
       "Boundingbox-Übersicht",
       e -> {
-        goToPane(new LayerOverviewPane(getMainScene()));
+        goToPane(LayerOverviewPane.create(getMainScene()));
       });
   }
   
@@ -79,7 +89,7 @@ public class MainPane extends ADwbkPane
   protected Node createContent()
   {
     VBox box = new VBox(
-      20,
+      GuiUtil.DEFAULT_SPACING,
       createGoToLayerOverviewButton(),
       createGoToBboxOverviewButton(),
       createInfoButton());

@@ -13,11 +13,15 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.lasy.dwbk.app.DwbkFramework;
-import com.lasy.dwbk.app.service.impl.ServiceTestSuite;
+import com.lasy.dwbk.app.service.ServiceTestSuite;
+import com.lasy.dwbk.db.DbTestSuite;
+import com.lasy.dwbk.validation.ValidationTestSuite;
 
 @RunWith(Suite.class)
 @SuiteClasses({
   ServiceTestSuite.class,
+  DbTestSuite.class,
+  ValidationTestSuite.class,
 })
 public class AllTests
 {

@@ -2,9 +2,9 @@ package com.lasy.dwbk.app;
 
 import org.geotools.data.DataStore;
 
-import com.google.common.base.Preconditions;
 import com.lasy.dwbk.app.service.impl.BboxCrudService;
 import com.lasy.dwbk.app.service.impl.LayerCrudService;
+import com.lasy.dwbk.util.Check;
 
 /**
  * Provides services. Needs to be initialized at startup!
@@ -34,7 +34,7 @@ public class DwbkServiceProvider
   
   protected DwbkServiceProvider(DataStore store)
   {
-    Preconditions.checkNotNull(store);
+    Check.notNull(store, "store");
     registerServices(store);
   }
 

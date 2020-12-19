@@ -73,15 +73,15 @@ public class DwbkAppInfo
 
     Label iconCreator = new Label("Icon-Ersteller: Freepik");
     Button iconCreatorBtn = createBrowseButton("Öffnet die Seite des Icon-Erstellers", ICON_CREATOR_URL);
-    HBox iconCreatorInfo = new HBox(10, iconCreatorBtn, iconCreator);
+    HBox iconCreatorInfo = new HBox(GuiUtil.DEFAULT_SPACING, iconCreatorBtn, iconCreator);
     iconCreatorInfo.setAlignment(Pos.CENTER_LEFT);
 
     Label iconSite = new Label("Icon-Plattform: Flaticon.com");
     Button iconSiteBtn = createBrowseButton("Öffnet die Seite der Icon-Plattform", ICON_SITE_URL);
-    HBox iconSiteInfo = new HBox(10, iconSiteBtn, iconSite);
+    HBox iconSiteInfo = new HBox(GuiUtil.DEFAULT_SPACING, iconSiteBtn, iconSite);
     iconSiteInfo.setAlignment(Pos.CENTER_LEFT);
 
-    return new VBox(10, header, versionInfo, iconCreatorInfo, iconSiteInfo);
+    return new VBox(GuiUtil.DEFAULT_SPACING, header, versionInfo, iconCreatorInfo, iconSiteInfo);
   }
 
   private static Button createBrowseButton(String toolTip, String site)
@@ -111,8 +111,7 @@ public class DwbkAppInfo
     }
 
     String msg = String.format("Das Öffnen der Seite (%s) wird nicht unterstützt!", site);
-    Alert alert = new Alert(AlertType.WARNING, msg, ButtonType.OK);
-    alert.setHeaderText(null);
+    Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Funktion nicht unterstützt", msg);
     alert.show();
   }
 

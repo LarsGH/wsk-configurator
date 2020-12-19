@@ -27,10 +27,9 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.FeatureId;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.lasy.dwbk.app.model.IGtModel;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
+import com.lasy.dwbk.util.Check;
 
 public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends IGtModelBuilder<TModel>> implements IDwbkCrudService<TModel, TBuilder>
 {
@@ -44,9 +43,8 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
    */
   public ADwbkCrudService(DataStore store, String tableName)
   {
-    this.store = Preconditions.checkNotNull(store); 
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(tableName));
-    this.tableName = tableName;
+    this.store = Check.notNull(store, "store"); 
+    this.tableName = Check.trimmedNotEmpty(tableName, "tableName");
   }
   
   @Override
@@ -119,10 +117,11 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
   @Override
   public TModel create(TBuilder builder)
   {
-    Preconditions.checkNotNull(builder);
+    Check.notNull(builder, "builder");
     try
     {
       TModel model = builder.build();
+      model.updateLastChangedDate();
       SimpleFeature feature = model.getFeature();
       doCreate(feature);
 
@@ -167,7 +166,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
   @Override
   public TModel update(TModel model)
   {
-    Preconditions.checkNotNull(model);
+    Check.notNull(model, "model");
     
     try
     {
@@ -189,6 +188,9 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
       SimpleFeatureStore featureStore = getSimpleFeatureStore();
       featureStore.setTransaction(transaction);
 
+      // update changed date
+      model.updateLastChangedDate();
+      
       Map<Name, Object> attributes = getAttributes(model);
       List<Name> attributeNames = new ArrayList<Name>();
       List<Object> attributeValues = new ArrayList<Object>();

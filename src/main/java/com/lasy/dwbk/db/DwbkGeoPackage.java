@@ -12,8 +12,7 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.geopkg.GeoPackage;
 import org.geotools.geopkg.GeoPkgDataStoreFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.lasy.dwbk.util.Check;
 
 /**
  * Access to the project GPKG file.
@@ -62,7 +61,7 @@ public class DwbkGeoPackage implements AutoCloseable
 
   private DwbkGeoPackage(File gpkgFile)
   {
-    Preconditions.checkNotNull(gpkgFile);
+    Check.notNull(gpkgFile, "gpkgFile");
     // TODO: wahrscheinlich anderer Konstruktor erforderlich?! GeoPackage(File file, SQLiteConfig config, Map<String, Object> storeParams)
     try
     {
@@ -134,7 +133,7 @@ public class DwbkGeoPackage implements AutoCloseable
     try
     {
       String[] typeNames = getDataStore().getTypeNames();
-      return Lists.newArrayList(typeNames);
+      return List.of(typeNames);
     }
     catch (Exception e)
     {

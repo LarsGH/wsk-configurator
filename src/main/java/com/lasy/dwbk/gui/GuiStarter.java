@@ -13,12 +13,11 @@ import javafx.stage.Stage;
 public class GuiStarter extends Application
 {
 
-  // TODO: Attributions! - siehe icon_attributions.txt
   @Override
   public void start(Stage stage) 
   {    
     Scene scene = new Scene(new BorderPane(), 640, 480);
-    MainPane mainPane = new MainPane(scene);
+    MainPane mainPane = MainPane.create(scene);
     scene.setRoot(mainPane);
 
     stage.setTitle("Waldbrandkarte Konfiguration");
@@ -30,7 +29,6 @@ public class GuiStarter extends Application
 
   public static void main(String[] args)
   {
-    System.out.println("hello world!");
     try (DwbkFramework framework = DwbkFramework.getInstance())
     {
       DwbkGeoPackage tmGpkg = framework.getGeoPackage();

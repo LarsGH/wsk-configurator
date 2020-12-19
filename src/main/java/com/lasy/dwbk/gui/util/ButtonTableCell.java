@@ -3,7 +3,7 @@ package com.lasy.dwbk.gui.util;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.google.common.base.Preconditions;
+import com.lasy.dwbk.util.Check;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -23,7 +23,7 @@ public class ButtonTableCell<TModelType> extends TableCell<TModelType, Button> {
   private final Button actionButton;
 
   private ButtonTableCell(Button button, Consumer<TModelType> modelConsumer) {
-      this.actionButton = Preconditions.checkNotNull(button);
+      this.actionButton = Check.notNull(button, "button");
       this.actionButton.setOnAction(e -> {
           modelConsumer.accept(getCurrentItem());
       });
