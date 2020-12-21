@@ -1,4 +1,4 @@
-package com.lasy.dwbk.gui.panes.edit;
+package com.lasy.dwbk.gui.panes.edit.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import javafx.scene.Node;
  * @param <TGuiElement> GUI element type (e.g. TextField)
  * @param <TModelAttribute> expected model attribute type
  */
-public class AttributeInputContainerBuilder<TModel extends IGtModel, TGuiElement extends Node, TModelAttribute> 
+public class AttributeInputContainerBuilder<TModel extends IGtModel, TGuiElement extends Node, TModelAttribute extends Object> 
 {
 
   protected String attributeDisplayName;

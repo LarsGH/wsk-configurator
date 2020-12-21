@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.lasy.dwbk.app.model.IGtModel;
 import com.lasy.dwbk.gui.panes.ADwbkPane;
+import com.lasy.dwbk.gui.panes.edit.util.AttributeInputContainer;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 import com.lasy.dwbk.util.Check;
@@ -41,7 +42,6 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
     super(mainScene, header);
     this.model = model;
     
-    setBottom(createSaveCancelButtonBox());
     doCreateAttributeInputContainers();
   }
   
@@ -85,7 +85,9 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
       goToOverviewPane();
     });
     
-    return new HBox(GuiUtil.DEFAULT_SPACING, saveBtn, cancelBtn);
+    HBox box = new HBox(GuiUtil.DEFAULT_SPACING, saveBtn, cancelBtn);
+    box.setAlignment(Pos.CENTER_RIGHT);
+    return box;
   }
   
   /**
@@ -143,7 +145,13 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
   }
   
   @Override
-  protected Node createContent()
+  protected Node createBottomContent()
+  {
+    return createSaveCancelButtonBox();
+  }
+  
+  @Override
+  protected Node createCenterContent()
   {
     VBox box = new VBox(GuiUtil.DEFAULT_SPACING);
     box.getChildren().addAll(attributeContainers);

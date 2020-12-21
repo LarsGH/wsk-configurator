@@ -24,6 +24,7 @@ public class BboxCrudServiceTest
   private static final String EXPECTED_BBOX_MIN_LAT = "1.11111";
   private static final String EXPECTED_BBOX_MAX_LON = "99.11111";
   private static final String EXPECTED_BBOX_MAX_LAT = "11.99999";
+  private static final int EXPECTED_BBOX_EPSG = 4326;
 
   private static BboxCrudService sut;
   
@@ -44,6 +45,7 @@ public class BboxCrudServiceTest
     
     boxA.setName("changedName");
     boxA.setDescription("changedDescription");
+    boxA.setEpsg(25832);
     
     // save
     sut.update(boxA);
@@ -75,6 +77,7 @@ public class BboxCrudServiceTest
   {
     BboxModel newBbox = sut.create(BboxModel.builder(name)
       .withDescription(EXPECTED_BBOX_DESCRIPTION)
+      .withEpsg(EXPECTED_BBOX_EPSG)
       .withMinLon(EXPECTED_BBOX_MIN_LON)
       .withMinLat(EXPECTED_BBOX_MIN_LAT) 
       .withMaxLon(EXPECTED_BBOX_MAX_LON)
@@ -83,6 +86,7 @@ public class BboxCrudServiceTest
     Assertions.assertThat(newBbox.getId()).isNotNull();
     Assertions.assertThat(newBbox.getName()).isEqualTo(name);
     Assertions.assertThat(newBbox.getDescription().get()).isEqualTo(EXPECTED_BBOX_DESCRIPTION);
+    Assertions.assertThat(newBbox.getEpsg()).isEqualTo(EXPECTED_BBOX_EPSG);
     Assertions.assertThat(newBbox.getMinLon()).isEqualTo(EXPECTED_BBOX_MIN_LON);
     Assertions.assertThat(newBbox.getMinLat()).isEqualTo(EXPECTED_BBOX_MIN_LAT);
     Assertions.assertThat(newBbox.getMaxLon()).isEqualTo(EXPECTED_BBOX_MAX_LON);

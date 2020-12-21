@@ -1,5 +1,7 @@
 package com.lasy.dwbk.db.tables;
 
+import java.io.InputStream;
+
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
@@ -11,7 +13,7 @@ public interface IDwbkTable
   /**
    * Default ID column name.
    */
-  String COL_ID = "fid";
+  String COL_ID = "id";
   
   /**
    * Standard name column name.
@@ -33,6 +35,12 @@ public interface IDwbkTable
    * @return table name
    */
   String getTableName();
+  
+  /**
+   * Returns the InputStream for the table create resource file.
+   * @return InputStream for the table create resource file
+   */
+  InputStream getCreateScriptInputStream();
   
   
   /**

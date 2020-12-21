@@ -6,7 +6,7 @@ public class GuiIcon
 {
 
   /** Create icon. */
-  public static final Image CREATE = createIcon("create_24.png");
+  public static final Image CREATE = createIcon("magic-wand_24.png");
   
   /** Edit icon. */
   public static final Image EDIT = createIcon("edit_24.png");

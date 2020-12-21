@@ -62,11 +62,9 @@ public class DwbkGeoPackage implements AutoCloseable
   private DwbkGeoPackage(File gpkgFile)
   {
     Check.notNull(gpkgFile, "gpkgFile");
-    // TODO: wahrscheinlich anderer Konstruktor erforderlich?! GeoPackage(File file, SQLiteConfig config, Map<String, Object> storeParams)
     try
     {
       gpkg = new GeoPackage(gpkgFile);
-      // TODO: init notwendig?!
       gpkg.init();
       
       dataStore = createDatastore(gpkg);

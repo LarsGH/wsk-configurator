@@ -64,19 +64,19 @@ public class CoordinateValidatorTest
    * Tests the validation.
    */
   @Test
-  public void testIsNotValidWithCharacters()
+  public void testIsValidWithLeadingDecimalPoint()
   {
-    boolean isValid = sut.isValid("abc");
-    Assertions.assertThat(isValid).isFalse();
+    boolean isValid = sut.isValid(".42");
+    Assertions.assertThat(isValid).isTrue();
   }
   
   /**
    * Tests the validation.
    */
   @Test
-  public void testIsNotValidWithLeadingDecimalPoint()
+  public void testIsNotValidWithCharacters()
   {
-    boolean isValid = sut.isValid(".42");
+    boolean isValid = sut.isValid("abc");
     Assertions.assertThat(isValid).isFalse();
   }
   
@@ -88,5 +88,35 @@ public class CoordinateValidatorTest
   {
     boolean isValid = sut.isValid("1.2.3");
     Assertions.assertThat(isValid).isFalse();
+  }
+  
+  /**
+   * Tests the replacement.
+   */
+  @Test
+  public void testReplaceInputWithNull()
+  {
+    String replaced = sut.replaceInput(null);
+    Assertions.assertThat(replaced).isNull();
+  }
+  
+  /**
+   * Tests the replacement.
+   */
+  @Test
+  public void testReplaceInputWithComma()
+  {
+    String replaced = sut.replaceInput("4,2");
+    Assertions.assertThat(replaced).isEqualTo("4.2");
+  }
+  
+  /**
+   * Tests the replacement.
+   */
+  @Test
+  public void testReplaceInputWithLeadingPoint()
+  {
+    String replaced = sut.replaceInput(".42");
+    Assertions.assertThat(replaced).isEqualTo("0.42");
   }
 }

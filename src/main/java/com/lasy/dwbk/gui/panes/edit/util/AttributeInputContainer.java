@@ -1,20 +1,26 @@
-package com.lasy.dwbk.gui.panes.edit;
+package com.lasy.dwbk.gui.panes.edit.util;
 
 import java.util.Optional;
 
 import com.lasy.dwbk.app.model.IGtModel;
+import com.lasy.dwbk.gui.panes.ADwbkMarginPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 import com.lasy.dwbk.util.Check;
 import com.lasy.dwbk.util.Is;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
@@ -27,7 +33,7 @@ import javafx.scene.paint.Color;
  * @param <TModelAttribute> expected model attribute type
  */
 public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extends Node, TModelAttribute> 
-  extends BorderPane
+  extends ADwbkMarginPane
 {
   
   private final AttributeInputContainerBuilder<TModel, TGuiElement, TModelAttribute> builder;
@@ -58,15 +64,48 @@ public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extend
   private void initContainer()
   {
     HBox nameAndInfoBox = createNameAndOptionalInfoBox();
-    setTop(nameAndInfoBox);
+    setTopWithMargin(nameAndInfoBox, createInsets());
     
     TGuiElement guiElement = builder.guiElement;
-    setCenter(guiElement);
+    setCenterWithMargin(guiElement, createInsets());
     setAlignment(guiElement, Pos.CENTER_LEFT);
     
-    this.errorLbl = GuiUtil.createBoldLabel(null);
-    errorLbl.setTextFill(Color.RED);
-    setBottom(errorLbl);
+    this.errorLbl = createErrorLabel();
+    
+    setBorder(createBorder());
+  }
+  
+  private void setErrorVisible(boolean isVisible)
+  {
+    if(isVisible)
+    {
+      setBottomWithMargin(errorLbl, createInsets());
+    }
+    else
+    {
+      setBottom(null);
+    }
+  }
+  
+  private Insets createInsets()
+  {
+    return new Insets(4);
+  }
+
+  private Border createBorder()
+  {
+    CornerRadii radii = new CornerRadii(10);
+    BorderWidths width = new BorderWidths(2);
+    BorderStroke borderStroke = new BorderStroke(Color.DARKGREY, BorderStrokeStyle.SOLID, radii, width);
+    Border border = new Border(borderStroke);
+    return border;
+  }
+  
+  private Label createErrorLabel()
+  {
+    Label lbl = GuiUtil.createBoldLabel(null);
+    lbl.setTextFill(Color.RED);
+    return lbl;
   }
   
   private HBox createNameAndOptionalInfoBox()
@@ -79,7 +118,7 @@ public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extend
     if(!Is.nullOrTrimmedEmpty(infoAlertMessage))
     {
       Button btn = createInfoButton(infoAlertMessage);
-      box.getChildren().add(btn);
+      box.getChildren().add(0, btn);
     }
     
     return box;
@@ -108,7 +147,13 @@ public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extend
    * Validates the current configuration.
    * If the configuration is invalid an error message will be set on the error label.
    */
-  public void validate()
+  private void validate()
+  {
+    setError();
+    setErrorVisible(hasError());
+  }
+
+  private void setError()
   {
     TModelAttribute configuredValue = getConfiguredValue();
     
@@ -123,6 +168,12 @@ public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extend
     errorLbl.setText(error);
   }
   
+  private boolean hasError()
+  {
+    String error = errorLbl.getText();
+    return !Is.nullOrTrimmedEmpty(error);
+  }
+  
   /**
    * Returns if the current configuration is valid.
    * @return {@code true} if the configuration is valid
@@ -130,8 +181,7 @@ public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extend
   public boolean isValid()
   {
     validate();
-    String error = errorLbl.getText();
-    return Is.nullOrTrimmedEmpty(error);
+    return !hasError();
   }
   
   /**

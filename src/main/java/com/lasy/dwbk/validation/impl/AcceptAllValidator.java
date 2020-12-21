@@ -15,4 +15,10 @@ public class AcceptAllValidator implements IUserInputValidator
     return true;
   }
 
+  @Override
+  public String replaceInput(String input)
+  {
+    return input;
+  }
+
 }

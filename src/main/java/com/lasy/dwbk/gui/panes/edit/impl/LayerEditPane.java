@@ -1,15 +1,20 @@
-package com.lasy.dwbk.gui.panes.edit;
+package com.lasy.dwbk.gui.panes.edit.impl;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.model.impl.LayerModelBuilder;
 import com.lasy.dwbk.app.service.impl.LayerCrudService;
-import com.lasy.dwbk.gui.panes.overview.LayerOverviewPane;
+import com.lasy.dwbk.db.util.DbPasswordModifier;
+import com.lasy.dwbk.gui.panes.edit.AModelEditPane;
+import com.lasy.dwbk.gui.panes.edit.util.AttributeInputContainer;
+import com.lasy.dwbk.gui.panes.edit.util.BboxComboBox;
+import com.lasy.dwbk.gui.panes.overview.impl.LayerOverviewPane;
 import com.lasy.dwbk.gui.util.AttributeInputValidator;
 import com.lasy.dwbk.gui.util.PatternTextField;
 
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 public class LayerEditPane extends AModelEditPane<LayerModel>
@@ -30,7 +35,9 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   private AttributeInputContainer<LayerModel, TextField, String> attrDescription;
   private AttributeInputContainer<LayerModel, TextField, String> attrUri;
   private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrStoreLocal;
-  private AttributeInputContainer<LayerModel, BboxSelectionContainer, Integer> attrBboxId;
+  private AttributeInputContainer<LayerModel, BboxComboBox, Integer> attrBboxId;
+  private AttributeInputContainer<LayerModel, TextField, String> attrUser;
+  private AttributeInputContainer<LayerModel, TextField, String> attrPw;
   
   /**
    * Layer create / edit GUI.
@@ -50,6 +57,8 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     model.setUri(attrUri.getConfiguredValue());
     model.setStoreLocal(attrStoreLocal.getConfiguredValue());
     model.setBboxId(attrBboxId.getConfiguredValue());
+    model.setUser(attrUser.getConfiguredValue());
+    model.setPw(DbPasswordModifier.toDbValue(attrPw.getConfiguredValue()));
     
     layerService().update(model);
   }
@@ -67,6 +76,8 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     builder.withUri(attrUri.getConfiguredValue());
     builder.withStoreLocal(attrStoreLocal.getConfiguredValue());
     builder.withBboxId(attrBboxId.getConfiguredValue());
+    builder.withUser(attrUser.getConfiguredValue());
+    builder.withPassword(DbPasswordModifier.toDbValue(attrPw.getConfiguredValue()));
     
     layerService().create(builder);
   }
@@ -95,17 +106,47 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     
     this.attrBboxId = createAttrBbox();
     addAttributeInputContainer(attrBboxId);
+    
+    this.attrUser = createAttrUser();
+    addAttributeInputContainer(attrUser);
+    
+    this.attrPw = createAttrPw();
+    addAttributeInputContainer(attrPw);
   }
   
-  private AttributeInputContainer<LayerModel, BboxSelectionContainer, Integer> createAttrBbox()
+  private AttributeInputContainer<LayerModel, TextField, String> createAttrPw()
   {
-    return AttributeInputContainer.<LayerModel, BboxSelectionContainer, Integer>builer("Layer-Begrenzung")
-      .withGuiElement(new BboxSelectionContainer())
-      .withGuiValueInitialization((bboxContainer, layer) -> {
-        bboxContainer.setSelectedBboxById(layer.getBboxId().orElse(null));
+    return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Benutzername")
+      .withGuiElement(new PasswordField())
+      .withGuiValueInitialization((txtField, layer) -> {
+        txtField.setText(layer.getPw().orElse(null));
       })
-      .withGuiElementToModelAttributeFunc(BboxSelectionContainer::getSelectedBboxId)
-      .withInfoAlertMessage("Diese Funktion macht insbesondere Sinn um die Datenmenge zu begrenzen, "
+      .withGuiElementToModelAttributeFunc(TextField::getText)
+      .withInfoAlertMessage("Das Login-Passwort zur Layer-Abfrage.")
+      .build();
+  }
+  
+  private AttributeInputContainer<LayerModel, TextField, String> createAttrUser()
+  {
+    return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Benutzername")
+      .withGuiElement(PatternTextField.createAcceptAllTextField())
+      .withGuiValueInitialization((txtField, layer) -> {
+        txtField.setText(layer.getUser().orElse(null));
+      })
+      .withGuiElementToModelAttributeFunc(TextField::getText)
+      .withInfoAlertMessage("Der Login-Benutzername zur Layer-Abfrage.")
+      .build();
+  }
+  
+  private AttributeInputContainer<LayerModel, BboxComboBox, Integer> createAttrBbox()
+  {
+    return AttributeInputContainer.<LayerModel, BboxComboBox, Integer>builer("Layer-Begrenzung")
+      .withGuiElement(new BboxComboBox())
+      .withGuiValueInitialization((comboBox, layer) -> {
+        comboBox.setSelectedBboxById(layer.getBboxId().orElse(null));
+      })
+      .withGuiElementToModelAttributeFunc(BboxComboBox::getSelectedBboxId)
+      .withInfoAlertMessage("Die Auswahl einer Boundingbox macht insbesondere Sinn um die Datenmenge zu begrenzen "
         + "wenn der Layer lokal gespeichert werden soll.")
       .build();
   }
@@ -133,7 +174,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
       // TODO: URI Logik bestimmen - hier anpassen
       .withInfoAlertMessage("Über die URI muss eine getCapabilities-Abfrage auf dem Dienst möglich sein!")
       // TODO: weiterer Validator für URI Format! - abstimmen mit info alert
-      .withInputValidationError(AttributeInputValidator.MANDATORY_STRING)
+      .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
       .build();
   }
 
@@ -148,6 +189,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
       .build();
   }
 
+  // TODO: Anpassung des namens problematisch für lokal gespeicherte layer!
   private AttributeInputContainer<LayerModel, TextField, String> createAttrName()
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Layer-Name")
@@ -156,7 +198,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
         txtField.setText(layer.getName());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
-      .withInputValidationError(AttributeInputValidator.MANDATORY_STRING)
+      .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
       .build();
   }
 

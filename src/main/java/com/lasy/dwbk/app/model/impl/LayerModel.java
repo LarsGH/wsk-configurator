@@ -6,8 +6,9 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.AGtModel;
-import com.lasy.dwbk.db.tables.LayerTable;
+import com.lasy.dwbk.db.tables.impl.LayerTable;
 import com.lasy.dwbk.db.util.DbBoolean;
+import com.lasy.dwbk.db.util.DbPasswordModifier;
 import com.lasy.dwbk.db.util.DbRowAccess;
 import com.lasy.dwbk.util.Check;
 
@@ -34,7 +35,7 @@ public class LayerModel extends AGtModel
 
   public String getUri()
   {
-    String name = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_NAME, String.class);
+    String name = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_URI, String.class);
     return name;
   }
 
@@ -105,7 +106,7 @@ public class LayerModel extends AGtModel
   public Optional<String> getPw()
   {
     String pw = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_PW, String.class);
-    return Optional.ofNullable(pw);
+    return Optional.ofNullable(DbPasswordModifier.fromDbValue(pw));
   }
 
   public void setPw(String pw)

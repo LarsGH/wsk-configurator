@@ -3,7 +3,7 @@ package com.lasy.dwbk.app.model.impl;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.lasy.dwbk.app.model.AGtModel;
-import com.lasy.dwbk.db.tables.BboxTable;
+import com.lasy.dwbk.db.tables.impl.BboxTable;
 import com.lasy.dwbk.db.util.DbRowAccess;
 import com.lasy.dwbk.util.Check;
 
@@ -27,6 +27,17 @@ public class BboxModel extends AGtModel
   public BboxModel(SimpleFeature feature)
   {
     super(feature);
+  }
+  
+  public int getEpsg()
+  {
+    Integer val = DbRowAccess.getMandatoryValue(getFeature(), BboxTable.EPSG, Integer.class);
+    return val;
+  }
+
+  public void setEpsg(int epsg)
+  {
+    this.getFeature().setAttribute(BboxTable.EPSG, epsg);
   }
 
   public String getMinLon()
@@ -70,7 +81,7 @@ public class BboxModel extends AGtModel
 
   public void setMaxLat(String maxLat)
   {
-    this.getFeature().setAttribute(BboxTable.COL_MAX_LON, maxLat);
+    this.getFeature().setAttribute(BboxTable.COL_MAX_LAT, maxLat);
   }
   
   @Override
@@ -80,10 +91,11 @@ public class BboxModel extends AGtModel
       ? " (" + getDescription().get() + ") "
       : "";
     
-    return String.format("BBox-%s: %s%s [lowerLeft (%s | %s) | upperRight (%s | %s)]",
+    return String.format("BBox-%s: %s%s [EPSG(%s): lowerLeft (%s | %s) | upperRight (%s | %s)]",
       getId(),
       getName(),
       description,
+      getEpsg(),
       getMinLon(),
       getMinLat(),
       getMaxLon(),

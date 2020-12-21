@@ -1,7 +1,9 @@
 package com.lasy.dwbk.gui;
 
+import java.util.logging.Level;
+
 import com.lasy.dwbk.app.DwbkFramework;
-import com.lasy.dwbk.db.DwbkGeoPackage;
+import com.lasy.dwbk.app.DwbkFrameworkException;
 import com.lasy.dwbk.gui.panes.MainPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
 
@@ -31,11 +33,20 @@ public class GuiStarter extends Application
   {
     try (DwbkFramework framework = DwbkFramework.getInstance())
     {
-      DwbkGeoPackage tmGpkg = framework.getGeoPackage();
-
-      System.out.println("Available tables: " + tmGpkg.getAvailableTableNames());
-
       Application.launch();
+    }
+    catch (DwbkFrameworkException e)
+    {
+      // TODO: In file Loggen!
+      
+      // TODO: Neue Umgebungsvariable Framework Log-Level!
+      
+      // TODO: Alert mit Fehlermeldung!
+      
+      if(e.hasLevel(Level.SEVERE))
+      {
+        System.exit(-1);
+      }
     }
     catch (Exception e)
     {

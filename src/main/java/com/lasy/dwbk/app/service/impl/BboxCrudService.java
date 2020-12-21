@@ -8,7 +8,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.lasy.dwbk.app.model.impl.BboxModel;
 import com.lasy.dwbk.app.model.impl.BboxModelBuilder;
 import com.lasy.dwbk.app.service.ADwbkCrudService;
-import com.lasy.dwbk.db.tables.BboxTable;
+import com.lasy.dwbk.db.tables.impl.BboxTable;
 
 /**
  * CRUD service for boundingboxes.

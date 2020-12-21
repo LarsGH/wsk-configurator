@@ -8,7 +8,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.model.impl.LayerModelBuilder;
 import com.lasy.dwbk.app.service.ADwbkCrudService;
-import com.lasy.dwbk.db.tables.LayerTable;
+import com.lasy.dwbk.db.tables.impl.LayerTable;
 
 /**
  * CRUD service for layers.

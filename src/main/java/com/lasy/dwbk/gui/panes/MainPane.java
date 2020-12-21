@@ -1,7 +1,8 @@
 package com.lasy.dwbk.gui.panes;
 
 import com.lasy.dwbk.gui.info.DwbkAppInfo;
-import com.lasy.dwbk.gui.panes.overview.LayerOverviewPane;
+import com.lasy.dwbk.gui.panes.overview.impl.BboxOverviewPane;
+import com.lasy.dwbk.gui.panes.overview.impl.LayerOverviewPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 
@@ -59,7 +60,7 @@ public class MainPane extends ADwbkPane
       "Wechselt zur Boundingbox-Übersicht",
       "Boundingbox-Übersicht",
       e -> {
-        goToPane(LayerOverviewPane.create(getMainScene()));
+        goToPane(BboxOverviewPane.create(getMainScene()));
       });
   }
   
@@ -86,7 +87,7 @@ public class MainPane extends ADwbkPane
   }
 
   @Override
-  protected Node createContent()
+  protected Node createCenterContent()
   {
     VBox box = new VBox(
       GuiUtil.DEFAULT_SPACING,
@@ -98,8 +99,14 @@ public class MainPane extends ADwbkPane
     
     return box;
   }
+
+  @Override
+  protected Node createBottomContent()
+  {
+    return null;
+  }
   
-  // TODO: HInweis ungespeicherte Aenderungen + Speichern
+  // TODO: HInweis ungespeicherte Aenderungen + Speichern button
   
 
 }

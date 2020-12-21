@@ -98,9 +98,10 @@ public class LayerCrudServiceTest
 
   private LayerModel assertThatLayerIsCreatedWithExpectedContent(String name)
   {
+    String expectedUri = EXPECTED_LAYER_URI + "_" + name;
     LayerModel newLayer = sut.create(LayerModel.builder(name)
       .withDescription(EXPECTED_LAYER_DESCRIPTION)
-      .withUri(EXPECTED_LAYER_URI)
+      .withUri(expectedUri)
       .withStoreLocal(EXPECTED_STORE_LOCAL)
       .withIsSaved(EXPECTED_IS_SAVED)
       .withBboxId(bbox.getId())
@@ -110,10 +111,12 @@ public class LayerCrudServiceTest
     Assertions.assertThat(newLayer.getId()).isNotNull();
     Assertions.assertThat(newLayer.getName()).isEqualTo(name);
     Assertions.assertThat(newLayer.getDescription().get()).isEqualTo(EXPECTED_LAYER_DESCRIPTION);
+    Assertions.assertThat(newLayer.getUri()).isEqualTo(expectedUri);
     Assertions.assertThat(newLayer.isStoreLocal()).isTrue();
     Assertions.assertThat(newLayer.isSaved()).isTrue();
     Assertions.assertThat(newLayer.getUser().get()).isEqualTo(EXPECTED_USER);
     Assertions.assertThat(newLayer.getPw().get()).isEqualTo(EXPECTED_PW);
+    Assertions.assertThat(newLayer.getBboxId().get()).isEqualTo(bbox.getId());
     Assertions.assertThat(newLayer.getLastChangedDate()).isEqualToIgnoringSeconds(LocalDateTime.now());
     
     return newLayer;

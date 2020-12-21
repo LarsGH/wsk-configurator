@@ -5,7 +5,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.db.tables.IDwbkTable;
-import com.lasy.dwbk.db.tables.LayerTable;
+import com.lasy.dwbk.db.tables.impl.LayerTable;
 import com.lasy.dwbk.db.util.DbBoolean;
 import com.lasy.dwbk.util.Check;
 
@@ -26,7 +26,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   {
     this.name = Check.trimmedNotEmpty(name, "name");
     this.storeLocal = false;
-    this.isSaved = false;
+    this.isSaved = true;
   }
   
   @Override
@@ -97,7 +97,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
    * @param bboxId ID of the boundingbox entry to reference
    * @return builder
    */
-  public LayerModelBuilder withBboxId(int bboxId)
+  public LayerModelBuilder withBboxId(Integer bboxId)
   {
     this.bboxId = bboxId;
     return this;

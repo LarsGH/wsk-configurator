@@ -1,18 +1,17 @@
 package com.lasy.dwbk.app;
 
-import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.data.DataStore;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.geopkg.FeatureEntry;
+import org.geotools.jdbc.util.SqlUtil;
 
 import com.lasy.dwbk.db.DwbkGeoPackage;
-import com.lasy.dwbk.db.tables.BboxTable;
 import com.lasy.dwbk.db.tables.IDwbkTable;
-import com.lasy.dwbk.db.tables.LayerTable;
+import com.lasy.dwbk.db.tables.impl.BboxTable;
+import com.lasy.dwbk.db.tables.impl.LayerTable;
 import com.lasy.dwbk.util.Check;
 import com.lasy.dwbk.util.Is;
 
@@ -82,33 +81,32 @@ public class DwbkFramework implements AutoCloseable
   private void createConfigTables(DwbkGeoPackage gpkg)
   {
     List<String> availableTableNames = gpkg.getAvailableTableNames();
-    if ( !availableTableNames.contains(LayerTable.TABLE_NAME))
-    {
-      LayerTable table = new LayerTable();
-      createConfigTable(gpkg.getDataStore(), table);
-    }
-
     if ( !availableTableNames.contains(BboxTable.TABLE_NAME))
     {
       BboxTable table = new BboxTable();
-      createConfigTable(gpkg.getDataStore(), table);
+      createConfigTable(gpkg, table);
+    }
+    
+    if ( !availableTableNames.contains(LayerTable.TABLE_NAME))
+    {
+      LayerTable table = new LayerTable();
+      createConfigTable(gpkg, table);
     }
   }
 
-  private void createConfigTable(DataStore store, IDwbkTable table)
+  private void createConfigTable(DwbkGeoPackage gpkg, IDwbkTable table)
   {
     try
     {
-      FeatureEntry entry = new FeatureEntry();
-      // geo attributes do not matter for config tables (but are mandatory)
-      entry.setBounds(ReferencedEnvelope.EVERYTHING);
-      entry.setSrid(4326);
-      store.createSchema(table.getSimpleFeatureType());
+      InputStream inputStream = table.getCreateScriptInputStream();
+      Connection connection = gpkg.getGeoPackage().getDataSource().getConnection();
+      SqlUtil.runScript(inputStream, connection);
     }
-    catch (IOException e)
+    catch (Exception e)
     {
-      String msg = String.format("Failed creating config table '%s'!", table.getTableName());
-      LOG.log(Level.INFO, msg);
+      throw DwbkFrameworkException.failForReason(e, 
+        "Zwingend erforderliche Konfigurationstabelle '%s' konnte nicht erstellt werden!", 
+        table.getTableName());
     }
     String msg = String.format("Created config table '%s'!", table.getTableName());
     LOG.log(Level.INFO, msg);
@@ -138,6 +136,5 @@ public class DwbkFramework implements AutoCloseable
   {
     return isRunning;
   }
-  
   
 }

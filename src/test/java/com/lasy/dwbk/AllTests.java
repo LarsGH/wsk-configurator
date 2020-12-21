@@ -34,7 +34,7 @@ public class AllTests
   public static void setUp()
   {
     try {
-      LOG.log(Level.INFO, "Setup testsuite... initializing framework");
+      LOG.log(Level.INFO, "Starting testsuite... initializing framework...");
       File projectRoot = folder.getRoot();
       DwbkFramework.initialize(projectRoot.getPath());
     }
@@ -47,6 +47,6 @@ public class AllTests
   @AfterClass
   public static void tearDown()
   {
-    System.out.println("Finished test suite!");
+    LOG.log(Level.INFO, "Finished test suite!");
   }
 }

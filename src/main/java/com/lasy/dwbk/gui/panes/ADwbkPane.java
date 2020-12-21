@@ -5,7 +5,10 @@ import com.lasy.dwbk.util.Check;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
 
 /**
  * Common BorderPane layout. 
@@ -14,7 +17,7 @@ import javafx.scene.layout.BorderPane;
  * @author larss
  *
  */
-public abstract class ADwbkPane extends BorderPane
+public abstract class ADwbkPane extends ADwbkMarginPane
 {
 
   protected static <TDwbkPane extends ADwbkPane> TDwbkPane createInitializedPane(TDwbkPane pane)
@@ -31,7 +34,7 @@ public abstract class ADwbkPane extends BorderPane
     this.mainScene = Check.notNull(mainScene, "mainScene");
     Check.notNull(header, "header");
     
-    setTop(GuiUtil.createHeader(header));
+    setTopWithMargin(GuiUtil.createHeader(header));
   }
   
   /**
@@ -39,21 +42,40 @@ public abstract class ADwbkPane extends BorderPane
    */
   public void init()
   {
-    setCenter(createContent());
+    setCenterWithMargin(createCenterPane());
+    setBottomWithMargin(createBottomContent());
+  }
+
+  private ScrollPane createCenterPane()
+  {
+    ScrollPane centerPane = new ScrollPane(createCenterContent());
+    centerPane.setFitToWidth(true);
+    centerPane.setFitToHeight(true);
+    centerPane.setCenterShape(true);
+    
+    Background bg = new Background(new BackgroundFill(Color.TRANSPARENT, null, null));
+    centerPane.setBackground(bg);
+    
+    return centerPane;
   }
   
   /**
-   * Creates the main content specific to the pane.
-   * @return pane specific content
+   * Creates the bottom content specific to the pane.
+   * @return specific content
    */
-  protected abstract Node createContent();
+  protected abstract Node createBottomContent();
+
+  /**
+   * Creates the main content specific to the pane.
+   * @return specific content
+   */
+  protected abstract Node createCenterContent();
 
   /**
    * Switches to the main pane.
    */
   public void goToMainPane()
   {
-    System.out.println("going to main pane...");
     MainPane mainPane = MainPane.create(this.mainScene);
     goToPane(mainPane);
   }

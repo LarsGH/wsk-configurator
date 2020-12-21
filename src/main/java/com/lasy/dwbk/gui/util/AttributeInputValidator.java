@@ -14,13 +14,22 @@ import com.lasy.dwbk.validation.impl.TextOnlyValidator;
 public class AttributeInputValidator
 {
 
-  public static final Function<String, Optional<String>> MANDATORY_STRING = val -> {
-    if(Is.nullOrTrimmedEmpty(val))
-    {
-      return Optional.of("Pflichtfeld!");
-    }
-    return Optional.empty();
-  };
+  public static final <TType extends Object> Function<TType, Optional<String>> createMandatoryInputFunction() {
+    return  val -> {
+      if(val == null)
+      {
+        return Optional.of("Pflichtfeld!");
+      }
+      
+      if(val instanceof String
+        && Is.nullOrTrimmedEmpty((String) val))
+      {
+        return Optional.of("Pflichtfeld!");
+      }
+      
+      return Optional.empty();
+    };
+  }
   
   public static final Function<String, Optional<String>> STRING_WITHOUT_DIGITS = val -> {
     boolean isValid = new TextOnlyValidator().isValid(val);

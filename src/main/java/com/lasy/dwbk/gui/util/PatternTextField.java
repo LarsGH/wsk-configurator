@@ -4,6 +4,7 @@ import com.lasy.dwbk.util.Check;
 import com.lasy.dwbk.validation.IUserInputValidator;
 import com.lasy.dwbk.validation.impl.AcceptAllValidator;
 import com.lasy.dwbk.validation.impl.CoordinateValidator;
+import com.lasy.dwbk.validation.impl.IntegersOnlyValidator;
 import com.lasy.dwbk.validation.impl.LayerUriValidator;
 import com.lasy.dwbk.validation.impl.TextOnlyValidator;
 
@@ -24,6 +25,15 @@ public class PatternTextField extends TextField
   public static PatternTextField createCoordinateTextField()
   {
     return new PatternTextField(new CoordinateValidator());
+  }
+  
+  /**
+   * Returns a textfield which allows integers only.
+   * @return textfield
+   */
+  public static PatternTextField createIntegersOnlyTextField()
+  {
+    return new PatternTextField(new IntegersOnlyValidator());
   }
   
   /**
@@ -66,7 +76,12 @@ public class PatternTextField extends TextField
   private void addAllowedPatternListener()
   {
     textProperty().addListener((observable, oldValue, newValue) -> {
-      if(!validator.isValid(newValue))
+      newValue = validator.replaceInput(newValue);
+      if(validator.isValid(newValue))
+      {
+        setText(newValue);
+      }
+      else
       {
         setText(oldValue);
       }

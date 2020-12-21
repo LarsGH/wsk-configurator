@@ -1,4 +1,4 @@
-package com.lasy.dwbk.gui.panes.edit;
+package com.lasy.dwbk.gui.panes.edit.util;
 
 import java.util.Collection;
 
@@ -13,6 +13,12 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
+/**
+ * Bbox selection by alert dialog.
+ * @author larss
+ * @deprecated use {@link BboxComboBox} instead!
+ */
+@Deprecated
 public class BboxSelectionContainer extends HBox
 {
   
@@ -54,7 +60,6 @@ public class BboxSelectionContainer extends HBox
 
   private ChoiceDialog<BboxModel> createBboxSelectionDialog()
   {
-    // TODO: HIER WEITER - display value!
     ChoiceDialog<BboxModel> dlg = new ChoiceDialog<BboxModel>(bbox, availableBboxes);
     dlg.setHeaderText(null);
     dlg.setTitle("Boundingbox Auswahl");

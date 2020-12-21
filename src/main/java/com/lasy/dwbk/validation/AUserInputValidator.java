@@ -18,6 +18,12 @@ public abstract class AUserInputValidator implements IUserInputValidator
   }
   
   @Override
+  public String replaceInput(String input)
+  {
+    return input;
+  }
+  
+  @Override
   public boolean isValid(String input)
   {
     input = getTrimmedInput(input);

@@ -4,8 +4,8 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.lasy.dwbk.app.model.IGtModelBuilder;
-import com.lasy.dwbk.db.tables.BboxTable;
 import com.lasy.dwbk.db.tables.IDwbkTable;
+import com.lasy.dwbk.db.tables.impl.BboxTable;
 import com.lasy.dwbk.util.Check;
 
 public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
@@ -14,14 +14,14 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
   
   private String name;
   private String description;
+  
+  private int epsg;
   private String minLon;
   private String minLat;
   private String maxLon;
   private String maxLat;
-  
-//  private Point lowerLeft;
-//  private Point upperRight;
 
+  
   protected BboxModelBuilder(String name)
   {
     this.name = Check.trimmedNotEmpty(name, "name");
@@ -35,6 +35,7 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
     featureBuilder.set(BboxTable.COL_NAME, this.name);
     featureBuilder.set(BboxTable.COL_DESCRIPTION, this.description);
     
+    featureBuilder.set(BboxTable.EPSG, this.epsg);
     featureBuilder.set(BboxTable.COL_MIN_LON, this.minLon);
     featureBuilder.set(BboxTable.COL_MIN_LAT, this.minLat);
     featureBuilder.set(BboxTable.COL_MAX_LON, this.maxLon);
@@ -46,13 +47,24 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
   }
   
   /**
-   * Sets the description
+   * Sets the description.
    * @param description description
    * @return builder
    */
   public BboxModelBuilder withDescription(String description)
   {
     this.description = Check.trimmedNotEmpty(description, "desciption");
+    return this;
+  }
+  
+  /**
+   * Sets the EPSG code.
+   * @param epsg EPSG code
+   * @return builder
+   */
+  public BboxModelBuilder withEpsg(int epsg)
+  {
+    this.epsg = epsg;
     return this;
   }
   
