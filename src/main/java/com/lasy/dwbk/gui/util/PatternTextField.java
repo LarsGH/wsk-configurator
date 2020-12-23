@@ -5,7 +5,6 @@ import com.lasy.dwbk.validation.IUserInputValidator;
 import com.lasy.dwbk.validation.impl.AcceptAllValidator;
 import com.lasy.dwbk.validation.impl.CoordinateValidator;
 import com.lasy.dwbk.validation.impl.IntegersOnlyValidator;
-import com.lasy.dwbk.validation.impl.LayerUriValidator;
 import com.lasy.dwbk.validation.impl.TextOnlyValidator;
 
 import javafx.scene.control.TextField;
@@ -52,15 +51,6 @@ public class PatternTextField extends TextField
   public static PatternTextField createAcceptAllTextField()
   {
     return new PatternTextField(new AcceptAllValidator());
-  }
-  
-  /**
-   * Returns a textfield which allows layer URIs.
-   * @return textfield
-   */
-  public static PatternTextField createLayerUriTextField()
-  {
-    return new PatternTextField(new LayerUriValidator());
   }
   
   private IUserInputValidator validator;

@@ -1,11 +1,14 @@
-package com.lasy.dwbk.app;
+package com.lasy.dwbk.app.error;
 
 import java.util.Objects;
 import java.util.logging.Level;
 
+import com.lasy.dwbk.gui.util.GuiUtil;
 import com.lasy.dwbk.util.Check;
 
-// TODO: alle fehler-quellen identifizieren und exception einbauen!
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 /**
  * Framework-Exception.
  * @author larss
@@ -46,6 +49,25 @@ public class DwbkFrameworkException extends RuntimeException
   }
   
   /**
+   * Returns the (log-) level.
+   * @return level
+   */
+  public Level getLevel()
+  {
+    return errorLevel;
+  }
+  
+  /**
+   * Returns the error alert.
+   * @return error alert
+   */
+  public Alert getErrorAlert()
+  {
+    String msg = String.join(System.lineSeparator(), getMessage(), "Details können dem Log entnommen werden.");
+    return GuiUtil.createOkAlert(AlertType.ERROR, "Fehler aufgetreten", msg);
+  }
+  
+  /**
    * Creates a framework exception that will generate an alert to inform the user about the failure.
    * The exception will be logged the application will close.
    * @param err cause
@@ -58,7 +80,6 @@ public class DwbkFrameworkException extends RuntimeException
     return new DwbkFrameworkException(err, Level.SEVERE, msg, args);
   }
   
-  // TODO: Log sicherstellen!
   /**
    * Creates a framework exception that will generate an alert to inform the user about the failure.
    * The exception will be logged!

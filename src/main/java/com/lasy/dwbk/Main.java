@@ -3,7 +3,7 @@ package com.lasy.dwbk;
 import java.util.logging.Level;
 
 import com.lasy.dwbk.app.DwbkFramework;
-import com.lasy.dwbk.app.DwbkFrameworkException;
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
 import com.lasy.dwbk.db.DwbkGeoPackage;
 
 public class Main

@@ -1,5 +1,7 @@
 package com.lasy.dwbk.gui.panes.edit.impl;
 
+import java.util.Optional;
+
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.model.impl.LayerModelBuilder;
@@ -138,6 +140,8 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
       .build();
   }
   
+  // TODO: Future work: Compare configured bbox with layer bbox from URI!
+  // <LatLonBoundingBox minx="5.72499" miny="50.1506" maxx="9.53154" maxy="52.602"/>
   private AttributeInputContainer<LayerModel, BboxComboBox, Integer> createAttrBbox()
   {
     return AttributeInputContainer.<LayerModel, BboxComboBox, Integer>builer("Layer-Begrenzung")
@@ -146,6 +150,16 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
         comboBox.setSelectedBboxById(layer.getBboxId().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(BboxComboBox::getSelectedBboxId)
+      .withDependingContainerValidator(attrStoreLocal, (storeLocalObj, bboxId) -> {
+        Boolean storeLocal = storeLocalObj == null
+          ? false
+          : (Boolean) storeLocalObj;
+        if (storeLocal && bboxId == null)
+        {
+          return Optional.of("Es muss eine Boundingbox angegeben werden, wenn der Layer lokal gespeichert wird!");
+        }
+        return Optional.empty();
+      })
       .withInfoAlertMessage("Die Auswahl einer Boundingbox macht insbesondere Sinn um die Datenmenge zu begrenzen "
         + "wenn der Layer lokal gespeichert werden soll.")
       .build();
@@ -166,15 +180,16 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   private AttributeInputContainer<LayerModel, TextField, String> createAttrUri()
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Layer-URI")
-      .withGuiElement(PatternTextField.createLayerUriTextField())
+      .withGuiElement(PatternTextField.createAcceptAllTextField())
       .withGuiValueInitialization((txtField, layer) -> {
         txtField.setText(layer.getUri());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
-      // TODO: URI Logik bestimmen - hier anpassen
-      .withInfoAlertMessage("Über die URI muss eine getCapabilities-Abfrage auf dem Dienst möglich sein!")
-      // TODO: weiterer Validator für URI Format! - abstimmen mit info alert
+      .withInfoAlertMessage("Die URI wird verwendet um einen WMS- oder WFS-Service anzufragen. "
+        + "Für WMS-Services muss ein GetMap-Request angegeben werden."
+        + "Für WFS-Services muss ein GetFeature-Request angegeben werden.")
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
+      .withInputValidationError(AttributeInputValidator.createLayerServiceFunction())
       .build();
   }
 
@@ -189,16 +204,16 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
       .build();
   }
 
-  // TODO: Anpassung des namens problematisch für lokal gespeicherte layer!
   private AttributeInputContainer<LayerModel, TextField, String> createAttrName()
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Layer-Name")
-      .withGuiElement(PatternTextField.createTextOnlyTextField())
+      .withGuiElement(PatternTextField.createAcceptAllTextField())
       .withGuiValueInitialization((txtField, layer) -> {
         txtField.setText(layer.getName());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
+      .withInfoAlertMessage("Der Layername wird in der Client Benutzeroberfläche verwendet.")
       .build();
   }
 

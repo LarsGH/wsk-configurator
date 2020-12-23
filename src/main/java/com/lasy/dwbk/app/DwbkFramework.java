@@ -4,16 +4,16 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotools.jdbc.util.SqlUtil;
 
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
+import com.lasy.dwbk.app.logging.DwbkLog;
 import com.lasy.dwbk.db.DwbkGeoPackage;
 import com.lasy.dwbk.db.tables.IDwbkTable;
 import com.lasy.dwbk.db.tables.impl.BboxTable;
 import com.lasy.dwbk.db.tables.impl.LayerTable;
 import com.lasy.dwbk.util.Check;
-import com.lasy.dwbk.util.Is;
 
 /**
  * The framework makes sure that the {@link DwbkGeoPackage} exists with the basic configuration tables.
@@ -22,23 +22,9 @@ import com.lasy.dwbk.util.Is;
  */
 public class DwbkFramework implements AutoCloseable
 {
-  private static Logger LOG = Logger.getLogger(DwbkFramework.class.getSimpleName());
   
   private static boolean isRunning = false;
   private static DwbkFramework instance;
-  
-  private static final String DB_FILE_DIRECTORY_ENV_NAME = "DWBK_DB_DIR";
-  private static String getPathFromEnv()
-  {
-    String path = System.getenv(DB_FILE_DIRECTORY_ENV_NAME);
-
-    if (Is.nullOrTrimmedEmpty(path))
-    {
-      String msg = String.format("Environment variable '%s' needs to be set!", DB_FILE_DIRECTORY_ENV_NAME);
-      throw new IllegalStateException(msg);
-    }
-    return path;
-  }
   
   /**
    * Returns the framework.
@@ -49,7 +35,7 @@ public class DwbkFramework implements AutoCloseable
     if(instance == null)
     {
       // Use environment variable to initialize framework (if not initialized before)
-      String path = getPathFromEnv();
+      String path = DwbkEnvironment.getConfigDirectory().getAbsolutePath();
       initialize(path);
     }
     return instance;
@@ -57,9 +43,16 @@ public class DwbkFramework implements AutoCloseable
 
   public static void initialize(String path)
   {
-    DwbkGeoPackage tmGpkg = DwbkGeoPackage.createForPath(path);
-    
-    instance = new DwbkFramework(tmGpkg);
+    try
+    {
+      DwbkLog.log(Level.INFO, "Framework wird mit folgenden Umgebungsvariablen gestartet: %n%s", DwbkEnvironment.getConfiguredInfo());
+      DwbkGeoPackage tmGpkg = DwbkGeoPackage.createForPath(path);
+      instance = new DwbkFramework(tmGpkg);
+    }
+    catch (Exception e)
+    {
+      throw DwbkFrameworkException.failForReason(null, "Geopackage konnte nicht geladen werden!");
+    }
     isRunning = true;
   }
   
@@ -75,7 +68,7 @@ public class DwbkFramework implements AutoCloseable
   {
     createConfigTables(gpkg);
     DwbkServiceProvider.initialize(gpkg.getDataStore());
-    LOG.log(Level.INFO, "Framwork initialized successfully!");
+    DwbkLog.log(Level.INFO, "Framwork erfolgreich initialisiert!");
   }
   
   private void createConfigTables(DwbkGeoPackage gpkg)
@@ -109,7 +102,7 @@ public class DwbkFramework implements AutoCloseable
         table.getTableName());
     }
     String msg = String.format("Created config table '%s'!", table.getTableName());
-    LOG.log(Level.INFO, msg);
+    DwbkLog.log(Level.INFO, msg);
   }
 
   /**
@@ -125,6 +118,7 @@ public class DwbkFramework implements AutoCloseable
   public void close() throws Exception
   {
     this.gpkg.close();
+    DwbkLog.getInstance().close();
     isRunning = false;
   }
   

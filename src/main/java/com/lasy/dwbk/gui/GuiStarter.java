@@ -1,9 +1,9 @@
 package com.lasy.dwbk.gui;
 
-import java.util.logging.Level;
+import java.lang.Thread.UncaughtExceptionHandler;
 
 import com.lasy.dwbk.app.DwbkFramework;
-import com.lasy.dwbk.app.DwbkFrameworkException;
+import com.lasy.dwbk.app.error.ErrorModule;
 import com.lasy.dwbk.gui.panes.MainPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
 
@@ -31,27 +31,24 @@ public class GuiStarter extends Application
 
   public static void main(String[] args)
   {
+    Thread.setDefaultUncaughtExceptionHandler(handleUncaughtException());
+    
     try (DwbkFramework framework = DwbkFramework.getInstance())
     {
       Application.launch();
     }
-    catch (DwbkFrameworkException e)
+    catch (Throwable t)
     {
-      // TODO: In file Loggen!
-      
-      // TODO: Neue Umgebungsvariable Framework Log-Level!
-      
-      // TODO: Alert mit Fehlermeldung!
-      
-      if(e.hasLevel(Level.SEVERE))
-      {
-        System.exit(-1);
-      }
+      ErrorModule.handleError(t);
     }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
+  }
+  
+  private static UncaughtExceptionHandler handleUncaughtException()
+  {
+    return (thread, thrown) -> {
+      System.out.println("hallo welt!");
+      ErrorModule.handleError(thrown);
+    };
   }
 
 }

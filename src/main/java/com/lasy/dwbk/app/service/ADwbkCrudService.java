@@ -27,6 +27,8 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.FeatureId;
 
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
+import com.lasy.dwbk.app.error.ErrorModule;
 import com.lasy.dwbk.app.model.IGtModel;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.util.Check;
@@ -60,9 +62,10 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     {
       return loadFiltered(Filter.INCLUDE);
     }
-    catch (IOException e)
+    catch (Exception e)
     {
-      throw new IllegalStateException("Failed to load features!", e);
+      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+        .failForReason(t, "Daten ('%s') konnten nicht geladen werden.", getTableName()));
     }
   }
 
@@ -73,13 +76,12 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     {
       Filter idFilter = createIdFilter(id);
       Collection<TModel> parsedResults = loadFiltered(idFilter);
-      return parsedResults.stream()
-        .findFirst();
+      return parsedResults.stream().findFirst();
     }
     catch (IOException e)
     {
-      String msg = String.format("Failed to load feature with id: !", id);
-      throw new IllegalStateException(msg, e);
+      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+        .failForReason(t, "Daten ('%s - ID: %s') konnten nicht geladen werden.", getTableName(), id));
     }
   }
   
@@ -95,8 +97,8 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      String msg = String.format("Could not delete feature with id: %s", id);
-      throw new IllegalStateException(msg, e);
+      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+        .failForReason(t, "Daten ('%s - ID: %s') konnten nicht gelöscht werden.", getTableName(), id));
     }
   }
   
@@ -109,8 +111,8 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      String msg = String.format("Could not access table '%s'", getTableName());
-      throw new IllegalStateException(msg, e);
+      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+        .failForReason(t, "Zugriff auf Tabelle '%s' ist fehlgeschlagen.", getTableName()));
     }
   }
   
@@ -130,14 +132,17 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      throw new IllegalStateException("Failed to create feature.", e);
+      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+        .failForReason(t, "Neuer Eintrag ('%s') konnte nicht erstellt werden.", getTableName()));
     }
   }
 
   private TModel reloadModel(TModel model)
   {
-    model = readById(model.getId())
-      .orElseThrow(() -> new IllegalStateException("Cannot load created model!"));
+    Integer id = model.getId();
+    model = readById(id)
+      .orElseThrow(() -> DwbkFrameworkException
+        .failForReason(null, "Daten ('%s - ID: %s') konnten nicht neu geladen werden.", getTableName(), id));
     return model;
   }
   
@@ -156,6 +161,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     catch (Exception e)
     {
       transaction.rollback();
+      throw e;
     }
     finally
     {
@@ -167,7 +173,8 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
   public TModel update(TModel model)
   {
     Check.notNull(model, "model");
-    
+
+    Integer id = model.getId();
     try
     {
       doUpdate(model);
@@ -176,7 +183,8 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      throw new IllegalStateException("Failed to update feature.", e);
+      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+          .failForReason(t, "Daten ('%s - ID: %s') konnten nicht aktualisiert werden.", getTableName(), id));
     }
   }
   
@@ -212,7 +220,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     catch (Exception e)
     {
       transaction.rollback();
-      throw new IllegalStateException("Update failed!", e);
+      throw e;
     }
     finally
     {

@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.geopkg.GeoPackage;
 import org.geotools.geopkg.GeoPkgDataStoreFactory;
 
+import com.lasy.dwbk.app.logging.DwbkLog;
 import com.lasy.dwbk.util.Check;
 
 /**
@@ -20,7 +20,6 @@ import com.lasy.dwbk.util.Check;
  */ 
 public class DwbkGeoPackage implements AutoCloseable
 {
-  private static Logger LOG = Logger.getLogger(DwbkGeoPackage.class.getSimpleName());
   private static final String DB_FILE_NAME = "dwbk_db.gpkg";
 
   /**
@@ -43,8 +42,8 @@ public class DwbkGeoPackage implements AutoCloseable
     {
       if(f.createNewFile())
       {
-        String msg = String.format("Created new geopackage: %s", f.getAbsolutePath());
-        LOG.log(Level.INFO, msg);
+        String msg = String.format("Neues Geopackage wurde angelegt: %s", f.getAbsolutePath());
+        DwbkLog.log(Level.INFO, msg);
       }
     }
     catch (IOException e)
@@ -76,7 +75,7 @@ public class DwbkGeoPackage implements AutoCloseable
     }
     
     String msg = String.format("Opened geopackage: %s", gpkgFile.getAbsolutePath());
-    LOG.log(Level.INFO, msg);
+    DwbkLog.log(Level.INFO, msg);
   }
 
   private DataStore createDatastore(GeoPackage gpkg)

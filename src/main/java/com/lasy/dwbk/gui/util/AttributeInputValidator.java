@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import com.lasy.dwbk.util.Is;
+import com.lasy.dwbk.validation.impl.LayerServiceUriValidator;
 import com.lasy.dwbk.validation.impl.TextOnlyValidator;
 
 /**
@@ -27,6 +28,17 @@ public class AttributeInputValidator
         return Optional.of("Pflichtfeld!");
       }
       
+      return Optional.empty();
+    };
+  }
+  
+  public static final Function<String, Optional<String>> createLayerServiceFunction() {
+    return  val -> {      
+      boolean isValid = new LayerServiceUriValidator().isValid(val);
+      if(!isValid)
+      {
+        return Optional.of("Die URI muss den anzufragenden Service (WMS / WFS) spezifizieren!");
+      }
       return Optional.empty();
     };
   }

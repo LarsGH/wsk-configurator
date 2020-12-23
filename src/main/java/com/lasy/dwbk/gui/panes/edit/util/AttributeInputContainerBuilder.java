@@ -1,9 +1,12 @@
 package com.lasy.dwbk.gui.panes.edit.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import com.lasy.dwbk.app.model.IGtModel;
@@ -27,6 +30,8 @@ public class AttributeInputContainerBuilder<TModel extends IGtModel, TGuiElement
   protected BiConsumer<TGuiElement, TModel> initializeGuiValueConsumer;
   protected Function<TGuiElement, TModelAttribute> containerToModelAttributeFunction;
   protected List<Function<TModelAttribute, Optional<String>>> inputValidationFunctions;
+  protected Map<AttributeInputContainer<TModel, ? extends Node, ? extends Object>, 
+    BiFunction<Object, TModelAttribute, Optional<String>>> dependingContainerValidationFunctions;
   protected String infoAlertMessage;
   
   /**
@@ -37,6 +42,7 @@ public class AttributeInputContainerBuilder<TModel extends IGtModel, TGuiElement
   {
     this.attributeDisplayName = Check.trimmedNotEmpty(attributeDisplayName, "attributeDisplayName");
     this.inputValidationFunctions = new ArrayList<>();
+    this.dependingContainerValidationFunctions = new HashMap<>();
   }
   
   public AttributeInputContainer<TModel, TGuiElement, TModelAttribute> build()
@@ -107,4 +113,22 @@ public class AttributeInputContainerBuilder<TModel extends IGtModel, TGuiElement
     this.infoAlertMessage = Check.trimmedNotEmpty(infoAlertMessage, infoAlertMessage);
     return this;
   }
+
+  /**
+   * Adds a depending container validation. 
+   * The optional message is generated depending on the values of this container and the value of other container.
+   * 
+   * @param <TAnotherModelAttribute> the attribute type of the other container
+   * @param container the other container
+   * @param validationFunction generates an optional message depending on the values of this container and the value of other container
+   * @return builder
+   */
+  public AttributeInputContainerBuilder<TModel, TGuiElement, TModelAttribute> withDependingContainerValidator(
+    AttributeInputContainer<TModel, ? extends Node, ? extends Object> container, 
+    BiFunction<Object, TModelAttribute, Optional<String>> validationFunction)
+  {
+    this.dependingContainerValidationFunctions.put(container, validationFunction);
+    return this;
+  }
+  
 }

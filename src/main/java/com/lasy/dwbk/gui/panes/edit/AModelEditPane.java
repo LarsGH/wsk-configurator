@@ -70,21 +70,20 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
 
   private HBox createSaveCancelButtonBox()
   {
-    
     Button saveBtn = GuiUtil.createIconButtonWithText(GuiIcon.SAVE, "Speichern", "Speichern");
     saveBtn.setOnAction(e -> {
       boolean saveSuccessful = handleSave();
-      if(saveSuccessful)
+      if (saveSuccessful)
       {
         goToOverviewPane();
       }
     });
-    
+
     Button cancelBtn = GuiUtil.createIconButtonWithText(GuiIcon.CANCEL, "Abbrechen", "Abbrechen");
     cancelBtn.setOnAction(e -> {
       goToOverviewPane();
     });
-    
+
     HBox box = new HBox(GuiUtil.DEFAULT_SPACING, saveBtn, cancelBtn);
     box.setAlignment(Pos.CENTER_RIGHT);
     return box;
@@ -105,14 +104,14 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
    */
   private boolean handleSave()
   {
-    if(hasInvalidUserInput())
+    if (hasInvalidUserInput())
     {
       showInvalidInputAlert();
       return false;
     }
     else
     {
-      if(getModel() == null)
+      if (getModel() == null)
       {
         doHandleCreateNewModel();
       }
@@ -123,7 +122,7 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
       return true;
     }
   }
-  
+
   private boolean hasInvalidUserInput()
   {
     boolean hasInvalidInput = false;

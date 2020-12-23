@@ -1,6 +1,8 @@
 package com.lasy.dwbk.gui.panes.edit.util;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 import com.lasy.dwbk.app.model.IGtModel;
 import com.lasy.dwbk.gui.panes.ADwbkMarginPane;
@@ -164,6 +166,18 @@ public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extend
       .filter(err -> !Is.nullOrTrimmedEmpty(err))
       .findFirst()
       .orElse(null);
+    
+    if(Is.nullOrTrimmedEmpty(error))
+    {
+      for(Map.Entry<AttributeInputContainer<TModel,? extends Node,? extends Object>,BiFunction<Object,TModelAttribute,Optional<String>>> entry : builder.dependingContainerValidationFunctions.entrySet())
+      {
+        AttributeInputContainer<? extends IGtModel, ? extends Node, ? extends Object> anotherContainer = entry.getKey();
+        Object anotherContainerValue = anotherContainer.getConfiguredValue();
+        
+        BiFunction<Object, TModelAttribute, Optional<String>> errorFunction = entry.getValue();
+        error = errorFunction.apply(anotherContainerValue, getConfiguredValue()).orElse(null);
+      }
+    }
     
     errorLbl.setText(error);
   }

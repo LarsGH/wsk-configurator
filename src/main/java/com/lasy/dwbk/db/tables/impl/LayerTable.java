@@ -2,7 +2,6 @@ package com.lasy.dwbk.db.tables.impl;
 
 import com.lasy.dwbk.db.tables.ADwbkTable;
 
-// TODO: LayerDefinitionTable + BboxTable als Config-File separat speichern?!
 /**
  * Defines the table for layer definitions.
  * @author larss

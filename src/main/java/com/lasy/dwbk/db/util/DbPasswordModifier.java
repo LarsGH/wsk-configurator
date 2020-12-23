@@ -5,7 +5,7 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
 
-import com.lasy.dwbk.app.DwbkFrameworkException;
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
 
 /**
  * Modifies the password for storage.

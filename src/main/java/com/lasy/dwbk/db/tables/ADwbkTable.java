@@ -6,7 +6,7 @@ import java.io.InputStream;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.lasy.dwbk.app.DwbkFramework;
-import com.lasy.dwbk.app.DwbkFrameworkException;
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
 import com.lasy.dwbk.util.Check;
 
 public abstract class ADwbkTable implements IDwbkTable
@@ -45,7 +45,7 @@ public abstract class ADwbkTable implements IDwbkTable
     }
     catch (IOException e)
     {
-      throw DwbkFrameworkException.failForReason(e, "Auf das Schema der Tabelle '%s' kann nicht zugegriffen werden!", getTableName());
+      throw DwbkFrameworkException.failForReason(null, "Auf das Schema der Tabelle '%s' kann nicht zugegriffen werden!", getTableName());
     }
   }
   
