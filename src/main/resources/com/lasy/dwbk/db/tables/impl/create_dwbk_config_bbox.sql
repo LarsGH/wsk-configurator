@@ -4,6 +4,7 @@ CREATE TABLE "dwbk_config_bbox" (
 "name" VARCHAR(40) NOT NULL UNIQUE, 
 "description" VARCHAR(255),
 "epsg" MEDIUMINT NOT NULL, 
+"is_map_boundary" VARCHAR(1) NOT NULL, 
 "min_lon" VARCHAR(40) NOT NULL, 
 "min_lat" VARCHAR(40) NOT NULL, 
 "max_lon" VARCHAR(40) NOT NULL, 

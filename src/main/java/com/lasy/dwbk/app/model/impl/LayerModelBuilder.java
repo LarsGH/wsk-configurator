@@ -7,6 +7,7 @@ import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.db.tables.IDwbkTable;
 import com.lasy.dwbk.db.tables.impl.LayerTable;
 import com.lasy.dwbk.db.util.DbBoolean;
+import com.lasy.dwbk.db.util.DbPasswordModifier;
 import com.lasy.dwbk.util.Check;
 
 public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
@@ -18,6 +19,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   private String uri;
   private boolean storeLocal;
   private boolean isSaved;
+  private boolean isVisible;
   private Integer bboxId;
   private String user;
   private String pw;
@@ -27,6 +29,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     this.name = Check.trimmedNotEmpty(name, "name");
     this.storeLocal = false;
     this.isSaved = true;
+    this.isVisible = false;
   }
   
   @Override
@@ -39,9 +42,10 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     featureBuilder.set(LayerTable.COL_URI, this.uri);
     featureBuilder.set(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(this.storeLocal));
     featureBuilder.set(LayerTable.COL_IS_SAVED, DbBoolean.toDbValue(this.isSaved));
+    featureBuilder.set(LayerTable.COL_IS_VISIBLE, DbBoolean.toDbValue(this.isVisible));
     featureBuilder.set(LayerTable.COL_BBOX_ID, this.bboxId);
     featureBuilder.set(LayerTable.COL_USER, this.user);
-    featureBuilder.set(LayerTable.COL_PW, this.pw);
+    featureBuilder.set(LayerTable.COL_PW, DbPasswordModifier.toDbValue(this.pw));
     
     SimpleFeature feature = featureBuilder.buildFeature(GENERATE_ID);
     
@@ -86,9 +90,20 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
    * @param isSaved {@code true} if layer is saved.
    * @return builder
    */
-  public LayerModelBuilder withIsSaved(boolean isSaved)
+  public LayerModelBuilder withSavedStatus(boolean isSaved)
   {
     this.isSaved = isSaved;
+    return this;
+  }
+  
+  /**
+   * Sets the value for the default visibility enabled status.
+   * @param isVisible {@code true} if layer should be visible by default.
+   * @return builder
+   */
+  public LayerModelBuilder withDefaultVisible(boolean isVisible)
+  {
+    this.isVisible = isVisible;
     return this;
   }
   

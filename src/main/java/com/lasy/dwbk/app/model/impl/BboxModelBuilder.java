@@ -6,6 +6,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.db.tables.IDwbkTable;
 import com.lasy.dwbk.db.tables.impl.BboxTable;
+import com.lasy.dwbk.db.util.DbBoolean;
 import com.lasy.dwbk.util.Check;
 
 public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
@@ -20,11 +21,14 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
   private String minLat;
   private String maxLon;
   private String maxLat;
+  
+  private boolean isMapBoundary;
 
   
   protected BboxModelBuilder(String name)
   {
     this.name = Check.trimmedNotEmpty(name, "name");
+    this.isMapBoundary = false;
   }
   
   @Override
@@ -40,6 +44,7 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
     featureBuilder.set(BboxTable.COL_MIN_LAT, this.minLat);
     featureBuilder.set(BboxTable.COL_MAX_LON, this.maxLon);
     featureBuilder.set(BboxTable.COL_MAX_LAT, this.maxLat);
+    featureBuilder.set(BboxTable.COL_IS_MAP_BOUNDARY, DbBoolean.toDbValue(this.isMapBoundary));
     
     SimpleFeature feature = featureBuilder.buildFeature(GENERATE_ID);
     
@@ -109,6 +114,17 @@ public class BboxModelBuilder implements IGtModelBuilder<BboxModel>
   public BboxModelBuilder withMaxLat(String maxLat)
   {
     this.maxLat = Check.validCoordinate(maxLat, "maxLat");
+    return this;
+  }
+  
+  /**
+   * Sets the value for the map boundary status (app map extent).
+   * @param isMapBoundary {@code true} if the bbox should be used as the map extent (in the app).
+   * @return builder
+   */
+  public BboxModelBuilder withMapBoundary(boolean isMapBoundary)
+  {
+    this.isMapBoundary = isMapBoundary;
     return this;
   }
   

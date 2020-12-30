@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -99,5 +100,21 @@ public abstract class AGtModel implements IGtModel
 
     return Objects.equals(this.getFeature(), ((AGtModel)other).getFeature());
   }
+  
+  @Override
+  public String toString()
+  {
+    String attributeInfo = feature.getFeatureType().getAttributeDescriptors()
+      .stream()
+      .map(attrDesc -> {
+        String attributeName = attrDesc.getLocalName();
+        Object attributeValue = feature.getAttribute(attributeName);
+        return attributeName + ": " + attributeValue;
+      })
+      .collect(Collectors.joining(System.lineSeparator()));
+    return String.format("## %s:%n%s", getModelName(), attributeInfo);
+  }
+
+  protected abstract String getModelName();
 
 }

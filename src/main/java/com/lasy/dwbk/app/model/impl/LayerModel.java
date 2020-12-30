@@ -66,6 +66,17 @@ public class LayerModel extends AGtModel
   {
     this.getFeature().setAttribute(LayerTable.COL_IS_SAVED, DbBoolean.toDbValue(isSaved));
   }
+  
+  public boolean isVisible()
+  {
+    String isSaved = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_IS_VISIBLE, String.class);
+    return DbBoolean.fromDbValue(isSaved);
+  }
+
+  public void setVisible(boolean isVisible)
+  {
+    this.getFeature().setAttribute(LayerTable.COL_IS_VISIBLE, DbBoolean.toDbValue(isVisible));
+  }
 
   public Optional<Integer> getBboxId()
   {
@@ -111,34 +122,16 @@ public class LayerModel extends AGtModel
 
   public void setPw(String pw)
   {
+    
     this.getFeature().setAttribute(LayerTable.COL_PW, pw);
   }
   
+  private static final String MODEL_NAME = "Layer";
+  
   @Override
-  public String toString()
+  protected String getModelName()
   {
-    String localInfo = this.isStoreLocal() 
-      ? "[LOCAL]" 
-      : "[REMOTE]";
-    
-    return String.format("Layer-%s-%s: %s | Bbox: %s | ConInfo: %s",
-      getId(),
-      localInfo,
-      getName(),
-      getBboxId(),
-      getConnectionInfo());
-  }
-
-  private String getConnectionInfo()
-  {
-    String info = "[";
-    
-    if(getUser().isPresent());
-    {
-      info += "(WITH_LOGIN) | ";
-    }
-    info += "uri: " + getUri() + "]";
-    return info;
+    return MODEL_NAME;
   }
 
 }

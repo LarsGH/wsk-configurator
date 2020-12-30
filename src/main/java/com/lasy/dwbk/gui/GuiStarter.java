@@ -46,7 +46,6 @@ public class GuiStarter extends Application
   private static UncaughtExceptionHandler handleUncaughtException()
   {
     return (thread, thrown) -> {
-      System.out.println("hallo welt!");
       ErrorModule.handleError(thrown);
     };
   }

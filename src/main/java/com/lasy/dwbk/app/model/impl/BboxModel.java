@@ -4,6 +4,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.lasy.dwbk.app.model.AGtModel;
 import com.lasy.dwbk.db.tables.impl.BboxTable;
+import com.lasy.dwbk.db.util.DbBoolean;
 import com.lasy.dwbk.db.util.DbRowAccess;
 import com.lasy.dwbk.util.Check;
 
@@ -84,22 +85,23 @@ public class BboxModel extends AGtModel
     this.getFeature().setAttribute(BboxTable.COL_MAX_LAT, maxLat);
   }
   
-  @Override
-  public String toString()
+  public boolean isMapBoundary()
   {
-    String description = getDescription().isPresent()
-      ? " (" + getDescription().get() + ") "
-      : "";
-    
-    return String.format("BBox-%s: %s%s [EPSG(%s): lowerLeft (%s | %s) | upperRight (%s | %s)]",
-      getId(),
-      getName(),
-      description,
-      getEpsg(),
-      getMinLon(),
-      getMinLat(),
-      getMaxLon(),
-      getMaxLat());
+    String isMapBoundary = DbRowAccess.getMandatoryValue(getFeature(), BboxTable.COL_IS_MAP_BOUNDARY, String.class);
+    return DbBoolean.fromDbValue(isMapBoundary);
+  }
+
+  public void setMapBoundary(boolean isMapBoundary)
+  {
+    this.getFeature().setAttribute(BboxTable.COL_IS_MAP_BOUNDARY, DbBoolean.toDbValue(isMapBoundary));
+  }
+  
+  private static final String MODEL_NAME = "Boundingbox";
+  
+  @Override
+  protected String getModelName()
+  {
+    return MODEL_NAME;
   }
 
 }

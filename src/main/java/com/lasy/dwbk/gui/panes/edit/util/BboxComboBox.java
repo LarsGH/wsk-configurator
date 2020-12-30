@@ -15,7 +15,7 @@ public class BboxComboBox extends ComboBox<BboxModel>
   /**
    * Display value for default entry ({@code null}).
    */
-  private static final String DEFAULT_BBOX_VALUE = "Keine Begrenzung";
+//  private static final String DEFAULT_BBOX_VALUE = "Keine Begrenzung";
   
   private BboxModel bbox;
   private Collection<BboxModel> availableBboxes;
@@ -29,19 +29,24 @@ public class BboxComboBox extends ComboBox<BboxModel>
 
   private void init()
   {
-    availableBboxes = bboxService().readAll();
+    availableBboxes = bboxService().readAll();    
     getItems().addAll(availableBboxes);
-    // add default entry
-    getItems().add(0, null);
+    
+//    // add default entry
+//    getItems().add(0, null);
     
     setConverter(new StringConverter<BboxModel>() {
       
       @Override
       public String toString(BboxModel box)
       {
+//        if(box == null)
+//        {
+//          return DEFAULT_BBOX_VALUE;
+//        }
         if(box == null)
         {
-          return DEFAULT_BBOX_VALUE;
+          return "";
         }
         return box.getName();
       }

@@ -107,6 +107,7 @@ public class MainPane extends ADwbkPane
     return null;
   }
   
+  // TODO: Logik: wann gespeichert? (immer true wenn !storeLocal | sonst nur wenn daten lokal gespeichert wurden und keine neue Änderung)
   // TODO: HInweis ungespeicherte Aenderungen + Speichern button
   
 

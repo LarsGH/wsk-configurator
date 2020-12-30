@@ -24,6 +24,7 @@ public class BboxCrudServiceTest
   private static final String EXPECTED_BBOX_MIN_LAT = "1.11111";
   private static final String EXPECTED_BBOX_MAX_LON = "99.11111";
   private static final String EXPECTED_BBOX_MAX_LAT = "11.99999";
+  private static final boolean EXPECTED_BBOX_IS_MAP_BOUNDARY = true;
   private static final int EXPECTED_BBOX_EPSG = 4326;
 
   private static BboxCrudService sut;
@@ -58,6 +59,11 @@ public class BboxCrudServiceTest
     
     BboxModel boxB = assertThatBboxIsCreatedWithExpectedContent("Test-Bbox-B");
     
+    // boxA lost the map boundary status!
+    boxA = sut.readById(boxA.getId())
+      .orElseThrow(() -> new AssertionError("Load by ID did not work!"));
+    Assertions.assertThat(boxA.isMapBoundary()).isFalse();
+    
     // load all
     Collection<BboxModel> all = sut.readAll();
     Assertions.assertThat(all).containsExactlyInAnyOrder(boxA, boxB);
@@ -81,7 +87,8 @@ public class BboxCrudServiceTest
       .withMinLon(EXPECTED_BBOX_MIN_LON)
       .withMinLat(EXPECTED_BBOX_MIN_LAT) 
       .withMaxLon(EXPECTED_BBOX_MAX_LON)
-      .withMaxLat(EXPECTED_BBOX_MAX_LAT));
+      .withMaxLat(EXPECTED_BBOX_MAX_LAT)
+      .withMapBoundary(EXPECTED_BBOX_IS_MAP_BOUNDARY));
     
     Assertions.assertThat(newBbox.getId()).isNotNull();
     Assertions.assertThat(newBbox.getName()).isEqualTo(name);
@@ -91,6 +98,7 @@ public class BboxCrudServiceTest
     Assertions.assertThat(newBbox.getMinLat()).isEqualTo(EXPECTED_BBOX_MIN_LAT);
     Assertions.assertThat(newBbox.getMaxLon()).isEqualTo(EXPECTED_BBOX_MAX_LON);
     Assertions.assertThat(newBbox.getMaxLat()).isEqualTo(EXPECTED_BBOX_MAX_LAT);
+    Assertions.assertThat(newBbox.isMapBoundary()).isTrue();
     Assertions.assertThat(newBbox.getLastChangedDate()).isEqualToIgnoringSeconds(LocalDateTime.now());
     
     return newBbox;

@@ -37,6 +37,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   private AttributeInputContainer<LayerModel, TextField, String> attrDescription;
   private AttributeInputContainer<LayerModel, TextField, String> attrUri;
   private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrStoreLocal;
+  private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrIsVisible;
   private AttributeInputContainer<LayerModel, BboxComboBox, Integer> attrBboxId;
   private AttributeInputContainer<LayerModel, TextField, String> attrUser;
   private AttributeInputContainer<LayerModel, TextField, String> attrPw;
@@ -58,6 +59,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     model.setDescription(attrDescription.getConfiguredValue());
     model.setUri(attrUri.getConfiguredValue());
     model.setStoreLocal(attrStoreLocal.getConfiguredValue());
+    model.setVisible(attrIsVisible.getConfiguredValue());
     model.setBboxId(attrBboxId.getConfiguredValue());
     model.setUser(attrUser.getConfiguredValue());
     model.setPw(DbPasswordModifier.toDbValue(attrPw.getConfiguredValue()));
@@ -77,6 +79,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     builder.withDescription(attrDescription.getConfiguredValue());
     builder.withUri(attrUri.getConfiguredValue());
     builder.withStoreLocal(attrStoreLocal.getConfiguredValue());
+    builder.withDefaultVisible(attrIsVisible.getConfiguredValue());
     builder.withBboxId(attrBboxId.getConfiguredValue());
     builder.withUser(attrUser.getConfiguredValue());
     builder.withPassword(DbPasswordModifier.toDbValue(attrPw.getConfiguredValue()));
@@ -105,6 +108,9 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     
     this.attrStoreLocal = createAttrStoreLocal();
     addAttributeInputContainer(attrStoreLocal);
+    
+    this.attrIsVisible = createAttrIsVisible();
+    addAttributeInputContainer(attrIsVisible);
     
     this.attrBboxId = createAttrBbox();
     addAttributeInputContainer(attrBboxId);
@@ -140,8 +146,6 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
       .build();
   }
   
-  // TODO: Future work: Compare configured bbox with layer bbox from URI!
-  // <LatLonBoundingBox minx="5.72499" miny="50.1506" maxx="9.53154" maxy="52.602"/>
   private AttributeInputContainer<LayerModel, BboxComboBox, Integer> createAttrBbox()
   {
     return AttributeInputContainer.<LayerModel, BboxComboBox, Integer>builer("Layer-Begrenzung")
@@ -162,6 +166,19 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
       })
       .withInfoAlertMessage("Die Auswahl einer Boundingbox macht insbesondere Sinn um die Datenmenge zu begrenzen "
         + "wenn der Layer lokal gespeichert werden soll.")
+      .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
+      .build();
+  }
+  
+  private AttributeInputContainer<LayerModel, CheckBox, Boolean> createAttrIsVisible()
+  {
+    return AttributeInputContainer.<LayerModel, CheckBox, Boolean>builer("Initiale Layer-Sichtbarkeit")
+      .withGuiElement(new CheckBox("Initial sichtbar?"))
+      .withGuiValueInitialization((cb, layer) -> {
+        cb.setSelected(layer.isVisible());
+      })
+      .withGuiElementToModelAttributeFunc(CheckBox::isSelected)
+      .withInfoAlertMessage("Wenn aktiviert, ist der Layer in der App initial sichtbar geschaltet!")
       .build();
   }
   

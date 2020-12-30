@@ -48,24 +48,4 @@ public class LayerServiceUriValidatorTest
     boolean isValid = sut.isValid("https://www.page?service=WCS&version=1.0.0&request=GetCapabilities");
     Assertions.assertThat(isValid).isFalse();
   }
-  
-  /**
-   * Tests the validation.
-   */
-  @Test
-  public void testIsNotValidWithouHttp()
-  {
-    boolean isValid = sut.isValid("www.page?service=WfS&version=1.0.0&request=GetCapabilities");
-    Assertions.assertThat(isValid).isFalse();
-  }
-  
-  /**
-   * Tests the validation.
-   */
-  @Test
-  public void testIsNotValidWithouWww()
-  {
-    boolean isValid = sut.isValid("https://page?service=WfS&version=1.0.0&request=GetCapabilities");
-    Assertions.assertThat(isValid).isFalse();
-  }
 }

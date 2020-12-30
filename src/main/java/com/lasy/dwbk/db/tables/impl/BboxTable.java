@@ -17,6 +17,7 @@ public class BboxTable extends ADwbkTable
   public static final String COL_MAX_LAT = "max_lat";
   
   public static final String EPSG = "epsg";
+  public static final String COL_IS_MAP_BOUNDARY = "is_map_boundary";
 
   public BboxTable()
   {

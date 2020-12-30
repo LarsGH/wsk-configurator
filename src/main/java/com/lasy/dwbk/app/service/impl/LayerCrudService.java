@@ -19,13 +19,25 @@ public class LayerCrudService extends ADwbkCrudService<LayerModel, LayerModelBui
 
   public LayerCrudService(DataStore store)
   {
-    super(store, LayerTable.TABLE_NAME); 
+    super(store, LayerTable.TABLE_NAME);
   }
 
   @Override
   public Function<SimpleFeature, LayerModel> featureToModel()
   {
     return LayerModel::new;
+  }
+
+  @Override
+  protected void doAfterCreate(LayerModel model)
+  {
+    // Nothing to do.
+  }
+
+  @Override
+  protected void doAfterUpdate(LayerModel model)
+  {
+    // Nothing to do.
   }
 
 }

@@ -1,11 +1,13 @@
 package com.lasy.dwbk.gui.panes.overview.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.service.ADwbkCrudService;
+import com.lasy.dwbk.app.service.impl.BboxCrudService;
 import com.lasy.dwbk.gui.panes.edit.AModelEditPane;
 import com.lasy.dwbk.gui.panes.edit.impl.LayerEditPane;
 import com.lasy.dwbk.gui.panes.overview.AOverviewPane;
@@ -56,19 +58,44 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected List<TableColumn<LayerModel, ?>> createSpecificModelColumns()
   {
+    TableColumn<LayerModel, String> isVisibleCol = new TableColumn<>("Initial sichtbar");
+    isVisibleCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isVisible())));
+    
     TableColumn<LayerModel, String> storeLocalCol = new TableColumn<>("Lokal speichern");
     storeLocalCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isStoreLocal())));
     
     TableColumn<LayerModel, String> isSavedCol = new TableColumn<>("Gespeichert");
     isSavedCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isSaved())));
 
-    return List.of(storeLocalCol, isSavedCol);
+    return List.of(isVisibleCol, storeLocalCol, isSavedCol);
   }
 
   @Override
   protected AModelEditPane<LayerModel> getModelEditPane(LayerModel model)
   {
     return LayerEditPane.create(getMainScene(), model);
+  }
+
+  @Override
+  protected Optional<String> getDeleteNotAllowedReason(LayerModel model)
+  {
+    return Optional.empty();
+  }
+
+  @Override
+  protected Optional<String> getCreateNotAllowedReason()
+  {
+    if(noBboxesExist())
+    {
+      return Optional.of("Es muss mindestens eine Boundingbox vorhanden sein um den Kartenausschnitt festzulegen!");
+    }
+    return Optional.empty();
+  }
+
+  private boolean noBboxesExist()
+  {
+    BboxCrudService bboxService = DwbkServiceProvider.getInstance().getBboxService();
+    return bboxService.readAll().isEmpty();
   }
 
 }

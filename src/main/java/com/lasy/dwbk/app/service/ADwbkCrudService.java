@@ -128,6 +128,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
       doCreate(feature);
 
       model = reloadModel(model);
+      doAfterCreate(model);
       return model;
     }
     catch (Exception e)
@@ -136,6 +137,12 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
         .failForReason(t, "Neuer Eintrag ('%s') konnte nicht erstellt werden.", getTableName()));
     }
   }
+  
+  /**
+   * Adds handling after the model was created.
+   * @param model the previously created model.
+   */
+  protected abstract void doAfterCreate(TModel model);
 
   private TModel reloadModel(TModel model)
   {
@@ -172,6 +179,16 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
   @Override
   public TModel update(TModel model)
   {
+    return update(model, true);
+  }
+  
+  protected TModel updateWithoutAfterHandling(TModel model)
+  {
+    return update(model, false);
+  }
+  
+  private TModel update(TModel model, boolean withAfterHandling)
+  {
     Check.notNull(model, "model");
 
     Integer id = model.getId();
@@ -179,6 +196,11 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     {
       doUpdate(model);
       model = reloadModel(model);
+      
+      if(withAfterHandling)
+      {
+        doAfterUpdate(model);
+      }
       return model;
     }
     catch (Exception e)
@@ -188,6 +210,12 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
   }
   
+  /**
+   * Adds handling after the model was updated.
+   * @param model the previously updated model.
+   */
+  protected abstract void doAfterUpdate(TModel model);
+
   private void doUpdate(TModel model) throws IOException
   {
     Transaction transaction = new DefaultTransaction(String.format("update_%s", getTableName()));

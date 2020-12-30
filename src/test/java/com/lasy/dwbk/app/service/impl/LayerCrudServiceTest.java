@@ -32,6 +32,7 @@ public class LayerCrudServiceTest
   private static final String EXPECTED_LAYER_URI = "https://my-test-uri.com";
   private static final boolean EXPECTED_STORE_LOCAL = true;
   private static final boolean EXPECTED_IS_SAVED = true;
+  private static final boolean EXPECTED_IS_VISIBLE = true;
   private static final String EXPECTED_USER = "test-user";
   private static final String EXPECTED_PW = "test-pw-1234";
 
@@ -68,7 +69,7 @@ public class LayerCrudServiceTest
     layerA.setPw("changedPw");
     layerA.setStoreLocal(false);
     layerA.setSaved(false);
-    layerA.setBboxId(null);
+    layerA.setVisible(false);
     
     // save
     sut.update(layerA);
@@ -103,7 +104,8 @@ public class LayerCrudServiceTest
       .withDescription(EXPECTED_LAYER_DESCRIPTION)
       .withUri(expectedUri)
       .withStoreLocal(EXPECTED_STORE_LOCAL)
-      .withIsSaved(EXPECTED_IS_SAVED)
+      .withSavedStatus(EXPECTED_IS_SAVED)
+      .withDefaultVisible(EXPECTED_IS_VISIBLE)
       .withBboxId(bbox.getId())
       .withUser(EXPECTED_USER)
       .withPassword(EXPECTED_PW));
@@ -114,6 +116,7 @@ public class LayerCrudServiceTest
     Assertions.assertThat(newLayer.getUri()).isEqualTo(expectedUri);
     Assertions.assertThat(newLayer.isStoreLocal()).isTrue();
     Assertions.assertThat(newLayer.isSaved()).isTrue();
+    Assertions.assertThat(newLayer.isVisible()).isTrue();
     Assertions.assertThat(newLayer.getUser().get()).isEqualTo(EXPECTED_USER);
     Assertions.assertThat(newLayer.getPw().get()).isEqualTo(EXPECTED_PW);
     Assertions.assertThat(newLayer.getBboxId().get()).isEqualTo(bbox.getId());

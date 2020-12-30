@@ -16,3 +16,5 @@ mvn clean javafx:run@run
 
 # load install jar
 java -jar dwbk-configurator.jar
+
+Es muss zwingend eine Boundingbox angelegt werden, welche die Karten-Begrenzung festlegt!

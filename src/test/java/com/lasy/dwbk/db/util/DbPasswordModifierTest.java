@@ -17,8 +17,7 @@ public class DbPasswordModifierTest
   @Test
   public void testEncryptDecrypt()
   {
-//    String pw = "Th1sIs4T3st!4212";
-    String pw = "test";
+    String pw = "Th1sIs4T3st!4212";
     
     String encrypted = DbPasswordModifier.toDbValue(pw);
     Assertions.assertThat(encrypted).isNotEqualTo(pw);

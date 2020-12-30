@@ -77,10 +77,25 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
   {
     Button newModelButton = createNewModelButton();
     newModelButton.setOnMouseClicked(e -> {
+      // Prevent delete for reasons
+      Optional<String> createNotAllowedReason = getCreateNotAllowedReason();
+      if (createNotAllowedReason.isPresent())
+      {
+        Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Erstellen nicht möglich", createNotAllowedReason.get());
+        alert.show();
+        return;
+      }
+      
       goToPane(getModelEditPane(null));
     });
     return newModelButton;
   }
+  
+  /**
+   * Returns the reason why a create might not be allowed.
+   * @return reason why a create might not be allowed
+   */
+  protected abstract Optional<String> getCreateNotAllowedReason();
   
   private TableView<TModelType> createModelTable()
   {
@@ -131,26 +146,48 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
   
   private void handleDeleteModel(TModelType model)
   {
-    // TODO: Für boundingbox hinweis wenn noch verlinkt mit Layer!
     if (model != null)
     {
-      String deleteMsg = String.format("'%s' wirklich löschen?", model.getName());
-      Alert alert = new Alert(AlertType.CONFIRMATION, deleteMsg, ButtonType.YES, ButtonType.NO);
-      alert.setTitle("Auswahl löschen");
-      alert.setHeaderText(null);
-
-      Optional<ButtonType> result = alert.showAndWait();
-
-      if (result.isPresent() && result.get() == ButtonType.YES)
+      // Prevent delete for reasons
+      Optional<String> deleteNotAllowedReason = getDeleteNotAllowedReason(model);
+      if (deleteNotAllowedReason.isPresent())
       {
-        int deleteCount = getCrudService().deleteById(model.getId());
-        if(deleteCount > 0)
+        Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Löschen nicht möglich", deleteNotAllowedReason.get());
+        alert.show();
+      }
+      else
+      {
+        // delete after confirmation
+        Alert alert = createDeleteAlert(model);
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.YES)
         {
-          this.modelTable.getItems().remove(model);
+          int deleteCount = getCrudService().deleteById(model.getId());
+          if (deleteCount > 0)
+          {
+            this.modelTable.getItems().remove(model);
+          }
         }
       }
     }
   }
+
+  private Alert createDeleteAlert(TModelType model)
+  {
+    String deleteMsg = String.format("'%s' wirklich löschen?", model.getName());
+    Alert alert = new Alert(AlertType.CONFIRMATION, deleteMsg, ButtonType.YES, ButtonType.NO);
+    alert.setTitle("Auswahl löschen");
+    alert.setHeaderText(null);
+    return alert;
+  }
+  
+  /**
+   * Returns the reason why a delete might not be allowed.
+   * @param model the model to check
+   * @return reason why a delete might not be allowed
+   */
+  protected abstract Optional<String> getDeleteNotAllowedReason(TModelType model);
 
   /**
    * Returns the CRUD service for the model.

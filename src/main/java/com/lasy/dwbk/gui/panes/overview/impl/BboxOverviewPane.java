@@ -1,11 +1,16 @@
 package com.lasy.dwbk.gui.panes.overview.impl;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.app.model.impl.BboxModel;
+import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.service.ADwbkCrudService;
+import com.lasy.dwbk.app.service.impl.LayerCrudService;
 import com.lasy.dwbk.gui.panes.edit.AModelEditPane;
 import com.lasy.dwbk.gui.panes.edit.impl.BboxEditPane;
 import com.lasy.dwbk.gui.panes.overview.AOverviewPane;
@@ -57,6 +62,9 @@ public class BboxOverviewPane extends AOverviewPane<BboxModel>
   @Override
   protected List<TableColumn<BboxModel, ?>> createSpecificModelColumns()
   {
+    TableColumn<BboxModel, String> isMapBoundaryCol = new TableColumn<>("Karten-Begrenzung");
+    isMapBoundaryCol.setCellValueFactory(new ModelValueFactory<BboxModel>(bbox -> GuiUtil.createBooleanDisplayValue(bbox.isMapBoundary())));
+    
     TableColumn<BboxModel, String> epsgCol = new TableColumn<>("EPSG-Code");
     epsgCol.setCellValueFactory(new ModelValueFactory<BboxModel>(bbox -> String.valueOf(bbox.getEpsg())));
 
@@ -72,13 +80,43 @@ public class BboxOverviewPane extends AOverviewPane<BboxModel>
     TableColumn<BboxModel, String> latMaxCol = new TableColumn<>("Breite (maximal)");
     latMaxCol.setCellValueFactory(new ModelValueFactory<BboxModel>(BboxModel::getMaxLat));
 
-    return List.of(epsgCol, lonMinCol, latMinCol, lonMaxCol, latMaxCol);
+    return List.of(isMapBoundaryCol, epsgCol, lonMinCol, latMinCol, lonMaxCol, latMaxCol);
   }
 
   @Override
-  protected AModelEditPane<BboxModel> getModelEditPane(BboxModel model)
+  protected AModelEditPane<BboxModel> getModelEditPane(BboxModel bbox)
   {
-    return BboxEditPane.create(getMainScene(), model);
+    return BboxEditPane.create(getMainScene(), bbox);
+  }
+
+  @Override
+  protected Optional<String> getDeleteNotAllowedReason(BboxModel bbox)
+  {
+    List<String> layersWithBbox = getLayersWithBbox(bbox);
+    if(!layersWithBbox.isEmpty())
+    {
+      String reason = String.format("Boundingbox '%s' kann nicht gelöscht werden, da sie von folgenden Layern verwendet wird: %s",
+        bbox.getName(),
+        String.join(", ", layersWithBbox));
+      return Optional.of(reason);
+    }
+    
+    return Optional.empty();
+  }
+  
+  private List<String> getLayersWithBbox(BboxModel bbox)
+  {
+    LayerCrudService layerCrudService = DwbkServiceProvider.getInstance().getLayerService();
+    return layerCrudService.readAll().stream()
+      .filter(layer -> Objects.equals(layer.getBboxId().orElse(null), bbox.getId()))
+      .map(LayerModel::getName)
+      .collect(Collectors.toList());
+  }
+
+  @Override
+  protected Optional<String> getCreateNotAllowedReason()
+  {
+    return Optional.empty();
   }
 
 }

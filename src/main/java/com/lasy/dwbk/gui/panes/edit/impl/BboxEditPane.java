@@ -14,6 +14,7 @@ import com.lasy.dwbk.gui.util.PatternTextField;
 import com.lasy.dwbk.util.Is;
 
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
 public class BboxEditPane extends AModelEditPane<BboxModel>
@@ -33,6 +34,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
   private AttributeInputContainer<BboxModel, TextField, String> attrName;
   private AttributeInputContainer<BboxModel, TextField, String> attrDescription;
   private AttributeInputContainer<BboxModel, TextField, Integer> attrEpsg;
+  private AttributeInputContainer<BboxModel, CheckBox, Boolean> attrIsMapBoundary;
   
   private AttributeInputContainer<BboxModel, TextField, String> attrMinLon;
   private AttributeInputContainer<BboxModel, TextField, String> attrMinLat;
@@ -59,6 +61,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
     model.setMinLat(attrMinLat.getConfiguredValue());
     model.setMaxLon(attrMaxLon.getConfiguredValue());
     model.setMaxLat(attrMaxLat.getConfiguredValue());
+    model.setMapBoundary(attrIsMapBoundary.getConfiguredValue());
     
     bBoxService().update(model);
   }
@@ -78,6 +81,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
     builder.withMinLat(attrMinLat.getConfiguredValue());
     builder.withMaxLon(attrMaxLon.getConfiguredValue());
     builder.withMaxLat(attrMaxLat.getConfiguredValue());
+    builder.withMapBoundary(attrIsMapBoundary.getConfiguredValue());
     
     bBoxService().create(builder);
   }
@@ -100,6 +104,9 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
     
     this.attrEpsg = createAttrEpsg();
     addAttributeInputContainer(attrEpsg);
+    
+    this.attrIsMapBoundary = createAttrIsMapBoundary();
+    addAttributeInputContainer(attrIsMapBoundary);
     
     this.attrMinLon = createCoordinateAttrInputContainer(
       "Minimale Länge", 
@@ -124,6 +131,19 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
       (txtField, bbox) -> txtField.setText(bbox.getMaxLat()),
       "Nord-Süd Wert der 'oberen rechten Ecke' des Ausschnitts.");
     addAttributeInputContainer(attrMaxLat);
+  }
+  
+  private AttributeInputContainer<BboxModel, CheckBox, Boolean> createAttrIsMapBoundary()
+  {
+    return AttributeInputContainer.<BboxModel, CheckBox, Boolean>builer("Standard Kartenbegrenzung")
+      .withGuiElement(new CheckBox("Als Kartenbegrenzung verwenden?"))
+      .withGuiValueInitialization((cb, bbox) -> {
+        cb.setSelected(bbox.isMapBoundary());
+      })
+      .withGuiElementToModelAttributeFunc(CheckBox::isSelected)
+      .withInfoAlertMessage("Wenn aktiviert, wird dieser Ausschnitt als Standardbegrenzung für die Karte in der App verwendet. "
+        + "Es muss genau eine Standard-Kartenbegrenzung vorhanden sein!")
+      .build();
   }
   
   private AttributeInputContainer<BboxModel, TextField, String> createCoordinateAttrInputContainer(

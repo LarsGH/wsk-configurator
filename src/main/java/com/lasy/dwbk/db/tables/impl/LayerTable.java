@@ -17,6 +17,7 @@ public class LayerTable  extends ADwbkTable
    */
   public static final String COL_IS_SAVED = "is_saved";
   public static final String COL_STORE_LOCAL = "store_local";
+  public static final String COL_IS_VISIBLE = "is_visible";
 
   public static final String COL_USER = "user";
   public static final String COL_PW = "pw";
