@@ -1,5 +1,7 @@
 package com.lasy.dwbk.app.model.impl;
 
+import java.math.BigDecimal;
+
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.lasy.dwbk.app.model.AGtModel;
@@ -46,6 +48,11 @@ public class BboxModel extends AGtModel
     String val = DbRowAccess.getMandatoryValue(getFeature(), BboxTable.COL_MIN_LON, String.class);
     return val;
   }
+  
+  public BigDecimal getMinLonNum()
+  {
+    return new BigDecimal(getMinLon());
+  }
 
   public void setMinLon(String minLon)
   {
@@ -56,6 +63,11 @@ public class BboxModel extends AGtModel
   {
     String val = DbRowAccess.getMandatoryValue(getFeature(), BboxTable.COL_MIN_LAT, String.class);
     return val;
+  }
+  
+  public BigDecimal getMinLatNum()
+  {
+    return new BigDecimal(getMinLat());
   }
 
   public void setMinLat(String minLat)
@@ -68,7 +80,13 @@ public class BboxModel extends AGtModel
     String val = DbRowAccess.getMandatoryValue(getFeature(), BboxTable.COL_MAX_LON, String.class);
     return val;
   }
+  
+  public BigDecimal getMaxLonNum()
+  {
+    return new BigDecimal(getMaxLon());
+  }
 
+  // TODO: max precision einheitlich prüfen!
   public void setMaxLon(String maxLon)
   {
     this.getFeature().setAttribute(BboxTable.COL_MAX_LON, maxLon);
@@ -78,6 +96,11 @@ public class BboxModel extends AGtModel
   {
     String val = DbRowAccess.getMandatoryValue(getFeature(), BboxTable.COL_MAX_LAT, String.class);
     return val;
+  }
+  
+  public BigDecimal getMaxLatNum()
+  {
+    return new BigDecimal(getMaxLat());
   }
 
   public void setMaxLat(String maxLat)

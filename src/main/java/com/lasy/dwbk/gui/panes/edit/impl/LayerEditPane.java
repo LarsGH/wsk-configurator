@@ -122,6 +122,8 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     addAttributeInputContainer(attrPw);
   }
   
+  // TODO: metersPerPixel in GUI aufnehmen!
+  
   private AttributeInputContainer<LayerModel, TextField, String> createAttrPw()
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Benutzername")
@@ -151,7 +153,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     return AttributeInputContainer.<LayerModel, BboxComboBox, Integer>builer("Layer-Begrenzung")
       .withGuiElement(new BboxComboBox())
       .withGuiValueInitialization((comboBox, layer) -> {
-        comboBox.setSelectedBboxById(layer.getBboxId().orElse(null));
+        comboBox.setSelectedBboxById(layer.getBboxId());
       })
       .withGuiElementToModelAttributeFunc(BboxComboBox::getSelectedBboxId)
       .withDependingContainerValidator(attrStoreLocal, (storeLocalObj, bboxId) -> {

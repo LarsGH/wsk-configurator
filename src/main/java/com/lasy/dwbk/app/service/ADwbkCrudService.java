@@ -127,8 +127,8 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
       SimpleFeature feature = model.getFeature();
       doCreate(feature);
 
-      model = reloadModel(model);
       doAfterCreate(model);
+      model = reloadModel(model);
       return model;
     }
     catch (Exception e)

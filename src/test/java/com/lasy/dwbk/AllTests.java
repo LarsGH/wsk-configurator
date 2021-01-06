@@ -16,12 +16,14 @@ import com.lasy.dwbk.app.DwbkFramework;
 import com.lasy.dwbk.app.service.ServiceTestSuite;
 import com.lasy.dwbk.db.DbTestSuite;
 import com.lasy.dwbk.validation.ValidationTestSuite;
+import com.lasy.dwbk.ws.WsTestSuite;
 
 @RunWith(Suite.class)
 @SuiteClasses({
   ServiceTestSuite.class,
   DbTestSuite.class,
   ValidationTestSuite.class,
+  WsTestSuite.class,
 })
 public class AllTests
 {

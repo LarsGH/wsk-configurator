@@ -18,6 +18,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   private String description;
   private String uri;
   private boolean storeLocal;
+  private String metersPerPixel;
   private boolean isSaved;
   private boolean isVisible;
   private Integer bboxId;
@@ -41,6 +42,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     featureBuilder.set(LayerTable.COL_DESCRIPTION, this.description);
     featureBuilder.set(LayerTable.COL_URI, this.uri);
     featureBuilder.set(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(this.storeLocal));
+    featureBuilder.set(LayerTable.COL_PIXEL_METERS, this.metersPerPixel);
     featureBuilder.set(LayerTable.COL_IS_SAVED, DbBoolean.toDbValue(this.isSaved));
     featureBuilder.set(LayerTable.COL_IS_VISIBLE, DbBoolean.toDbValue(this.isVisible));
     featureBuilder.set(LayerTable.COL_BBOX_ID, this.bboxId);
@@ -82,6 +84,17 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   public LayerModelBuilder withStoreLocal(boolean storeLocal)
   {
     this.storeLocal = storeLocal;
+    return this;
+  }
+  
+  /**
+   * Sets the value for valid meters per pixels. Values must be separated by semicolon (';')!
+   * @param metersPerPixel the meters per pixel (used to build the tile matrix pyramid).
+   * @return builder
+   */
+  public LayerModelBuilder withMetersPerPixel(String metersPerPixel)
+  {
+    this.metersPerPixel = Check.notNull(metersPerPixel, "metersPerPixel");
     return this;
   }
   

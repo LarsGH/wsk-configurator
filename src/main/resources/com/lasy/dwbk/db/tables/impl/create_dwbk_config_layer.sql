@@ -5,11 +5,14 @@ CREATE TABLE "dwbk_config_layer" (
 "description" VARCHAR(255),
 "is_saved" VARCHAR(1) NOT NULL, 
 "store_local" VARCHAR(1) NOT NULL, 
+"pixel_meters" VARCHAR(40), 
 "is_visible" VARCHAR(1) NOT NULL, 
 "uri" VARCHAR(1000) NOT NULL UNIQUE, 
 "bbox_id" MEDIUMINT NOT NULL, 
 "user" VARCHAR(40), 
 "pw" VARCHAR(40),
+"query_parts" VARCHAR(1000), 
+"local_name" VARCHAR(40),
 "last_changed" VARCHAR(19) NOT NULL,
 FOREIGN KEY("bbox_id") REFERENCES dwbk_config_bbox("id")
 );

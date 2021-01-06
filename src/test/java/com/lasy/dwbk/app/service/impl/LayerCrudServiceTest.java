@@ -2,6 +2,7 @@ package com.lasy.dwbk.app.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.geotools.data.DataStore;
@@ -13,6 +14,7 @@ import com.lasy.dwbk.app.DwbkFramework;
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.impl.BboxModel;
 import com.lasy.dwbk.app.model.impl.LayerModel;
+import com.lasy.dwbk.db.util.DbGeneratedLayerName;
 
 /**
  * Testet {@link LayerCrudService}.
@@ -29,7 +31,7 @@ public class LayerCrudServiceTest
   private static final String EXPECTED_BBOX_MAX_LAT = "11.99999";
   
   private static final String EXPECTED_LAYER_DESCRIPTION = "My layer description...";
-  private static final String EXPECTED_LAYER_URI = "https://my-test-uri.com";
+  private static final String EXPECTED_LAYER_URI = "https://my-test-uri.com?service=wms&version=1.0.0&layer=test";
   private static final boolean EXPECTED_STORE_LOCAL = true;
   private static final boolean EXPECTED_IS_SAVED = true;
   private static final boolean EXPECTED_IS_VISIBLE = true;
@@ -63,13 +65,14 @@ public class LayerCrudServiceTest
   {
     // create
     LayerModel layerA = assertThatLayerIsCreatedWithExpectedContent("Test-Layer-A");
-    Assertions.assertThat(layerA.getBbox().get()).isEqualTo(bbox);
+    Assertions.assertThat(layerA.getBbox()).isEqualTo(bbox);
     
     layerA.setName("changedName");
     layerA.setPw("changedPw");
     layerA.setStoreLocal(false);
+    layerA.setMetersPerPixel(null);
     layerA.setSaved(false);
-    layerA.setVisible(false);
+    layerA.setVisible(false);    
     
     // save
     sut.update(layerA);
@@ -79,6 +82,7 @@ public class LayerCrudServiceTest
       .orElseThrow(() -> new AssertionError("Load by ID did not work!"));
     
     Assertions.assertThat(layerA).isEqualTo(reloadedLayerA);
+    Assertions.assertThat(reloadedLayerA.getMetersPerPixelPerZoomLevel()).isEmpty();
     
     LayerModel layerB = assertThatLayerIsCreatedWithExpectedContent("Test-Layer-B");
     
@@ -104,6 +108,7 @@ public class LayerCrudServiceTest
       .withDescription(EXPECTED_LAYER_DESCRIPTION)
       .withUri(expectedUri)
       .withStoreLocal(EXPECTED_STORE_LOCAL)
+      .withMetersPerPixel("1;10;100")
       .withSavedStatus(EXPECTED_IS_SAVED)
       .withDefaultVisible(EXPECTED_IS_VISIBLE)
       .withBboxId(bbox.getId())
@@ -115,12 +120,24 @@ public class LayerCrudServiceTest
     Assertions.assertThat(newLayer.getDescription().get()).isEqualTo(EXPECTED_LAYER_DESCRIPTION);
     Assertions.assertThat(newLayer.getUri()).isEqualTo(expectedUri);
     Assertions.assertThat(newLayer.isStoreLocal()).isTrue();
+    Assertions.assertThat(newLayer.getMetersPerPixelPerZoomLevel()).containsExactlyEntriesOf(Map.of(
+      0, 100, 
+      1, 10, 
+      2, 1));
     Assertions.assertThat(newLayer.isSaved()).isTrue();
     Assertions.assertThat(newLayer.isVisible()).isTrue();
     Assertions.assertThat(newLayer.getUser().get()).isEqualTo(EXPECTED_USER);
     Assertions.assertThat(newLayer.getPw().get()).isEqualTo(EXPECTED_PW);
-    Assertions.assertThat(newLayer.getBboxId().get()).isEqualTo(bbox.getId());
+    Assertions.assertThat(newLayer.getBboxId()).isEqualTo(bbox.getId());
     Assertions.assertThat(newLayer.getLastChangedDate()).isEqualToIgnoringSeconds(LocalDateTime.now());
+    String expectedLocalName = DbGeneratedLayerName.idToGeneratedTableName(newLayer.getId());
+    Assertions.assertThat(newLayer.getLocalName()).isEqualTo(expectedLocalName);
+    
+    String expectedQueryParts = String.format("{\"base_url\":\"https://my-test-uri.com?\",\r\n"
+      + "\"layer\":\"test_%s\",\r\n"
+      + "\"service\":\"wms\",\r\n"
+      + "\"version\":\"1.0.0\"}", newLayer.getName());
+    Assertions.assertThat(newLayer.getQueryParts()).isEqualTo(expectedQueryParts);
     
     return newLayer;
   }

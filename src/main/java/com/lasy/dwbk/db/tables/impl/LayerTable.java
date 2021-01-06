@@ -22,6 +22,10 @@ public class LayerTable  extends ADwbkTable
   public static final String COL_USER = "user";
   public static final String COL_PW = "pw";
   
+  public static final String COL_PIXEL_METERS = "pixel_meters";
+  public static final String COL_LOCAL_NAME = "local_name";
+  public static final String COL_QUERY_PARTS = "query_parts";
+  
   public static final String COL_BBOX_ID = "bbox_id";
   
   public LayerTable()

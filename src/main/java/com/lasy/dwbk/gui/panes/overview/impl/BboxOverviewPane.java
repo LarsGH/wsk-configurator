@@ -108,7 +108,7 @@ public class BboxOverviewPane extends AOverviewPane<BboxModel>
   {
     LayerCrudService layerCrudService = DwbkServiceProvider.getInstance().getLayerService();
     return layerCrudService.readAll().stream()
-      .filter(layer -> Objects.equals(layer.getBboxId().orElse(null), bbox.getId()))
+      .filter(layer -> Objects.equals(layer.getBboxId(), bbox.getId()))
       .map(LayerModel::getName)
       .collect(Collectors.toList());
   }
