@@ -1,5 +1,7 @@
 package com.lasy.dwbk.app.model.impl;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -63,6 +65,33 @@ public class LayerModel extends AGtModel
   public void setStoreLocal(boolean storeLocal)
   {
     this.getFeature().setAttribute(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(storeLocal));
+  }
+  
+  // TODO: mechanism to delete downloaded layer
+  public Optional<LocalDateTime> getLastDownloadDate()
+  {
+    String lastChanged = DbRowAccess.getValueElseNull(getFeature(), LayerTable.COL_LAST_DL, String.class);
+    if(Is.nullOrTrimmedEmpty(lastChanged))
+    {
+      return Optional.empty();
+    }
+    
+    return Optional.of(LocalDateTime.parse(lastChanged));
+  }
+  
+  public void setLastDownloadDate(LocalDateTime date)
+  {
+    String insertDate = date != null
+      ? date.truncatedTo(ChronoUnit.SECONDS).toString()
+      : null;
+    this.getFeature().setAttribute(LayerTable.COL_LAST_DL, insertDate);
+  }
+  
+  // TODO: updateLastDownloadDate nach geopackage layer tile generierung!
+  public void updateLastDownloadDate()
+  {
+    LocalDateTime now = LocalDateTime.now();
+    setLastDownloadDate(now);
   }
 
   public boolean isSaved()

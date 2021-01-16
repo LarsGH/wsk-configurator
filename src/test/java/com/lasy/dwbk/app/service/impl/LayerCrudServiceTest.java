@@ -74,9 +74,11 @@ public class LayerCrudServiceTest
     layerA.setMetersPerPixelText(null);
     layerA.setSaved(false);
     layerA.setVisible(false);    
+    layerA.updateLastDownloadDate();
     
     // save
     sut.update(layerA);
+    Assertions.assertThat(layerA.getLastDownloadDate().get()).isEqualToIgnoringSeconds(LocalDateTime.now());
     
     // load (by ID)
     LayerModel reloadedLayerA = sut.readById(layerA.getId())

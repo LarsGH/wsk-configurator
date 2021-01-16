@@ -13,6 +13,7 @@ CREATE TABLE "dwbk_config_layer" (
 "pw" VARCHAR(40),
 "query_parts" VARCHAR(1000), 
 "local_name" VARCHAR(40),
+"last_dl" VARCHAR(19),
 "last_changed" VARCHAR(19) NOT NULL,
 FOREIGN KEY("bbox_id") REFERENCES dwbk_config_bbox("id")
 );
