@@ -4,6 +4,7 @@ import com.lasy.dwbk.gui.info.DwbkAppInfo;
 import com.lasy.dwbk.gui.panes.overview.impl.BboxOverviewPane;
 import com.lasy.dwbk.gui.panes.overview.impl.LayerOverviewPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
+import com.lasy.dwbk.gui.util.GuiImage;
 import com.lasy.dwbk.gui.util.GuiUtil;
 
 import javafx.event.EventHandler;
@@ -14,8 +15,18 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.VBox;
 
+/**
+ * The main pane shown when the application is started.
+ * @author larss
+ *
+ */
 public class MainPane extends ADwbkPane
 {
   
@@ -97,8 +108,28 @@ public class MainPane extends ADwbkPane
       createInfoButton());
     box.setAlignment(Pos.CENTER);
     box.setPrefWidth(BUTTON_WIDTH);
+    box.setBackground(createMainBackground());
     
     return box;
+  }
+  
+  private Background createMainBackground()
+  {
+    BackgroundSize bgSize = new BackgroundSize(
+      BackgroundSize.AUTO, 
+      BackgroundSize.AUTO, 
+      false, 
+      false, 
+      true, 
+      true);
+    
+    Background bg = new Background(new BackgroundImage(
+      GuiImage.MAIN_PAGE_BACKGROUND_IMG, 
+      BackgroundRepeat.NO_REPEAT, 
+      BackgroundRepeat.NO_REPEAT, 
+      BackgroundPosition.CENTER, 
+      bgSize));
+    return bg;
   }
 
   @Override

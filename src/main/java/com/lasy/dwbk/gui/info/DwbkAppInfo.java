@@ -67,7 +67,7 @@ public class DwbkAppInfo
 
   public static VBox getInfoBox()
   {
-    HBox header = GuiUtil.createHeader("Digitale Waldbrand-Karte");
+    HBox header = GuiUtil.createHeader("Digitale Waldbrandkarte");
 
     Label versionInfo = new Label("Version: " + getVersion());
 
@@ -80,8 +80,18 @@ public class DwbkAppInfo
     Button iconSiteBtn = createBrowseButton("Öffnet die Seite der Icon-Plattform", ICON_SITE_URL);
     HBox iconSiteInfo = new HBox(GuiUtil.DEFAULT_SPACING, iconSiteBtn, iconSite);
     iconSiteInfo.setAlignment(Pos.CENTER_LEFT);
+    
+    Label copyRightMainPage = new Label("Copyright Bild Konfigurations-Übersicht: "
+      + "Photo taken by John McColgan, "
+      + "employed as a fire behavior analyst at the Forest Service, "
+      + "an agency of the U.S. Department of Agriculture");
 
-    return new VBox(GuiUtil.DEFAULT_SPACING, header, versionInfo, iconCreatorInfo, iconSiteInfo);
+    return new VBox(GuiUtil.DEFAULT_SPACING, 
+      header, 
+      versionInfo, 
+      iconCreatorInfo, 
+      iconSiteInfo,
+      copyRightMainPage);
   }
 
   private static Button createBrowseButton(String toolTip, String site)

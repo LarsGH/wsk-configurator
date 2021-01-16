@@ -23,13 +23,14 @@ public class GuiStarter extends Application
   @Override
   public void start(Stage stage) 
   {    
-    Scene scene = new Scene(new BorderPane(), 640, 480);
+    Scene scene = new Scene(new BorderPane());
     MainPane mainPane = MainPane.create(scene);
     scene.setRoot(mainPane);
 
     stage.setTitle("Waldbrandkarte Konfiguration");
     stage.getIcons().add(GuiIcon.WILD_FIRE);
     stage.setScene(scene);
+    stage.setMaximized(true);
     stage.show();
     stage.toFront();
   }
