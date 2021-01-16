@@ -1,9 +1,14 @@
 package com.lasy.dwbk.gui;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Collection;
 
 import com.lasy.dwbk.app.DwbkFramework;
+import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.error.ErrorModule;
+import com.lasy.dwbk.app.model.impl.LayerModel;
+import com.lasy.dwbk.app.service.impl.LayerCrudService;
+import com.lasy.dwbk.db.util.DbGeneratedLayerName;
 import com.lasy.dwbk.gui.panes.MainPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
 
@@ -35,6 +40,7 @@ public class GuiStarter extends Application
     
     try (DwbkFramework framework = DwbkFramework.getInstance())
     {
+//      migrate();
       Application.launch();
     }
     catch (Throwable t)
@@ -48,6 +54,25 @@ public class GuiStarter extends Application
     return (thread, thrown) -> {
       ErrorModule.handleError(thrown);
     };
+  }
+  
+  /**
+   * Starts the migration.
+   */
+  @SuppressWarnings("unused")
+  private static void migrate()
+  {
+    LayerCrudService layerService = DwbkServiceProvider.getInstance().getLayerService();
+    Collection<LayerModel> layers = layerService.readAll();
+    for(LayerModel model : layers)
+    {
+      String localTableName = DbGeneratedLayerName.idToGeneratedTableName(model.getId());
+      model.setLocalName(localTableName);
+      
+      layerService.update(model);
+    }
+    
+    System.out.println("Migration abgeschlossen!");
   }
 
 }

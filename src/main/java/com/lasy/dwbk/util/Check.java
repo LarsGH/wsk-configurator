@@ -1,6 +1,10 @@
 package com.lasy.dwbk.util;
 
-import com.lasy.dwbk.validation.impl.CoordinateValidator;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Comparator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Check preconditions. Throws {@link IllegalArgumentException} if conditions are not met.
@@ -42,6 +46,9 @@ public class Check
     return val;
   }
   
+  /** The maximum number of decimal digits for coordinates. */
+  private static final int MAX_COORD_PRECISION = 6;
+  
   /**
    * Checks if a coordinate is valid.
    * @param coord the input coordinate
@@ -50,12 +57,40 @@ public class Check
    */
   public static String validCoordinate(String coord, String attrName)
   {
-    CoordinateValidator validator = new CoordinateValidator();
-    if(!validator.isValid(coord))
+    try
     {
-      String msg = String.format("'%s' is not a valid coordinate!", attrName);
+      BigDecimal num = new BigDecimal(coord);
+      num = num.setScale(MAX_COORD_PRECISION, RoundingMode.HALF_UP);
+      return num.toPlainString();
+    }
+    catch (Exception e)
+    {
+      String msg = String.format("'%s' is not a valid coordinate! Was: %s", attrName, coord);
       throw new IllegalArgumentException(msg);
     }
-    return coord.trim();
+  }
+
+  /**
+   * Checks if the string contains integers separated by semicolons. 
+   * @param intString string of integers separated by semicolons
+   * @param attrName attribute name
+   * @return the string with integers separated by semicolons without duplicates and in decreasing order.
+   */
+  public static String numbersSeparatedBySemicolons(String intString, String attrName)
+  {
+    try
+    {
+      return Stream.of(intString.split(";"))
+        .map(str -> Integer.valueOf(str))
+        .distinct()
+        .sorted(Comparator.reverseOrder())
+        .map(num -> num.toString())
+        .collect(Collectors.joining(";"));
+    } catch (Exception e)
+    {
+      String msg = String.format("'%s' is not a valid list of numbers separated by ';'. Was: %s", attrName, intString);
+      throw new IllegalArgumentException(msg);
+    }
+    
   }
 }

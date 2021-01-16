@@ -7,6 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.lasy.dwbk.validation.impl.AcceptAllValidatorTest;
 import com.lasy.dwbk.validation.impl.CoordinateValidatorTest;
 import com.lasy.dwbk.validation.impl.IntegersOnlyValidatorTest;
+import com.lasy.dwbk.validation.impl.IntegersSeparatedBySemicolonValidatorTest;
 import com.lasy.dwbk.validation.impl.LayerServiceUriValidatorTest;
 import com.lasy.dwbk.validation.impl.TextOnlyValidatorTest;
 
@@ -15,6 +16,7 @@ import com.lasy.dwbk.validation.impl.TextOnlyValidatorTest;
   AcceptAllValidatorTest.class,
   CoordinateValidatorTest.class,
   IntegersOnlyValidatorTest.class,
+  IntegersSeparatedBySemicolonValidatorTest.class, 
   LayerServiceUriValidatorTest.class,
   TextOnlyValidatorTest.class,
 })

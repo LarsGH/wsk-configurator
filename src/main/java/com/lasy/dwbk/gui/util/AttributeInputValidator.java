@@ -2,6 +2,8 @@ package com.lasy.dwbk.gui.util;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.lasy.dwbk.util.Is;
 import com.lasy.dwbk.validation.impl.LayerServiceUriValidator;
@@ -38,6 +40,29 @@ public class AttributeInputValidator
       if(!isValid)
       {
         return Optional.of("Die URI muss den anzufragenden Service (WMS / WFS) spezifizieren!");
+      }
+      return Optional.empty();
+    };
+  }
+  
+  public static Function<String, Optional<String>> createDivisorInputFunction(int num)
+  {
+    return val -> {
+      if(Is.nullOrTrimmedEmpty(val))
+      {
+        return Optional.empty();
+      }
+      
+      String[] parts = val.split(";");
+      String errorValues = Stream.of(parts)
+        .map(str -> Integer.valueOf(str))
+        .filter(n -> (num % n) != 0)
+        .map(n -> n.toString())
+        .collect(Collectors.joining(", "));
+      
+      if(!Is.nullOrTrimmedEmpty(errorValues))
+      {
+        return Optional.of(String.format("Die folgenden Werte sind keine Teiler von %s: %s", num, errorValues));
       }
       return Optional.empty();
     };

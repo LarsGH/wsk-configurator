@@ -5,6 +5,7 @@ import com.lasy.dwbk.validation.IUserInputValidator;
 import com.lasy.dwbk.validation.impl.AcceptAllValidator;
 import com.lasy.dwbk.validation.impl.CoordinateValidator;
 import com.lasy.dwbk.validation.impl.IntegersOnlyValidator;
+import com.lasy.dwbk.validation.impl.IntegersSeparatedBySemicolonValidator;
 import com.lasy.dwbk.validation.impl.TextOnlyValidator;
 
 import javafx.scene.control.TextField;
@@ -33,6 +34,15 @@ public class PatternTextField extends TextField
   public static PatternTextField createIntegersOnlyTextField()
   {
     return new PatternTextField(new IntegersOnlyValidator());
+  }
+  
+  /**
+   * Returns a textfield with allows a list of integers separated by semicolons.
+   * @return textfield
+   */
+  public static PatternTextField createNumbersSeparatedBySemicolonsTextField()
+  {
+    return new PatternTextField(new IntegersSeparatedBySemicolonValidator());
   }
   
   /**

@@ -2,6 +2,7 @@ package com.lasy.dwbk.app.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
@@ -70,7 +71,7 @@ public class LayerCrudServiceTest
     layerA.setName("changedName");
     layerA.setPw("changedPw");
     layerA.setStoreLocal(false);
-    layerA.setMetersPerPixel(null);
+    layerA.setMetersPerPixelText(null);
     layerA.setSaved(false);
     layerA.setVisible(false);    
     
@@ -120,10 +121,13 @@ public class LayerCrudServiceTest
     Assertions.assertThat(newLayer.getDescription().get()).isEqualTo(EXPECTED_LAYER_DESCRIPTION);
     Assertions.assertThat(newLayer.getUri()).isEqualTo(expectedUri);
     Assertions.assertThat(newLayer.isStoreLocal()).isTrue();
-    Assertions.assertThat(newLayer.getMetersPerPixelPerZoomLevel()).containsExactlyEntriesOf(Map.of(
-      0, 100, 
-      1, 10, 
-      2, 1));
+    
+    Map<Integer, Integer> expectedMetersPerPixelPerZoomLevel = new LinkedHashMap<Integer, Integer>();
+    expectedMetersPerPixelPerZoomLevel.put(0, 100);
+    expectedMetersPerPixelPerZoomLevel.put(1, 10);
+    expectedMetersPerPixelPerZoomLevel.put(2, 1);
+    Assertions.assertThat(newLayer.getMetersPerPixelPerZoomLevel()).containsExactlyEntriesOf(expectedMetersPerPixelPerZoomLevel);
+    
     Assertions.assertThat(newLayer.isSaved()).isTrue();
     Assertions.assertThat(newLayer.isVisible()).isTrue();
     Assertions.assertThat(newLayer.getUser().get()).isEqualTo(EXPECTED_USER);

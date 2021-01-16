@@ -20,10 +20,10 @@ import com.lasy.dwbk.app.model.impl.BboxModel;
 public class BboxCrudServiceTest
 {
   private static final String EXPECTED_BBOX_DESCRIPTION = "Bbox description...";
-  private static final String EXPECTED_BBOX_MIN_LON = "9.99999";
-  private static final String EXPECTED_BBOX_MIN_LAT = "1.11111";
-  private static final String EXPECTED_BBOX_MAX_LON = "99.11111";
-  private static final String EXPECTED_BBOX_MAX_LAT = "11.99999";
+  private static final String EXPECTED_BBOX_MIN_LON = "9.999993";
+  private static final String EXPECTED_BBOX_MIN_LAT = "1.111116";
+  private static final String EXPECTED_BBOX_MAX_LON = "99.111117";
+  private static final String EXPECTED_BBOX_MAX_LAT = "11.999992";
   private static final boolean EXPECTED_BBOX_IS_MAP_BOUNDARY = true;
   private static final int EXPECTED_BBOX_EPSG = 4326;
 

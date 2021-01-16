@@ -2,6 +2,7 @@ package com.lasy.dwbk.app.model.impl;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -133,7 +134,7 @@ public class LayerModel extends AGtModel
    */
   public Map<Integer, Integer> getMetersPerPixelPerZoomLevel()
   {
-    String metersPerPixel = DbRowAccess.getValueElseNull(getFeature(), LayerTable.COL_PIXEL_METERS, String.class);
+    String metersPerPixel = getMetersPerPixelText();
     if(Is.nullOrTrimmedEmpty(metersPerPixel))
     {
       return Collections.emptyMap();
@@ -143,11 +144,31 @@ public class LayerModel extends AGtModel
     return Stream.of(metersPerPixel.split(";"))
       .map(val -> Integer.valueOf(val))
       .sorted(Comparator.reverseOrder())
-      .collect(Collectors.toMap(val -> index.getAndIncrement(), val -> val));
+      .collect(Collectors.toMap(val -> index.getAndIncrement(), val -> val,
+        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
   }
   
-  public void setMetersPerPixel(String metersPerPixel)
+  /**
+   * Returns the pixel resolution in meters per zoom level. Values are decreasing and separated by semicolons. 
+   * @return pixel resolution in meters per zoom level.
+   */
+  public String getMetersPerPixelText()
   {
+    String metersPerPixel = DbRowAccess.getValueElseNull(getFeature(), LayerTable.COL_PIXEL_METERS, String.class);
+    return metersPerPixel;
+  }
+  
+  /**
+   * Sets the meters per pixel in the correct format.
+   * @param metersPerPixel integer string separated by semicolons
+   */
+  public void setMetersPerPixelText(String metersPerPixel)
+  {
+    if(metersPerPixel != null)
+    {
+      // ensure correct formatting
+      metersPerPixel = Check.numbersSeparatedBySemicolons(metersPerPixel, "metersPerPixel");      
+    }
     this.getFeature().setAttribute(LayerTable.COL_PIXEL_METERS, metersPerPixel);
   }
   

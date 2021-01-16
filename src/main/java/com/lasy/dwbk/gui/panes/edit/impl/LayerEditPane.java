@@ -13,6 +13,7 @@ import com.lasy.dwbk.gui.panes.edit.util.BboxComboBox;
 import com.lasy.dwbk.gui.panes.overview.impl.LayerOverviewPane;
 import com.lasy.dwbk.gui.util.AttributeInputValidator;
 import com.lasy.dwbk.gui.util.PatternTextField;
+import com.lasy.dwbk.util.Is;
 
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -36,6 +37,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   private AttributeInputContainer<LayerModel, TextField, String> attrName;
   private AttributeInputContainer<LayerModel, TextField, String> attrDescription;
   private AttributeInputContainer<LayerModel, TextField, String> attrUri;
+  private AttributeInputContainer<LayerModel, TextField, String> attrMetersPerPixel;
   private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrStoreLocal;
   private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrIsVisible;
   private AttributeInputContainer<LayerModel, BboxComboBox, Integer> attrBboxId;
@@ -58,6 +60,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     model.setName(attrName.getConfiguredValue());
     model.setDescription(attrDescription.getConfiguredValue());
     model.setUri(attrUri.getConfiguredValue());
+    model.setMetersPerPixelText(attrMetersPerPixel.getConfiguredValue());
     model.setStoreLocal(attrStoreLocal.getConfiguredValue());
     model.setVisible(attrIsVisible.getConfiguredValue());
     model.setBboxId(attrBboxId.getConfiguredValue());
@@ -78,6 +81,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     LayerModelBuilder builder = LayerModel.builder(attrName.getConfiguredValue());
     builder.withDescription(attrDescription.getConfiguredValue());
     builder.withUri(attrUri.getConfiguredValue());
+    builder.withMetersPerPixel(attrMetersPerPixel.getConfiguredValue());
     builder.withStoreLocal(attrStoreLocal.getConfiguredValue());
     builder.withDefaultVisible(attrIsVisible.getConfiguredValue());
     builder.withBboxId(attrBboxId.getConfiguredValue());
@@ -109,6 +113,9 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     this.attrStoreLocal = createAttrStoreLocal();
     addAttributeInputContainer(attrStoreLocal);
     
+    this.attrMetersPerPixel = createAttrMetersPerPixel();
+    addAttributeInputContainer(attrMetersPerPixel);
+    
     this.attrIsVisible = createAttrIsVisible();
     addAttributeInputContainer(attrIsVisible);
     
@@ -122,8 +129,30 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     addAttributeInputContainer(attrPw);
   }
   
-  // TODO: metersPerPixel in GUI aufnehmen!
-  
+  private AttributeInputContainer<LayerModel, TextField, String> createAttrMetersPerPixel()
+  {
+    return AttributeInputContainer.<LayerModel, TextField, String>builer("Auflösung pro Zoomstufe")
+      .withGuiElement(PatternTextField.createNumbersSeparatedBySemicolonsTextField())
+      .withGuiValueInitialization((txtField, layer) -> {
+        txtField.setText(layer.getMetersPerPixelText());
+      })
+      .withGuiElementToModelAttributeFunc(TextField::getText)
+      .withInfoAlertMessage("Die Auflösung pro Pixel. Kann mehrere Werte (absteigend) getrennt durch ';' enthalten. "
+        + "Die Werte müssen Teiler von 500 sein (500 % <Auflösung> = 0). Die Liste wird beim Speichern automatisch geordnet.")
+      .withDependingContainerValidator(attrStoreLocal, (storeLocalObj, metersPerPixel) -> {
+        Boolean storeLocal = storeLocalObj == null
+          ? false
+          : (Boolean) storeLocalObj;
+        if (storeLocal && Is.nullOrTrimmedEmpty(metersPerPixel))
+        {
+          return Optional.of("Es muss mindestens eine Auflösung angegeben werden, wenn der Layer lokal gespeichert wird!");
+        }
+        return Optional.empty();
+      })
+      .withInputValidationError(AttributeInputValidator.createDivisorInputFunction(500))
+      .build();
+  }
+
   private AttributeInputContainer<LayerModel, TextField, String> createAttrPw()
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Benutzername")
@@ -156,16 +185,6 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
         comboBox.setSelectedBboxById(layer.getBboxId());
       })
       .withGuiElementToModelAttributeFunc(BboxComboBox::getSelectedBboxId)
-      .withDependingContainerValidator(attrStoreLocal, (storeLocalObj, bboxId) -> {
-        Boolean storeLocal = storeLocalObj == null
-          ? false
-          : (Boolean) storeLocalObj;
-        if (storeLocal && bboxId == null)
-        {
-          return Optional.of("Es muss eine Boundingbox angegeben werden, wenn der Layer lokal gespeichert wird!");
-        }
-        return Optional.empty();
-      })
       .withInfoAlertMessage("Die Auswahl einer Boundingbox macht insbesondere Sinn um die Datenmenge zu begrenzen "
         + "wenn der Layer lokal gespeichert werden soll.")
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())

@@ -56,7 +56,7 @@ public class BboxModel extends AGtModel
 
   public void setMinLon(String minLon)
   {
-    this.getFeature().setAttribute(BboxTable.COL_MIN_LON, minLon);
+    this.getFeature().setAttribute(BboxTable.COL_MIN_LON, Check.validCoordinate(minLon, "minLon"));
   }
 
   public String getMinLat()
@@ -72,7 +72,7 @@ public class BboxModel extends AGtModel
 
   public void setMinLat(String minLat)
   {
-    this.getFeature().setAttribute(BboxTable.COL_MIN_LAT, minLat);
+    this.getFeature().setAttribute(BboxTable.COL_MIN_LAT, Check.validCoordinate(minLat, "minLat"));
   }
 
   public String getMaxLon()
@@ -86,10 +86,9 @@ public class BboxModel extends AGtModel
     return new BigDecimal(getMaxLon());
   }
 
-  // TODO: max precision einheitlich prüfen!
   public void setMaxLon(String maxLon)
   {
-    this.getFeature().setAttribute(BboxTable.COL_MAX_LON, maxLon);
+    this.getFeature().setAttribute(BboxTable.COL_MAX_LON, Check.validCoordinate(maxLon, "maxLon"));
   }
 
   public String getMaxLat()
@@ -105,7 +104,7 @@ public class BboxModel extends AGtModel
 
   public void setMaxLat(String maxLat)
   {
-    this.getFeature().setAttribute(BboxTable.COL_MAX_LAT, maxLat);
+    this.getFeature().setAttribute(BboxTable.COL_MAX_LAT, Check.validCoordinate(maxLat, "maxLat"));
   }
   
   public boolean isMapBoundary()
