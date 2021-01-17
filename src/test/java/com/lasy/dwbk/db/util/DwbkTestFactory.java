@@ -5,6 +5,7 @@ import com.lasy.dwbk.app.model.impl.BboxModel;
 import com.lasy.dwbk.app.model.impl.BboxModelBuilder;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.model.impl.LayerModelBuilder;
+import com.lasy.dwbk.util.BboxUtil;
 
 /**
  * Factory for test models.
@@ -60,7 +61,7 @@ public class DwbkTestFactory
   {
     return BboxModel.builder("Factory-Bbox")
       .withDescription("Bbox for unit tests")
-      .withEpsg(3857)
+      .withEpsg(BboxUtil.EPSG_3857)
       .withMapBoundary(true)
       .withMinLon("0")
       .withMinLat("0")

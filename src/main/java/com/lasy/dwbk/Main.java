@@ -13,7 +13,7 @@ public class Main
   {
     try (DwbkFramework framework = DwbkFramework.getInstance())
     {
-      DwbkGeoPackage tmGpkg = framework.getGeoPackage();
+      DwbkGeoPackage tmGpkg = framework.getDwbkGeoPackage();
       
       System.out.println("Available tables: " + tmGpkg.getAvailableTableNames());
     }

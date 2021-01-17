@@ -2,6 +2,7 @@ package com.lasy.dwbk.gui;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Collection;
+import java.util.Optional;
 
 import com.lasy.dwbk.app.DwbkFramework;
 import com.lasy.dwbk.app.DwbkServiceProvider;
@@ -11,6 +12,7 @@ import com.lasy.dwbk.app.service.impl.LayerCrudService;
 import com.lasy.dwbk.db.util.DbGeneratedLayerName;
 import com.lasy.dwbk.gui.panes.MainPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
+import com.lasy.dwbk.ws.wms.WmsLayerWriter;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -42,6 +44,7 @@ public class GuiStarter extends Application
     try (DwbkFramework framework = DwbkFramework.getInstance())
     {
 //      migrate();
+      // testWriter(framework);
       Application.launch();
     }
     catch (Throwable t)
@@ -50,6 +53,16 @@ public class GuiStarter extends Application
     }
   }
   
+  private static void testWriter(DwbkFramework framework)
+  {
+    // siedlung_luftbild Layer
+    Optional<LayerModel> siedlungLuftbild = DwbkServiceProvider.getInstance().getLayerService().readById(8);
+    if(siedlungLuftbild.isPresent()) {
+      WmsLayerWriter writer = WmsLayerWriter.createForLayer(siedlungLuftbild.get());
+      writer.write();
+    }
+  }
+
   private static UncaughtExceptionHandler handleUncaughtException()
   {
     return (thread, thrown) -> {

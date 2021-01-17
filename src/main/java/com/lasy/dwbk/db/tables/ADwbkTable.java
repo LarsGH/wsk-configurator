@@ -41,7 +41,7 @@ public abstract class ADwbkTable implements IDwbkTable
   {
     try
     {
-      return DwbkFramework.getInstance().getGeoPackage().getDataStore().getSchema(getTableName());
+      return DwbkFramework.getInstance().getDwbkGeoPackage().getDataStore().getSchema(getTableName());
     }
     catch (IOException e)
     {

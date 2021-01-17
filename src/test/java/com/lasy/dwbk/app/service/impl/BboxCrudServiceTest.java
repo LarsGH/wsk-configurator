@@ -34,7 +34,7 @@ public class BboxCrudServiceTest
   {
     // Test can just be started with AllTests!
     Assume.assumeTrue("This test needs a running test-framework!", DwbkFramework.isRunning());
-    DataStore store = DwbkFramework.getInstance().getGeoPackage().getDataStore();
+    DataStore store = DwbkFramework.getInstance().getDwbkGeoPackage().getDataStore();
     sut = new BboxCrudService(store);
   }
   

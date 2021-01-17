@@ -67,7 +67,7 @@ public class LayerModel extends AGtModel
     this.getFeature().setAttribute(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(storeLocal));
   }
   
-  // TODO: mechanism to delete downloaded layer
+  // TODO: last download date in GUI anzeigen?!
   public Optional<LocalDateTime> getLastDownloadDate()
   {
     String lastChanged = DbRowAccess.getValueElseNull(getFeature(), LayerTable.COL_LAST_DL, String.class);
@@ -87,7 +87,6 @@ public class LayerModel extends AGtModel
     this.getFeature().setAttribute(LayerTable.COL_LAST_DL, insertDate);
   }
   
-  // TODO: updateLastDownloadDate nach geopackage layer tile generierung!
   public void updateLastDownloadDate()
   {
     LocalDateTime now = LocalDateTime.now();

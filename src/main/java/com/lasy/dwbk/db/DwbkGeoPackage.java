@@ -107,7 +107,7 @@ public class DwbkGeoPackage implements AutoCloseable
    * Returns the GeoPackage.
    * @return GeoPackage
    */
-  public GeoPackage getGeoPackage()
+  public GeoPackage getGtGeoPackage()
   {
     return gpkg;
   }

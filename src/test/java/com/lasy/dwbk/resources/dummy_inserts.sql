@@ -1,14 +1,14 @@
 -- BBOX
-INSERT INTO dwbk_config_bbox
-(id, name, description, epsg, is_map_boundary, min_lon, min_lat, max_lon, max_lat, last_changed)
-VALUES(1, 'Dorsten Holsterhausen', 'Ortsteil Dorsten Holsterhausen', 4326, 'N', '6.926850', '51.669430', '6.971011', '51.687067', '2020-12-28T09:39:44');
-INSERT INTO dwbk_config_bbox
-(id, name, description, epsg, is_map_boundary, min_lon, min_lat, max_lon, max_lat, last_changed)
-VALUES(2, 'Dorsten Gesamt', 'Gesamtes Stadtgebiet Dorsten', 4326, 'Y', '6.887640', '51.636216', '7.083052', '51.781193', '2020-12-28T09:39:44');
+INSERT INTO dwbk_config_bbox (id, name, description, epsg, is_map_boundary, min_lon, min_lat, max_lon, max_lat, last_changed) 
+VALUES
+(1, 'Dorsten Holsterhausen', 'Ortsteil Dorsten Holsterhausen', 4326, 'N', '6.926850', '51.669430', '6.971011', '51.687067', '2020-12-28T09:39:44'),
+(2, 'Dorsten Gesamt', 'Gesamtes Stadtgebiet Dorsten', 4326, 'Y', '6.887640', '51.636216', '7.083052', '51.781193', '2020-12-28T09:39:44'),
+(3, 'Radweg', 'Radweg mit Rettungspunkten', 4326, 'N', '6.922229', '51.673266', '6.947550', '51.677131', '2021-01-16T14:04:22');
 
 
 -- LAYER
-INSERT INTO dwbk_config_layer (id, name, description, is_saved, store_local, pixel_meters, is_visible, uri, bbox_id, "user", pw, query_parts, local_name, last_changed)
+INSERT INTO dwbk_config_layer (id, name, description, is_saved, store_local, pixel_meters, is_visible, uri, bbox_id, "user", pw, query_parts, local_name, last_changed) 
+VALUES
 (1, 'Luftbild NRW', 'Zeigt das Luftbild', 'Y', 'N', '10;1', 'Y', 'https://www.wms.nrw.de/geobasis/wms_nw_dop?service=WMS&version=1.0.0&request=GetMap&layers=WMS_NW_DOP&srs=EPSG:4326&bbox=6.95187,51.67352,6.95547,51.67529&width=1000&height=1000&format=image/png', 2, '', '', '{"base_url":"https://www.wms.nrw.de/geobasis/wms_nw_dop?",
 "bbox":"6.95187,51.67352,6.95547,51.67529",
 "format":"image/png",
@@ -73,4 +73,16 @@ INSERT INTO dwbk_config_layer (id, name, description, is_saved, store_local, pix
 "service":"WMS",
 "styles":"Stadtteile",
 "version":"1.3.0",
-"width":"1000"}', 'dwbk_genlayer_si', '2021-01-15T17:20:11');
+"width":"1000"}', 'dwbk_genlayer_si', '2021-01-15T17:20:11'),
+(7, 'Rettung-test', 'test für save', 'Y', 'Y', '1', 'Y', 'https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_BEVSCHUTZ/guest?service=WMS&version=1.3.0&request=GetMap&layers=RETTUNGSPUNKTE&crs=EPSG:4326&bbox=51.67352,6.95187,51.67529,6.95547&width=1000&height=1000&format=image/png&STYLES=BEVSchutz:Rettungspunkte', 3, '', '', '{"base_url":"https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_BEVSCHUTZ/guest?",
+"bbox":"51.67352,6.95187,51.67529,6.95547",
+"crs":"EPSG:4326",
+"format":"image/png",
+"height":"1000",
+"layers":"RETTUNGSPUNKTE",
+"request":"GetMap",
+"service":"WMS",
+"styles":"BEVSchutz:Rettungspunkte",
+"version":"1.3.0",
+"width":"1000"}', 'dwbk_genlayer_se', '2021-01-15T17:20:11');
+

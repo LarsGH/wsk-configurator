@@ -92,7 +92,7 @@ public class DwbkFramework implements AutoCloseable
     try
     {
       InputStream inputStream = table.getCreateScriptInputStream();
-      Connection connection = gpkg.getGeoPackage().getDataSource().getConnection();
+      Connection connection = gpkg.getGtGeoPackage().getDataSource().getConnection();
       SqlUtil.runScript(inputStream, connection);
     }
     catch (Exception e)
@@ -109,7 +109,7 @@ public class DwbkFramework implements AutoCloseable
    * Returns the geopackage.
    * @return geopackage
    */
-  public DwbkGeoPackage getGeoPackage()
+  public DwbkGeoPackage getDwbkGeoPackage()
   {
     return this.gpkg;
   }

@@ -57,7 +57,7 @@ public class LayerCrudServiceTest
         .withMaxLon(EXPECTED_BBOX_MAX_LON)
         .withMaxLat(EXPECTED_BBOX_MAX_LAT));
     
-    DataStore store = DwbkFramework.getInstance().getGeoPackage().getDataStore();
+    DataStore store = DwbkFramework.getInstance().getDwbkGeoPackage().getDataStore();
     sut = new LayerCrudService(store);
   }
   
