@@ -5,9 +5,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -51,9 +57,16 @@ public class WmsLayerWriter
 
   private final LayerModel layer;
   
+  private final ExecutorService threadPool;
+  private final LinkedBlockingQueue<Future<WmsTileResponse>> responseQueue;
+  
   private WmsLayerWriter(LayerModel layer)
   {
     this.layer = Check.notNull(layer, "layer");
+    
+    // TODO: thread-pool / response-queue size konfigurierbar settings (json)
+    this.threadPool = Executors.newFixedThreadPool(10);
+    this.responseQueue = new LinkedBlockingQueue<>(10);
   }
   
   // TODO: nach write -> layer.updateLastDownloadDate und crud.update!
@@ -71,7 +84,13 @@ public class WmsLayerWriter
     
     TileEntry tileEntry = createTileEntry(tileMatrixParams, gpkg);
 
+    // Single thread to write tiles
+    threadPool.execute(createTileWriterThread(tileEntry, gpkg));
+    
     queryAllTilesAndWriteToTileEntry(tileMatrixParams, tileEntry, gpkg);
+    
+    threadPool.shutdown();
+    DwbkLog.log(Level.INFO, "Alle Tiles für Layer '%s' geschrieben.", this.layer.getName());
   }
 
   /**
@@ -104,61 +123,56 @@ public class WmsLayerWriter
     }
   }
   
-  // TODO: mit pyramide groesserem bereich testen! 1;5
-
-  // TODO: bei request + schreiben mit mehreren Threads arbeiten?!
   // TODO: WmsQueryParameters als Wrapper mit getter für QueryParameters?!
   private void queryMatrixTilesAndWriteToTileEntry(WebMapServer wms, TileMatrixParams tileMatrixParam, Map<String, String> queryParams, TileEntry tileEntry,
     GeoPackage gpkg)
   {
-    GetMapRequest request = createBasicRequest(wms, queryParams);
-    request.setDimensions(tileMatrixParam.getTileWidthInPixels(), tileMatrixParam.getTileHeightInPixels());
-
-    ReferencedEnvelope matrixBbox = tileMatrixParam.getMatrixBbox();
-    double bboxMinLon = matrixBbox.getMinX();
-    double bboxMaxLat = matrixBbox.getMaxY();
-    int tileWidthInMeters = tileMatrixParam.getTileWidthInMeters();
-    int tileHeightInMeters = tileMatrixParam.getTileHeightInMeters();
+    final ReferencedEnvelope matrixBbox = tileMatrixParam.getMatrixBbox();
+    final double bboxMinLon = matrixBbox.getMinX();
+    final double bboxMaxLat = matrixBbox.getMaxY();
+    final int tileWidthInMeters = tileMatrixParam.getTileWidthInMeters();
+    final int tileHeightInMeters = tileMatrixParam.getTileHeightInMeters();
+    final int currentZoom = tileMatrixParam.getZoomLevel();
+    
     int tilesAddedCount = 0;
-
-    // Matrix format (Y(col),X(row)):
+    
+    // Matrix format (Col, Row):
     // (0,0) | (1,0)
     // (0,1) | (1,1)
     
+    LocalDateTime start = LocalDateTime.now();
+    
+    // Multiple threads to query tiles 
     // Latitude -> row
     for (int row = 0; row < tileMatrixParam.getMatrixHeight(); row++ )
     {
-      double currentMaxLat = bboxMaxLat - (row * tileHeightInMeters);
-      double currentMinLat = currentMaxLat - tileHeightInMeters;
+      final double currentMaxLat = bboxMaxLat - (row * tileHeightInMeters);
+      final double currentMinLat = currentMaxLat - tileHeightInMeters;
 
       // Longitude -> col
       for (int col = 0; col < tileMatrixParam.getMatrixWidth(); col++ )
       {
-        double currentMinLon = bboxMinLon + (col * tileWidthInMeters);
-        double currentMaxLon = currentMinLon + tileWidthInMeters;
-
-        request.setBBox(String.format("%s,%s,%s,%s", currentMinLon, currentMinLat, currentMaxLon, currentMaxLat));
+        final double currentMinLon = bboxMinLon + (col * tileWidthInMeters);
+        final double currentMaxLon = currentMinLon + tileWidthInMeters;
 
         try
         {
-          DwbkLog.log(Level.FINEST, "Sending request: %n%s", request.getFinalURL());
-
-          GetMapResponse response = wms.issueRequest(request);
-          InputStream is = response.getInputStream();
-          try
+          GetMapRequest request = createBasicRequest(wms, queryParams);
+          request.setDimensions(tileMatrixParam.getTileWidthInPixels(), tileMatrixParam.getTileHeightInPixels());
+          request.setBBox(String.format("%s,%s,%s,%s", currentMinLon, currentMinLat, currentMaxLon, currentMaxLat));
+          final int currentRow = row;
+          final int currentCol = col;
+          Future<WmsTileResponse> futureResponse = threadPool.submit(() -> {
+            DwbkLog.log(Level.FINER, "Sending request: %n%s", request.getFinalURL());
+            GetMapResponse response = wms.issueRequest(request);
+            return new WmsTileResponse(response, currentZoom, currentRow, currentCol);
+          });
+          responseQueue.put(futureResponse);
+          
+          tilesAddedCount++ ;
+          if (tilesAddedCount % 100 == 0)
           {
-            Tile tile = new Tile(tileMatrixParam.getZoomLevel(), col, row, is.readAllBytes());
-            gpkg.add(tileEntry, tile);
-            tilesAddedCount++ ;
-            if (tilesAddedCount % 100 == 0)
-            {
-              DwbkLog.log(Level.INFO, "%s/%s Tiles für Zoomstufe %s gespeichert.", tilesAddedCount, tileMatrixParam.getTotalTileCount(),
-                tileMatrixParam.getZoomLevel());
-            }
-          }
-          finally
-          {
-            is.close();
+            DwbkLog.log(Level.INFO, "%s/%s Tiles für Zoomstufe %s gespeichert.", tilesAddedCount, tileMatrixParam.getTotalTileCount(), currentZoom);
           }
         }
         catch (Exception e)
@@ -167,7 +181,47 @@ public class WmsLayerWriter
         }
       }
     }
-    DwbkLog.log(Level.INFO, "Alle Tiles (%s) für Zoomstufe %s gespeichert.", tilesAddedCount, tileMatrixParam.getZoomLevel());
+    
+    LocalDateTime end = LocalDateTime.now();
+    long seconds = Duration.between(start, end).getSeconds();
+    
+    DwbkLog.log(Level.INFO, "Alle Tiles (%s) für Zoomstufe %s gespeichert. Dauer: %s", 
+      tileMatrixParam.getTotalTileCount(), 
+      currentZoom,
+      seconds);
+  }
+
+  private Runnable createTileWriterThread(TileEntry tileEntry, GeoPackage gpkg)
+  {
+    return () -> {
+      try
+      {
+        while (!threadPool.isShutdown() 
+          ||  (threadPool.isShutdown() && !responseQueue.isEmpty()))
+        {
+          Future<WmsTileResponse> futureResponse = responseQueue.take();
+          WmsTileResponse response = futureResponse.get();
+          InputStream is = response.getResponse().getInputStream();
+          try
+          {
+            Tile tile = new Tile(response.getZoom(), response.getCol(), response.getRow(), is.readAllBytes());
+            gpkg.add(tileEntry, tile);
+            
+//            DwbkLog.log(Level.INFO, "Tile geschrieben: [z:%s, r:%s, c:%s]", 
+//              response.getZoom(), response.getRow(), response.getCol());
+          }
+          finally
+          {
+            is.close();
+          }
+        }
+      }
+      catch (Exception e)
+      {
+        threadPool.shutdownNow();
+        throw DwbkFrameworkException.failForReason(e, "Beim Schreiben der Tiles ist ein unerwarteter Fehler aufgetreten!");
+      }
+    };
   }
 
   /**

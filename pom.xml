@@ -12,6 +12,7 @@
 		<app.main.class>com.lasy.dwbk.gui.GuiStarter</app.main.class>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
+		<geotools.version>24.0</geotools.version>
 	</properties>
 	<build>
 		<plugins>
@@ -84,15 +85,30 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-geopkg</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.geotools/gt-wms -->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-wms</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		<!-- <dependency> <groupId>org.geotools</groupId> <artifactId>gt-epsg-extension</artifactId> 
+			<version>${geotools.version}</version> </dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.geotools/gt-epsg-wkt -->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-wkt</artifactId>
 			<version>24.0</version>
 		</dependency>
+
+
+
 		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
-		<!-- <dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-controls</artifactId>
-			<version>15</version>
-		</dependency> -->
-		<!-- Test dependencies have provided scope so they are ignored by the assembly plugin! -->
+		<!-- <dependency> <groupId>org.openjfx</groupId> <artifactId>javafx-controls</artifactId> 
+			<version>15</version> </dependency> -->
+		<!-- Test dependencies have provided scope so they are ignored by the assembly 
+			plugin! -->
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>
