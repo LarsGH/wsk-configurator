@@ -8,7 +8,7 @@ import com.lasy.dwbk.ws.wms.TileMatrixParamsTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  QueryParametersTest.class,
+  RequestParametersTest.class,
   TileMatrixParamsTest.class,
 })
 public class WsTestSuite

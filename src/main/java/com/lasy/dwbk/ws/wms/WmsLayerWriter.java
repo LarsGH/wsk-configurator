@@ -8,7 +8,6 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,13 +27,13 @@ import org.geotools.ows.wms.request.GetMapRequest;
 import org.geotools.ows.wms.response.GetMapResponse;
 
 import com.lasy.dwbk.app.DwbkFramework;
+import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.error.DwbkFrameworkException;
 import com.lasy.dwbk.app.logging.DwbkLog;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.db.util.DbScriptUtil;
 import com.lasy.dwbk.util.BboxUtil;
 import com.lasy.dwbk.util.Check;
-import com.lasy.dwbk.ws.QueryParameters;
 
 // TODO: Abstract class ALayerWriter for WMS / WFS impls?
 /**
@@ -64,12 +63,12 @@ public class WmsLayerWriter
   {
     this.layer = Check.notNull(layer, "layer");
     
-    // TODO: thread-pool / response-queue size konfigurierbar settings (json)
-    this.threadPool = Executors.newFixedThreadPool(10);
-    this.responseQueue = new LinkedBlockingQueue<>(10);
+    // configured WMS request threads + writer thread
+    int poolSize = DwbkFramework.getInstance().getSettings().getWmsMaxThreads() + 1;
+    this.threadPool = Executors.newFixedThreadPool(poolSize);
+    this.responseQueue = new LinkedBlockingQueue<>(5);
   }
   
-  // TODO: nach write -> layer.updateLastDownloadDate und crud.update!
   /**
    * Creates the local layer in the geopackage.
    * @return {@code true} if the layer was written successfully
@@ -91,6 +90,9 @@ public class WmsLayerWriter
     
     threadPool.shutdown();
     DwbkLog.log(Level.INFO, "Alle Tiles für Layer '%s' geschrieben.", this.layer.getName());
+    
+    this.layer.updateLastDownloadDate();
+    DwbkServiceProvider.getInstance().getLayerService().update(this.layer);
   }
 
   /**
@@ -114,17 +116,20 @@ public class WmsLayerWriter
 
   private void queryAllTilesAndWriteToTileEntry(List<TileMatrixParams> tileMatrixParams, TileEntry tileEntry, GeoPackage gpkg)
   {
-    QueryParameters queryParameters = QueryParameters.fromLayerUri(this.layer.getUri());
-    WebMapServer wms = createWebMapServer(queryParameters);
+    IWmsRequestParameters requestParams = WmsRequestParameters.fromLayerUri(this.layer.getUri());
+    WebMapServer wms = createWebMapServer(requestParams);
     
     for(TileMatrixParams tileMatrixParam : tileMatrixParams)
     {
-      queryMatrixTilesAndWriteToTileEntry(wms, tileMatrixParam, queryParameters.getParams(), tileEntry, gpkg);
+      queryMatrixTilesAndWriteToTileEntry(wms, tileMatrixParam, requestParams, tileEntry, gpkg);
     }
   }
   
-  // TODO: WmsQueryParameters als Wrapper mit getter für QueryParameters?!
-  private void queryMatrixTilesAndWriteToTileEntry(WebMapServer wms, TileMatrixParams tileMatrixParam, Map<String, String> queryParams, TileEntry tileEntry,
+  private void queryMatrixTilesAndWriteToTileEntry(
+    WebMapServer wms, 
+    TileMatrixParams tileMatrixParam, 
+    IWmsRequestParameters requestParams, 
+    TileEntry tileEntry,
     GeoPackage gpkg)
   {
     final ReferencedEnvelope matrixBbox = tileMatrixParam.getMatrixBbox();
@@ -157,7 +162,7 @@ public class WmsLayerWriter
 
         try
         {
-          GetMapRequest request = createBasicRequest(wms, queryParams);
+          GetMapRequest request = createBasicRequest(wms, requestParams);
           request.setDimensions(tileMatrixParam.getTileWidthInPixels(), tileMatrixParam.getTileHeightInPixels());
           request.setBBox(String.format("%s,%s,%s,%s", currentMinLon, currentMinLat, currentMaxLon, currentMaxLat));
           final int currentRow = row;
@@ -227,25 +232,18 @@ public class WmsLayerWriter
   /**
    * Creates the request with the basic parameters.
    * @param wms the GT WMS
-   * @param queryParams the layer URI query parameters
+   * @param requestParams the layer URI query parameters
    * @return request
    */
-  private GetMapRequest createBasicRequest(WebMapServer wms, Map<String, String> queryParams)
+  private GetMapRequest createBasicRequest(WebMapServer wms, IWmsRequestParameters requestParams)
   {
     GetMapRequest request = wms.createGetMapRequest();
-    String version = queryParams.get(WmsQueryConst.GetMap.VERSION);
-    request.setVersion(version);
+    request.setVersion(requestParams.getVersion());
+    request.addLayer(requestParams.getLayer(), requestParams.getStyles());
     
-    String layerName = queryParams.get(WmsQueryConst.GetMap.LAYERS);
-    String styleName = queryParams.get(WmsQueryConst.GetMap.STYLES);
-    request.addLayer(layerName, styleName);
-    
-    String format = queryParams.get(WmsQueryConst.GetMap.FORMAT);
-    request.setFormat(format);
-    request.setSRS("EPSG:3857");
-    String transparentStr = queryParams.getOrDefault(WmsQueryConst.GetMap.TRANSPARENT, "true");
-    boolean transparent = Boolean.valueOf(transparentStr);
-    request.setTransparent(transparent);
+    request.setFormat(requestParams.getFormat());
+    request.setSRS(BboxUtil.getEpsgStringForCode(BboxUtil.EPSG_3857));
+    request.setTransparent(requestParams.isTransparent());
     return request;
   }
 
@@ -254,20 +252,20 @@ public class WmsLayerWriter
    * @param queryParameters layer URI query parameters
    * @return GT WMS
    */
-  private WebMapServer createWebMapServer(QueryParameters queryParameters)
+  private WebMapServer createWebMapServer(IWmsRequestParameters requestParams)
   {
     try
     {
-      URL url = createUrl(queryParameters.getCapablitiesRequest());
+      URL url = createUrl(requestParams.getCapablitiesRequest());
       WebMapServer wms = new WebMapServer(url);
       
       Set<String> supportedSrs = wms.getCapabilities().getLayer().getSrs();
-      if(!supportedSrs.contains("EPSG:" + BboxUtil.EPSG_3857))
+      if(!supportedSrs.contains(BboxUtil.getEpsgStringForCode(BboxUtil.EPSG_3857)))
       {
         throw new IllegalStateException("Service is not supported because it does not support EPSG:3857");
       }
       
-      wms.getCapabilities().getRequest().getGetMap().setGet(createUrl(queryParameters.getBaseRequest()));
+      wms.getCapabilities().getRequest().getGetMap().setGet(createUrl(requestParams.getBaseRequest()));
       
       return wms;
     } 

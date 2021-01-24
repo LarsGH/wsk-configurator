@@ -12,7 +12,7 @@ import com.lasy.dwbk.app.model.impl.LayerModelBuilder;
 import com.lasy.dwbk.app.service.ADwbkCrudService;
 import com.lasy.dwbk.db.tables.impl.LayerTable;
 import com.lasy.dwbk.db.util.DbGeneratedLayerName;
-import com.lasy.dwbk.ws.QueryParameters;
+import com.lasy.dwbk.ws.RequestParameters;
 
 /**
  * CRUD service for layers.
@@ -46,7 +46,7 @@ public class LayerCrudService extends ADwbkCrudService<LayerModel, LayerModelBui
   protected void doAfterUpdate(LayerModel model)
   {
     // Update the query parameter parts!
-    Map<String, String> params = QueryParameters.fromLayerUri(model.getUri()).getParams();
+    Map<String, String> params = RequestParameters.fromLayerUri(model.getUri()).getParams();
     String paramsJson = params.entrySet().stream()
       .sorted(Map.Entry.comparingByKey())
       .map(entry -> String.format("\"%s\":\"%s\"", entry.getKey(), entry.getValue()))

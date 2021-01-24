@@ -1,6 +1,10 @@
 package com.lasy.dwbk.app;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,7 +27,6 @@ import com.lasy.dwbk.util.Check;
 public class DwbkFramework implements AutoCloseable
 {
   
-  private static boolean isRunning = false;
   private static DwbkFramework instance;
   
   /**
@@ -36,39 +39,78 @@ public class DwbkFramework implements AutoCloseable
     {
       // Use environment variable to initialize framework (if not initialized before)
       String path = DwbkEnvironment.getConfigDirectory().getAbsolutePath();
-      initialize(path);
+      instance = initializeFramework(path);
     }
     return instance;
   }
 
-  public static void initialize(String path)
+  public static DwbkFramework initializeFramework(String path)
   {
-    try
-    {
-      DwbkLog.log(Level.INFO, "Framework wird mit folgenden Umgebungsvariablen gestartet: %n%s", DwbkEnvironment.getConfiguredInfo());
-      DwbkGeoPackage tmGpkg = DwbkGeoPackage.createForPath(path);
-      instance = new DwbkFramework(tmGpkg);
-    }
-    catch (Exception e)
-    {
-      throw DwbkFrameworkException.failForReason(null, "Geopackage konnte nicht geladen werden!");
-    }
-    isRunning = true;
+    instance = new DwbkFramework(path);
+    return instance;
   }
   
   private DwbkGeoPackage gpkg;
+  private boolean isRunning = false;
+  private DwbkSettings settings;
   
-  private DwbkFramework(DwbkGeoPackage gpkg)
+  private DwbkFramework(String configDirectoryPath)
   {
-    this.gpkg = Check.notNull(gpkg, "gpkg");
+    Check.trimmedNotEmpty(configDirectoryPath, "configDirectoryPath");
+    
+    this.settings = getValidatedSettings();
+    this.gpkg = DwbkGeoPackage.createForPath(configDirectoryPath);
+    
     init();
+  }
+  
+  private DwbkSettings getValidatedSettings()
+  {
+    File settingFile = new File(DwbkEnvironment.getConfigDirectory(), DwbkSettings.SETTINGS_FILE_NAME);
+    DwbkSettings settings = createSettings(settingFile);
+    
+    try(FileWriter writer = new FileWriter(settingFile, StandardCharsets.UTF_8))
+    {
+      // write current settings (may have changed with new attributes)
+      writer.write(settings.toString());
+      return settings;
+    }
+    catch (Exception e)
+    {
+      throw DwbkFrameworkException.failForReason(e, "Die Settings ('%s') konnten nicht geschrieben werden!", DwbkSettings.SETTINGS_FILE_NAME);
+    }
+  }
+
+  private DwbkSettings createSettings(File settingFile)
+  {
+    if(settingFile.exists())
+    {
+      try
+      {
+        String settingFileContent = Files.readString(settingFile.toPath(), StandardCharsets.UTF_8);
+        return DwbkSettings.createFromFileContent(settingFileContent);
+      }
+      catch (Exception e)
+      {
+        throw DwbkFrameworkException.failForReason(e, "Die Settings ('%s') konnten nicht geladen werden!", DwbkSettings.SETTINGS_FILE_NAME);
+      }
+    }
+    else
+    {
+      // create new settings with default values
+      return new DwbkSettings();
+    }
   }
 
   private void init()
-  {
+  {    
     createConfigTables(gpkg);
     DwbkServiceProvider.initialize(gpkg.getDataStore());
     DwbkLog.log(Level.INFO, "Framwork erfolgreich initialisiert!");
+    
+    // Use configured log-level after init!
+    DwbkLog.getInstance().setLogLevel(this.settings.getLogLevel());
+    this.isRunning = true;
   }
   
   private void createConfigTables(DwbkGeoPackage gpkg)
@@ -128,7 +170,18 @@ public class DwbkFramework implements AutoCloseable
    */
   public static boolean isRunning()
   {
-    return isRunning;
+    return instance == null
+      ? false
+      : instance.isRunning;
+  }
+  
+  /**
+   * Returns the settings.
+   * @return settings
+   */
+  public DwbkSettings getSettings()
+  {
+    return this.settings;
   }
   
 }

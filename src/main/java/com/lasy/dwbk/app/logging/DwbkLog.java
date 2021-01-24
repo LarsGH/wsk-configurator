@@ -56,12 +56,23 @@ public class DwbkLog
       System.setProperty("java.util.logging.SimpleFormatter.format", createLogFormat());
       
       logger.addHandler(createFileHandler());
-      logger.setLevel(DwbkEnvironment.getDebugLevel());
+      // Default level
+      logger.setLevel(Level.INFO);
     }
     catch (Exception e)
     {
       throw DwbkFrameworkException.failForReason(e, "Logger konnte nicht konfiguriert werden!");
     }
+  }
+  
+  /**
+   * Sets the log level.
+   * @param level log level
+   */
+  public void setLogLevel(Level level)
+  {
+    this.logger.setLevel(level);
+    DwbkLog.log(Level.INFO, "Neues Log-Level: %s", level.getName());
   }
 
   private String createLogFormat()

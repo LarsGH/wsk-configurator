@@ -40,7 +40,7 @@ public class AllTests
     try {
       LOG.log(Level.INFO, "Starting testsuite... initializing framework...");
       File projectRoot = folder.getRoot();
-      DwbkFramework.initialize(projectRoot.getPath());
+      DwbkFramework.initializeFramework(projectRoot.getPath());
     }
     catch (Exception e)
     {

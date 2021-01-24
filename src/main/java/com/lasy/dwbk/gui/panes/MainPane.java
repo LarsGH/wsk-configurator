@@ -44,7 +44,6 @@ public class MainPane extends ADwbkPane
 
   private MainPane(Scene mainScene)
   {
-    // TODO: allgemeine Settings (passwort speichern erlauben?)
     super(mainScene, "Konfigurations-Übersicht");
   }
   

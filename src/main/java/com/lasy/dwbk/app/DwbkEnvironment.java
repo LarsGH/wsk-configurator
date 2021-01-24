@@ -1,10 +1,8 @@
 package com.lasy.dwbk.app;
 
 import java.io.File;
-import java.util.logging.Level;
 
 import com.lasy.dwbk.app.error.DwbkFrameworkException;
-import com.lasy.dwbk.app.logging.DwbkLog;
 import com.lasy.dwbk.util.Is;
 
 /**
@@ -19,43 +17,15 @@ public class DwbkEnvironment
    */
   private static final String CONFIG_DIRECTORY = "DWBK_CONFIG_DIRECTORY";
   
-  /**
-   * The debug level (see logging {@link Level}).
-   */
-  private static final String CONFIG_DEBUG_LEVEL = "DWBK_CONFIG_DEBUG_LEVEL";
-  
   private static final DwbkEnvironment env = new DwbkEnvironment();
   
   private final File configDirectory;
-  private final Level configDebugLevel;
   
   private DwbkEnvironment()
   {
-    this.configDirectory = getValidatedConfigDirectory();
-    this.configDebugLevel = getValidatedDebugLevel();
+    this.configDirectory = getValidatedConfigDirectory();   
   }
   
-  private Level getValidatedDebugLevel()
-  {
-    String debugLevel = System.getenv(CONFIG_DEBUG_LEVEL);
-    if(Is.nullOrTrimmedEmpty(debugLevel))
-    {
-      // Use default INFO
-      Level fallback = Level.INFO;
-      DwbkLog.log(Level.INFO, "Die Umgebungsvariable '%s' wurde nicht definiert. Benutze Fallback: '%s'.", fallback);
-      return fallback;
-    }
-    
-    try
-    {
-      return Level.parse(debugLevel);
-    }
-    catch (Exception e)
-    {
-      throw exitForReason(CONFIG_DEBUG_LEVEL, debugLevel, "Invalider Wert.");
-    }
-  }
-
   private File getValidatedConfigDirectory()
   {
     String path = System.getenv(CONFIG_DIRECTORY);
@@ -97,21 +67,4 @@ public class DwbkEnvironment
     return env.configDirectory;
   }
   
-  /**
-   * Returns the configured debug level (or INFO as default).
-   * @return configured debug level
-   */
-  public static Level getDebugLevel()
-  {
-    return (env.configDebugLevel);
-  }
-
-  public static String getConfiguredInfo()
-  {
-    String dirInfo = String.format("%s = %s", CONFIG_DIRECTORY, getConfigDirectory().getAbsolutePath());
-    String debugInfo = String.format("%s = %s", CONFIG_DEBUG_LEVEL, getDebugLevel());
-    
-    return String.join(System.lineSeparator(), dirInfo, debugInfo);
-  }
-
 }

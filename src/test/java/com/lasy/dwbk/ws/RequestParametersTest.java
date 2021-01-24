@@ -8,11 +8,11 @@ import org.junit.Test;
 import com.lasy.dwbk.ws.wms.WmsQueryConst;
 
 /**
- * Tests {@link QueryParameters}.
+ * Tests {@link RequestParameters}.
  * @author larss
  *
  */
-public class QueryParametersTest
+public class RequestParametersTest
 {
   private static final String GET_MAP_QUERY = "https://www.wms.nrw.de/geobasis/wms_nw_dvg"
     + "?service=WMS"
@@ -32,7 +32,7 @@ public class QueryParametersTest
   @Test
   public void testParameters()
   {    
-    QueryParameters sut = QueryParameters.fromLayerUri(GET_MAP_QUERY);
+    IRequestParameters sut = RequestParameters.fromLayerUri(GET_MAP_QUERY);
     
     Assertions.assertThat(sut.getParams()).containsExactlyInAnyOrderEntriesOf(Map.ofEntries(
       Map.entry(WmsQueryConst.GetMap.BASE_URL, "https://www.wms.nrw.de/geobasis/wms_nw_dvg?"),
@@ -54,7 +54,7 @@ public class QueryParametersTest
   @Test
   public void testGetCapabilitiesRequest()
   {    
-    QueryParameters sut = QueryParameters.fromLayerUri(GET_MAP_QUERY);
+    IRequestParameters sut = RequestParameters.fromLayerUri(GET_MAP_QUERY);
     
     Assertions.assertThat(sut.getCapablitiesRequest())
     .isEqualTo("https://www.wms.nrw.de/geobasis/wms_nw_dvg"
@@ -69,7 +69,7 @@ public class QueryParametersTest
   @Test
   public void testGetBaseUrl()
   {    
-    QueryParameters sut = QueryParameters.fromLayerUri(GET_MAP_QUERY);
+    IRequestParameters sut = RequestParameters.fromLayerUri(GET_MAP_QUERY);
     
     Assertions.assertThat(sut.getBaseRequest()).isEqualTo("https://www.wms.nrw.de/geobasis/wms_nw_dvg?");
   }

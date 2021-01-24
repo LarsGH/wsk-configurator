@@ -100,6 +100,14 @@ public class BboxUtilTest
     Assertions.assertThat(envelopeWithoutDecimals.getMinY()).isEqualTo(9);
     Assertions.assertThat(envelopeWithoutDecimals.getMaxY()).isEqualTo(100);
   }
+  
+  @Test
+  public void testGetEpsgStringForCode()
+  {
+    String epsgStr = BboxUtil.getEpsgStringForCode(BboxUtil.EPSG_3857);
+    
+    Assertions.assertThat(epsgStr).isEqualTo("EPSG:3857");
+  }
 
   /**
    * Creates a test bbox in EPSG:4326.

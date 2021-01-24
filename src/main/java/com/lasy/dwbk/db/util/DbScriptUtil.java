@@ -19,7 +19,6 @@ public class DbScriptUtil
   /** The tablename parameter to replace in the script.  */
   private static final String TABLENAME_PARAM = "tableName";
   
-  // TODO: test?
   /**
    * Deletes a generated table from the geopackage. Delete affects:
    * <ul>

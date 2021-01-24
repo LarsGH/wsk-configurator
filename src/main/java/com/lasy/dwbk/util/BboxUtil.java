@@ -156,4 +156,14 @@ public class BboxUtil
     }
   }
   
+  /**
+   * Returns the EPSG string. Example: 'EPSG:3857'.
+   * @param code the EPSG code
+   * @return EPSG string
+   */
+  public static String getEpsgStringForCode(int code)
+  {
+    return String.format("EPSG:%s", code);
+  }
+  
 }
