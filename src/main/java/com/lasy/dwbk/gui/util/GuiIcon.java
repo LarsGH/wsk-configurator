@@ -37,6 +37,12 @@ public class GuiIcon
   
   /** Browser icon. */
   public static final Image BROWSER = createIcon("browser_24.png");
+  
+  /** Download icon. */
+  public static final Image DOWNLOAD = createIcon("download_24.png");
+  
+  /** Loading icon. */
+  public static final Image LOADING = createIcon("loading_24.png");
 
   private static Image createIcon(String iconName)
   {

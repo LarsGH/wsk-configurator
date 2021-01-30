@@ -3,12 +3,14 @@ package com.lasy.dwbk.ws.wms;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
-import org.junit.BeforeClass;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.impl.BboxModel;
 import com.lasy.dwbk.app.model.impl.LayerModel;
+import com.lasy.dwbk.db.util.DwbkEmptyModelsRule;
 import com.lasy.dwbk.db.util.DwbkTestFactory;
 
 /**
@@ -22,11 +24,14 @@ public class TileMatrixParamsTest
   private static BboxModel bbox;
   private static LayerModel layer;
   
+  @Rule
+  public DwbkEmptyModelsRule emptyModelsRule = new DwbkEmptyModelsRule();
+  
   /**
    * Setup.
    */
-  @BeforeClass
-  public static void setUp()
+  @Before
+  public void setUp()
   {
     layer = DwbkTestFactory.createLayer();
     bbox = layer.getBbox(); 

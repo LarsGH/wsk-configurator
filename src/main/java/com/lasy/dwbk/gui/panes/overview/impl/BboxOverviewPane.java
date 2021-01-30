@@ -1,5 +1,6 @@
 package com.lasy.dwbk.gui.panes.overview.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -117,6 +118,12 @@ public class BboxOverviewPane extends AOverviewPane<BboxModel>
   protected Optional<String> getCreateNotAllowedReason()
   {
     return Optional.empty();
+  }
+
+  @Override
+  protected List<TableColumn<BboxModel, Button>> createAdditionalButtons()
+  {
+    return Collections.emptyList();
   }
 
 }

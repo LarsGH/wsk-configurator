@@ -8,7 +8,8 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.geotools.data.DataStore;
 import org.junit.Assume;
-import org.junit.BeforeClass;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.lasy.dwbk.app.DwbkFramework;
@@ -16,6 +17,7 @@ import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.impl.BboxModel;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.db.util.DbGeneratedLayerName;
+import com.lasy.dwbk.db.util.DwbkEmptyModelsRule;
 
 /**
  * Testet {@link LayerCrudService}.
@@ -38,13 +40,16 @@ public class LayerCrudServiceTest
   private static final boolean EXPECTED_IS_VISIBLE = true;
   private static final String EXPECTED_USER = "test-user";
   private static final String EXPECTED_PW = "test-pw-1234";
+  
+  @Rule
+  public DwbkEmptyModelsRule emptyModelsRule = new DwbkEmptyModelsRule();
 
   private static LayerCrudService sut;
   
   private static BboxModel bbox;
   
-  @BeforeClass
-  public static void setUp()
+  @Before
+  public void setUp()
   {
     // Test can just be started with AllTests!
     Assume.assumeTrue("This test needs a running test-framework!", DwbkFramework.isRunning());
@@ -73,12 +78,10 @@ public class LayerCrudServiceTest
     layerA.setStoreLocal(false);
     layerA.setMetersPerPixelText(null);
     layerA.setSaved(false);
-    layerA.setVisible(false);    
-    layerA.updateLastDownloadDate();
+    layerA.setVisible(false);
     
     // save
     sut.update(layerA);
-    Assertions.assertThat(layerA.getLastDownloadDate().get()).isEqualToIgnoringSeconds(LocalDateTime.now());
     
     // load (by ID)
     LayerModel reloadedLayerA = sut.readById(layerA.getId())

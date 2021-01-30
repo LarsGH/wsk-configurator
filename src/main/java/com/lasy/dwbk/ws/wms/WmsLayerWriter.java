@@ -27,7 +27,6 @@ import org.geotools.ows.wms.request.GetMapRequest;
 import org.geotools.ows.wms.response.GetMapResponse;
 
 import com.lasy.dwbk.app.DwbkFramework;
-import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.error.DwbkFrameworkException;
 import com.lasy.dwbk.app.logging.DwbkLog;
 import com.lasy.dwbk.app.model.impl.LayerModel;
@@ -76,7 +75,7 @@ public class WmsLayerWriter
   public void write()
   {
     GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();
-    deleteCurrentTileEntryIfPresent(gpkg);
+    DbScriptUtil.deleteLocalLayerContentIfPresent(this.layer);
 
     List<TileMatrixParams> tileMatrixParams = TileMatrixParams.createForLayer(this.layer);
     checkValidTileCount(tileMatrixParams);
@@ -90,9 +89,6 @@ public class WmsLayerWriter
     
     threadPool.shutdown();
     DwbkLog.log(Level.INFO, "Alle Tiles für Layer '%s' geschrieben.", this.layer.getName());
-    
-    this.layer.updateLastDownloadDate();
-    DwbkServiceProvider.getInstance().getLayerService().update(this.layer);
   }
 
   /**
@@ -330,33 +326,13 @@ public class WmsLayerWriter
       throw DwbkFrameworkException.failForReason(e, "Fehler beim Erstellen des lokalen Layers '%s'", this.layer.getName());
     }
   }
-
-  /**
-   * Deletes the current layer content if it exists.
-   * @param gpkg the geopackage
-   */
-  private void deleteCurrentTileEntryIfPresent(GeoPackage gpkg)
-  {
-    try
-    {
-      TileEntry tileEntry = gpkg.tile(this.layer.getLocalName());
-      if(tileEntry != null)
-      {
-        DbScriptUtil.deleteGeneratedTable(gpkg, this.layer.getLocalName());
-        DwbkLog.log(Level.INFO, "Offline Content von Layer '%s' wurde erfolgreich gelöscht.", this.layer.getName());
-      }
-    }
-    catch (Exception e)
-    {
-      DwbkFrameworkException.failForReason(e, "Aktueller offline Content von Layer '%s' konnte nicht gelöscht werden!", this.layer.getName());
-    }
-  }
   
   /**
    * Writes the response to a file
    * @param response the WMS response
    * @deprecated writing to files should not be used!
    */
+  @SuppressWarnings("unused")
   @Deprecated
   private void writeResponseToFile(GetMapResponse response) throws IOException
   {

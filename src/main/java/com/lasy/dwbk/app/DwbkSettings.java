@@ -50,7 +50,6 @@ public class DwbkSettings
   private String logLevel = Level.INFO.getName();
   private int wmsMaxThreads = 8;
   
-  // TODO: Setting isSavePasswordAllowed berücksichtigen! ggf. nicht in DB schreiben?!
   /**
    * Returns {@code true} if the password is allowed to be stored in the database.
    * @return {@code true} if the password is allowed to be stored in the database

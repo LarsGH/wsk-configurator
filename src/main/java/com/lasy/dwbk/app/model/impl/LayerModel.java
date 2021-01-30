@@ -65,9 +65,12 @@ public class LayerModel extends AGtModel
   public void setStoreLocal(boolean storeLocal)
   {
     this.getFeature().setAttribute(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(storeLocal));
+    if(storeLocal == false)
+    {
+      setLastDownloadDate(null);
+    }
   }
   
-  // TODO: last download date in GUI anzeigen?!
   public Optional<LocalDateTime> getLastDownloadDate()
   {
     String lastChanged = DbRowAccess.getValueElseNull(getFeature(), LayerTable.COL_LAST_DL, String.class);
@@ -85,12 +88,6 @@ public class LayerModel extends AGtModel
       ? date.truncatedTo(ChronoUnit.SECONDS).toString()
       : null;
     this.getFeature().setAttribute(LayerTable.COL_LAST_DL, insertDate);
-  }
-  
-  public void updateLastDownloadDate()
-  {
-    LocalDateTime now = LocalDateTime.now();
-    setLastDownloadDate(now);
   }
 
   public boolean isSaved()
@@ -136,7 +133,7 @@ public class LayerModel extends AGtModel
 
   public Optional<String> getUser()
   {
-    String user = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_USER, String.class);
+    String user = DbRowAccess.getValueElseNull(getFeature(), LayerTable.COL_USER, String.class);
     return Optional.ofNullable(user);
   }
 
@@ -147,7 +144,7 @@ public class LayerModel extends AGtModel
 
   public Optional<String> getPw()
   {
-    String pw = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_PW, String.class);
+    String pw = DbRowAccess.getValueElseNull(getFeature(), LayerTable.COL_PW, String.class);
     return Optional.ofNullable(DbPasswordModifier.fromDbValue(pw));
   }
 

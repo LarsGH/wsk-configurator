@@ -7,10 +7,12 @@ import org.assertj.core.api.Assertions;
 import org.geotools.data.DataStore;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.lasy.dwbk.app.DwbkFramework;
 import com.lasy.dwbk.app.model.impl.BboxModel;
+import com.lasy.dwbk.db.util.DwbkEmptyModelsRule;
 
 /**
  * Testet {@link BboxCrudService}.
@@ -26,6 +28,9 @@ public class BboxCrudServiceTest
   private static final String EXPECTED_BBOX_MAX_LAT = "11.999992";
   private static final boolean EXPECTED_BBOX_IS_MAP_BOUNDARY = true;
   private static final int EXPECTED_BBOX_EPSG = 4326;
+  
+  @Rule
+  public DwbkEmptyModelsRule emptyModelsRule = new DwbkEmptyModelsRule();
 
   private static BboxCrudService sut;
   

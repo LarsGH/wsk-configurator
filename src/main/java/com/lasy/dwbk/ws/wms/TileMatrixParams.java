@@ -7,6 +7,7 @@ import java.util.logging.Level;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
 import com.lasy.dwbk.app.logging.DwbkLog;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.util.BboxUtil;
@@ -37,27 +38,31 @@ public final class TileMatrixParams
   {
     Check.notNull(layer, "layer");
     List<TileMatrixParams> matrixParams = new ArrayList<>();
-    
-    final ReferencedEnvelope matrixBbox = BboxUtil.getFittingBboxEnvelopeInEpsg3857(layer.getBbox(), DEFAULT_TILE_LENGTH);
-    final int bboxWidthInMeters = (int) matrixBbox.getWidth();
-    final int bboxHeightInMeters= (int) matrixBbox.getHeight();
-    
-    for(Map.Entry<Integer, Integer> metersPerPixelPerZoom : layer.getMetersPerPixelPerZoomLevel().entrySet())
+    try
     {
-      final int zoomLevel = metersPerPixelPerZoom.getKey();
-      final int metersPerPixel = metersPerPixelPerZoom.getValue();
-      final int tileWidth = getBestTileSizeInPixels(bboxWidthInMeters, metersPerPixel);
-      final int tileHeight = getBestTileSizeInPixels(bboxHeightInMeters, metersPerPixel);
+      final ReferencedEnvelope matrixBbox = BboxUtil.getFittingBboxEnvelopeInEpsg3857(layer.getBbox(), DEFAULT_TILE_LENGTH);
+      final int bboxWidthInMeters = (int) matrixBbox.getWidth();
+      final int bboxHeightInMeters= (int) matrixBbox.getHeight();
       
-      final int matrixWidth = bboxWidthInMeters / (tileWidth * metersPerPixel);
-      final int matrixHeight = bboxHeightInMeters / (tileHeight * metersPerPixel);
-      
-      final TileMatrixParams matrixParam = new TileMatrixParams(zoomLevel, matrixBbox, matrixWidth, matrixHeight, tileWidth, tileHeight, metersPerPixel);
-      matrixParams.add(matrixParam);
-      
-      DwbkLog.log(Level.INFO, "TileMatrix erstellt für '%s': %n%s", layer.getName(), matrixParam);
+      for(Map.Entry<Integer, Integer> metersPerPixelPerZoom : layer.getMetersPerPixelPerZoomLevel().entrySet())
+      {
+        final int zoomLevel = metersPerPixelPerZoom.getKey();
+        final int metersPerPixel = metersPerPixelPerZoom.getValue();
+        final int tileWidth = getBestTileSizeInPixels(bboxWidthInMeters, metersPerPixel);
+        final int tileHeight = getBestTileSizeInPixels(bboxHeightInMeters, metersPerPixel);
+        
+        final int matrixWidth = bboxWidthInMeters / (tileWidth * metersPerPixel);
+        final int matrixHeight = bboxHeightInMeters / (tileHeight * metersPerPixel);
+        
+        final TileMatrixParams matrixParam = new TileMatrixParams(zoomLevel, matrixBbox, matrixWidth, matrixHeight, tileWidth, tileHeight, metersPerPixel);
+        matrixParams.add(matrixParam);
+        
+        DwbkLog.log(Level.INFO, "TileMatrix erstellt für '%s': %n%s", layer.getName(), matrixParam);
+      }
+    } catch (Exception e)
+    {
+      throw DwbkFrameworkException.failForReason(e, "Tilematrix konnte nicht erstellt werden.");
     }
-    
     return matrixParams;
   }  
   
@@ -65,7 +70,7 @@ public final class TileMatrixParams
   {
     int maxPixels = DEFAULT_TILE_LENGTH + DEFAULT_TOLERANCE;
     // by default choose tile size as big as possible
-    for(int i = maxPixels; i > (maxPixels / 2); i--)
+    for(int i = maxPixels; i > (maxPixels / 2); i-=10)
     {
       int currentWidthInMeters = i * metersPerPixel;
       if(bboxWidthInMeters % currentWidthInMeters == 0)
@@ -74,7 +79,6 @@ public final class TileMatrixParams
       }
     }
     
-    // TODO: Fehler metersPerPixel muss gefangen werden!
     String msg = String.format("Cannot determine best tile length for parameters: [bbox width in meters: %s, meters per pixel: %s, max tile size: %s]", 
       bboxWidthInMeters, metersPerPixel, maxPixels);
     throw new IllegalArgumentException(msg);

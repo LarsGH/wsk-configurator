@@ -3,9 +3,16 @@ package com.lasy.dwbk.db.util;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.geotools.geopkg.GeoPackage;
+import org.geotools.geopkg.TileEntry;
 import org.geotools.jdbc.util.SqlUtil;
+
+import com.lasy.dwbk.app.DwbkFramework;
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
+import com.lasy.dwbk.app.logging.DwbkLog;
+import com.lasy.dwbk.app.model.impl.LayerModel;
 
 /**
  * Helper to execute useful scripts on the geopackage file.
@@ -28,22 +35,27 @@ public class DbScriptUtil
    * <li>entry in gpkg_tile_matrix_set</li>
    * </ul>
    * 
-   * @param gpkg the GT geopackage
-   * @param tableName the generated table name (layer localname)
+   * @param layer the layer
    */
-  public static void deleteGeneratedTable(GeoPackage gpkg, String tableName)
+  public static void deleteLocalLayerContentIfPresent(LayerModel layer)
   {
+    String localLayerName = layer.getLocalName();
     try
     {
-      Connection connection = gpkg.getDataSource().getConnection();
-      Map<String, String> params = Map.of(TABLENAME_PARAM, tableName);
-      InputStream is = DbScriptUtil.class.getResourceAsStream(DELETE_GEN_TABLE_SCRIPT_NAME);
-      SqlUtil.runScript(is, connection, params);      
+      GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();
+      TileEntry tileEntry = gpkg.tile(localLayerName);
+      if(tileEntry != null)
+      {
+        Connection connection = gpkg.getDataSource().getConnection();
+        Map<String, String> params = Map.of(TABLENAME_PARAM, localLayerName);
+        InputStream is = DbScriptUtil.class.getResourceAsStream(DELETE_GEN_TABLE_SCRIPT_NAME);
+        SqlUtil.runScript(is, connection, params);
+        DwbkLog.log(Level.INFO, "Offline Content von Layer '%s' wurde erfolgreich gelöscht. (Tabelle: '%s')", layer.getName(), localLayerName);
+      }      
     }
     catch (Exception e)
     {
-      String msg = String.format("Execution of delete script for table '%s' failed!", tableName);
-      throw new IllegalStateException(msg, e);
+      throw DwbkFrameworkException.failForReason(e, "Aktueller offline Content von Layer '%s' konnte nicht gelöscht werden!", layer.getName());
     }
   }
 }

@@ -6,7 +6,7 @@ import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.model.impl.LayerModelBuilder;
 import com.lasy.dwbk.app.service.impl.LayerCrudService;
-import com.lasy.dwbk.db.util.DbPasswordModifier;
+import com.lasy.dwbk.db.util.DbScriptUtil;
 import com.lasy.dwbk.gui.panes.edit.AModelEditPane;
 import com.lasy.dwbk.gui.panes.edit.util.AttributeInputContainer;
 import com.lasy.dwbk.gui.panes.edit.util.BboxComboBox;
@@ -16,6 +16,9 @@ import com.lasy.dwbk.gui.util.PatternTextField;
 import com.lasy.dwbk.util.Is;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -41,8 +44,8 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrStoreLocal;
   private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrIsVisible;
   private AttributeInputContainer<LayerModel, BboxComboBox, Integer> attrBboxId;
-  private AttributeInputContainer<LayerModel, TextField, String> attrUser;
-  private AttributeInputContainer<LayerModel, TextField, String> attrPw;
+//  private AttributeInputContainer<LayerModel, TextField, String> attrUser;
+//  private AttributeInputContainer<LayerModel, TextField, String> attrPw;
   
   /**
    * Layer create / edit GUI.
@@ -55,19 +58,51 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   }
 
   @Override
-  protected void doHandleUpdateModel(LayerModel model)
+  protected void doHandleUpdateModel(LayerModel layer)
   {
-    model.setName(attrName.getConfiguredValue());
-    model.setDescription(attrDescription.getConfiguredValue());
-    model.setUri(attrUri.getConfiguredValue());
-    model.setMetersPerPixelText(attrMetersPerPixel.getConfiguredValue());
-    model.setStoreLocal(attrStoreLocal.getConfiguredValue());
-    model.setVisible(attrIsVisible.getConfiguredValue());
-    model.setBboxId(attrBboxId.getConfiguredValue());
-    model.setUser(attrUser.getConfiguredValue());
-    model.setPw(DbPasswordModifier.toDbValue(attrPw.getConfiguredValue()));
+    layer.setName(attrName.getConfiguredValue());
+    layer.setDescription(attrDescription.getConfiguredValue());
+    layer.setUri(attrUri.getConfiguredValue());
+    layer.setMetersPerPixelText(attrMetersPerPixel.getConfiguredValue());
+    layer.setVisible(attrIsVisible.getConfiguredValue());
+    layer.setBboxId(attrBboxId.getConfiguredValue());
+//    layer.setUser(attrUser.getConfiguredValue());
+//    getConfiguredPw().ifPresent(layer::setPw);
     
-    layerService().update(model);
+    boolean storeLocal = attrStoreLocal.getConfiguredValue();
+    handleStoreLocalSelection(layer, storeLocal);
+    
+    layerService().update(layer);
+  }
+
+  private void handleStoreLocalSelection(LayerModel layer, boolean storeLocal)
+  {
+    if(!storeLocal
+      && layer.getLastDownloadDate().isPresent())
+    {
+      Alert alert = createDeleteLocalDataAlert();
+      Optional<ButtonType> result = alert.showAndWait();
+
+      boolean deleteLocalData = result.isPresent() 
+        && result.get() == ButtonType.YES;
+      
+      if(deleteLocalData)
+      {
+        DbScriptUtil.deleteLocalLayerContentIfPresent(layer);
+      }
+      
+      storeLocal = !deleteLocalData;
+    }
+    layer.setStoreLocal(storeLocal);
+  }
+  
+  private Alert createDeleteLocalDataAlert()
+  {
+    String deleteMsg = "Sollen alle lokal gespeicherten Daten wirklich gelöscht werden?";
+    Alert alert = new Alert(AlertType.CONFIRMATION, deleteMsg, ButtonType.YES, ButtonType.NO);
+    alert.setTitle("Lokale Daten löschen");
+    alert.setHeaderText(null);
+    return alert;
   }
 
   private LayerCrudService layerService()
@@ -85,11 +120,20 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     builder.withStoreLocal(attrStoreLocal.getConfiguredValue());
     builder.withDefaultVisible(attrIsVisible.getConfiguredValue());
     builder.withBboxId(attrBboxId.getConfiguredValue());
-    builder.withUser(attrUser.getConfiguredValue());
-    builder.withPassword(DbPasswordModifier.toDbValue(attrPw.getConfiguredValue()));
+//    builder.withUser(attrUser.getConfiguredValue());
+//    getConfiguredPw().ifPresent(builder::withPassword);
     
     layerService().create(builder);
   }
+  
+//  private Optional<String> getConfiguredPw()
+//  {
+//    if(DwbkFramework.getInstance().getSettings().isSavePasswordAllowed())
+//    {
+//      Optional.ofNullable(DbPasswordModifier.toDbValue(attrPw.getConfiguredValue()));
+//    }
+//    return Optional.empty();
+//  }
 
   @Override
   protected void goToOverviewPane()
@@ -122,11 +166,16 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     this.attrBboxId = createAttrBbox();
     addAttributeInputContainer(attrBboxId);
     
-    this.attrUser = createAttrUser();
-    addAttributeInputContainer(attrUser);
+    // authentication is not supported (yet)
     
-    this.attrPw = createAttrPw();
-    addAttributeInputContainer(attrPw);
+//    this.attrUser = createAttrUser();
+//    addAttributeInputContainer(attrUser);
+//    
+//    if(DwbkFramework.getInstance().getSettings().isSavePasswordAllowed())
+//    {
+//      this.attrPw = createAttrPw();
+//      addAttributeInputContainer(attrPw);
+//    }
   }
   
   private AttributeInputContainer<LayerModel, TextField, String> createAttrMetersPerPixel()
@@ -153,18 +202,22 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
       .build();
   }
 
+  @SuppressWarnings("unused")
+  @Deprecated
   private AttributeInputContainer<LayerModel, TextField, String> createAttrPw()
   {
-    return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Benutzername")
+    return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Passwort")
       .withGuiElement(new PasswordField())
       .withGuiValueInitialization((txtField, layer) -> {
         txtField.setText(layer.getPw().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
-      .withInfoAlertMessage("Das Login-Passwort zur Layer-Abfrage.")
+      .withInfoAlertMessage("Das Passwort zur Layer-Abfrage.")
       .build();
   }
   
+  @SuppressWarnings("unused")
+  @Deprecated
   private AttributeInputContainer<LayerModel, TextField, String> createAttrUser()
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Benutzername")
@@ -173,7 +226,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
         txtField.setText(layer.getUser().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
-      .withInfoAlertMessage("Der Login-Benutzername zur Layer-Abfrage.")
+      .withInfoAlertMessage("Der Benutzername zur Layer-Abfrage.")
       .build();
   }
   

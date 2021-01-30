@@ -84,13 +84,6 @@ public abstract class AGtModel implements IGtModel
   }
   
   @Override
-  public void updateLastChangedDate()
-  {
-    LocalDateTime now = LocalDateTime.now();
-    setLastChangedDate(now);
-  }
-  
-  @Override
   public boolean equals(Object other)
   {
     if(other == null)

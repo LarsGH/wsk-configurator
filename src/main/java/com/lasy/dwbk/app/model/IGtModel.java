@@ -60,9 +60,4 @@ public interface IGtModel
    */
   public void setLastChangedDate(LocalDateTime date);
   
-  /**
-   * Sets the last changed date to the current system time.
-   */
-  public void updateLastChangedDate();
-  
 }

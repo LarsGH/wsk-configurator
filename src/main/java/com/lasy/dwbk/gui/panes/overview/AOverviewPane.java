@@ -1,5 +1,6 @@
 package com.lasy.dwbk.gui.panes.overview;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -122,20 +123,35 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
   
   private List<TableColumn<TModelType, ?>> createChangedAndButtonColumns()
   {
+    List<TableColumn<TModelType, ?>> colList = new ArrayList<>();
+    
     TableColumn<TModelType, String> lastChangeCol = new TableColumn<>("Letzte Änderung");
     lastChangeCol.setCellValueFactory(new ModelValueFactory<TModelType>(model -> model.getLastChangedDate().toString()));
+    colList.add(lastChangeCol);
+    
+    // add more buttons before edit if necessary
+    List<TableColumn<TModelType, Button>> additionalButtons = createAdditionalButtons();
+    colList.addAll(additionalButtons);
     
     TableColumn<TModelType, Button> editCol = new TableColumn<>("Editieren");
     Supplier<Button> btnEdit = () -> GuiUtil.createIconButton(GuiIcon.EDIT, "Ruft die Editieren-Maske auf");
     editCol.setCellFactory(ButtonTableCell.<TModelType> create(btnEdit, this::handleEditModel));
+    colList.add(editCol);
 
     TableColumn<TModelType, Button> deleteCol = new TableColumn<>("Löschen");
     Supplier<Button> btnDelete = () -> GuiUtil.createIconButton(GuiIcon.DELETE, "Löscht die Auswahl");
     deleteCol.setCellFactory(ButtonTableCell.<TModelType> create(btnDelete, this::handleDeleteModel));
+    colList.add(deleteCol);
     
-    return List.of(lastChangeCol, editCol, deleteCol);
+    return colList;
   }
   
+  /**
+   * Creates new buttons that are inserted before the edit button.
+   * @return new buttons
+   */
+  protected abstract List<TableColumn<TModelType, Button>> createAdditionalButtons();
+
   private void handleEditModel(TModelType model)
   {
     if (model != null)
@@ -163,6 +179,9 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
 
         if (result.isPresent() && result.get() == ButtonType.YES)
         {
+          // handle more delete logic besides CRUD service call if necessary
+          doHandleDelete(model);
+          
           int deleteCount = getCrudService().deleteById(model.getId());
           if (deleteCount > 0)
           {
@@ -171,6 +190,15 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
         }
       }
     }
+  }
+
+  /**
+   * Handle more delete logic (besides CRUD service call)
+   * @param model the model to delete
+   */
+  protected void doHandleDelete(TModelType model)
+  {
+    // By default do nothing
   }
 
   private Alert createDeleteAlert(TModelType model)

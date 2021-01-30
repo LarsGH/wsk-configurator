@@ -1,22 +1,32 @@
 package com.lasy.dwbk.gui.panes.overview.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
+import com.lasy.dwbk.app.error.ErrorModule;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.service.ADwbkCrudService;
 import com.lasy.dwbk.app.service.impl.BboxCrudService;
+import com.lasy.dwbk.db.util.DbScriptUtil;
 import com.lasy.dwbk.gui.panes.edit.AModelEditPane;
 import com.lasy.dwbk.gui.panes.edit.impl.LayerEditPane;
 import com.lasy.dwbk.gui.panes.overview.AOverviewPane;
+import com.lasy.dwbk.gui.util.ButtonTableCell;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 import com.lasy.dwbk.gui.util.ModelValueFactory;
+import com.lasy.dwbk.ws.wms.WmsLayerWriter;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 
 /**
@@ -34,7 +44,7 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   {
     return createInitializedPane(new LayerOverviewPane(mainScene));
   }
-  
+
   private LayerOverviewPane(Scene mainScene)
   {
     super(mainScene, "Layer-Übersicht");
@@ -43,10 +53,7 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected Button createNewModelButton()
   {
-    return GuiUtil.createIconButtonWithText(
-      GuiIcon.CREATE, 
-      "Erstellt einen neuen Layer",  
-      "Neuen Layer erstellen");
+    return GuiUtil.createIconButtonWithText(GuiIcon.CREATE, "Erstellt einen neuen Layer", "Neuen Layer erstellen");
   }
 
   @Override
@@ -60,14 +67,27 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   {
     TableColumn<LayerModel, String> isVisibleCol = new TableColumn<>("Initial sichtbar");
     isVisibleCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isVisible())));
-    
-    TableColumn<LayerModel, String> storeLocalCol = new TableColumn<>("Lokal speichern");
-    storeLocalCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isStoreLocal())));
-    
-    TableColumn<LayerModel, String> isSavedCol = new TableColumn<>("Gespeichert");
-    isSavedCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isSaved())));
 
-    return List.of(isVisibleCol, storeLocalCol, isSavedCol);
+    TableColumn<LayerModel, String> lastDownloadCol = new TableColumn<>("Zuletzt heruntergeladen");
+    lastDownloadCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> {
+      if(layer.isStoreLocal())
+      {
+        Optional<LocalDateTime> lastDownloadDate = layer.getLastDownloadDate();
+        if (lastDownloadDate.isPresent())
+        {
+          LocalDateTime dlDate = lastDownloadDate.get();
+          
+          return dlDate.isAfter(layer.getLastChangedDate()) 
+            ? dlDate.toString()
+            : String.join(System.lineSeparator(), dlDate.toString(), "* Konfigurationsänderungen!");
+        }
+        return "NICHT LOKAL GESPEICHERT!";
+      }
+      // show nothing for layers that are not allowed to be stored locally
+      return "";
+    }));
+
+    return List.of(isVisibleCol, lastDownloadCol);
   }
 
   @Override
@@ -85,7 +105,7 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected Optional<String> getCreateNotAllowedReason()
   {
-    if(noBboxesExist())
+    if (noBboxesExist())
     {
       return Optional.of("Es muss mindestens eine Boundingbox vorhanden sein um den Kartenausschnitt festzulegen!");
     }
@@ -96,6 +116,60 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   {
     BboxCrudService bboxService = DwbkServiceProvider.getInstance().getBboxService();
     return bboxService.readAll().isEmpty();
+  }
+
+  @Override
+  protected List<TableColumn<LayerModel, Button>> createAdditionalButtons()
+  {
+    TableColumn<LayerModel, Button> downloadCol = new TableColumn<>("Herunterladen");
+    Supplier<Button> btnDownload = () -> GuiUtil.createIconButton(GuiIcon.DOWNLOAD, "Speichert den Layer lokal");
+    downloadCol.setCellFactory(ButtonTableCell.<LayerModel> create(btnDownload, this::handleDownload,
+      // just show button if it can be stored local
+      layer -> layer.isStoreLocal()));
+
+    return List.of(downloadCol);
+  }
+
+  private void handleDownload(LayerModel layer)
+  {
+    if (layer != null)
+    {
+      try
+      {
+        Alert alert = createDownloadAlert(layer);
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.YES)
+        {
+          WmsLayerWriter writer = WmsLayerWriter.createForLayer(layer);
+          writer.write();
+          
+          layer.setLastDownloadDate(LocalDateTime.now());
+          DwbkServiceProvider.getInstance().getLayerService().update(layer);
+        }
+      }
+      catch (Exception e)
+      {
+        throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
+          .failForReason(t, "Fehler beim Speichern des lokalen layers '%s'", layer.getName()));
+      }
+
+    }
+  }
+
+  private Alert createDownloadAlert(LayerModel layer)
+  {
+    String msg = String.format("'%s' jetzt herunterladen? Das Herunterladen kann einige Minuten dauern.", layer.getName());
+    Alert alert = new Alert(AlertType.CONFIRMATION, msg, ButtonType.YES, ButtonType.NO);
+    alert.setTitle("Layer Herunterladen");
+    alert.setHeaderText(null);
+    return alert;
+  }
+
+  @Override
+  protected void doHandleDelete(LayerModel layer)
+  {
+    DbScriptUtil.deleteLocalLayerContentIfPresent(layer);
   }
 
 }

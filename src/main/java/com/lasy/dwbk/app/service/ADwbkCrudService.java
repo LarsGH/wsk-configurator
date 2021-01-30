@@ -1,6 +1,7 @@
 package com.lasy.dwbk.app.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,7 +65,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
         .failForReason(t, "Daten ('%s') konnten nicht geladen werden.", getTableName()));
     }
   }
@@ -80,7 +81,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (IOException e)
     {
-      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
         .failForReason(t, "Daten ('%s - ID: %s') konnten nicht geladen werden.", getTableName(), id));
     }
   }
@@ -97,7 +98,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
         .failForReason(t, "Daten ('%s - ID: %s') konnten nicht gelöscht werden.", getTableName(), id));
     }
   }
@@ -111,7 +112,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
         .failForReason(t, "Zugriff auf Tabelle '%s' ist fehlgeschlagen.", getTableName()));
     }
   }
@@ -123,7 +124,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     try
     {
       TModel model = builder.build();
-      model.updateLastChangedDate();
+      model.setLastChangedDate(LocalDateTime.now());
       SimpleFeature feature = model.getFeature();
       doCreate(feature);
 
@@ -133,7 +134,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
         .failForReason(t, "Neuer Eintrag ('%s') konnte nicht erstellt werden.", getTableName()));
     }
   }
@@ -205,7 +206,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
     }
     catch (Exception e)
     {
-      throw ErrorModule.createFrameworkExcepiton(e, t -> DwbkFrameworkException
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
           .failForReason(t, "Daten ('%s - ID: %s') konnten nicht aktualisiert werden.", getTableName(), id));
     }
   }
@@ -225,7 +226,7 @@ public abstract class ADwbkCrudService<TModel extends IGtModel, TBuilder extends
       featureStore.setTransaction(transaction);
 
       // update changed date
-      model.updateLastChangedDate();
+      model.setLastChangedDate(LocalDateTime.now());
       
       Map<Name, Object> attributes = getAttributes(model);
       List<Name> attributeNames = new ArrayList<Name>();

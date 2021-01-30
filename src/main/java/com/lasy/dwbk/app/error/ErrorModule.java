@@ -21,7 +21,7 @@ public class ErrorModule
    * @param thrown the exception to wrap (or throw)
    * @param frameworkExceptionFunction function to transform the original error to a framework error
    */
-  public static DwbkFrameworkException createFrameworkExcepiton(
+  public static DwbkFrameworkException createFrameworkException(
     Throwable thrown,
     Function<Throwable, DwbkFrameworkException> frameworkExceptionFunction)
   {

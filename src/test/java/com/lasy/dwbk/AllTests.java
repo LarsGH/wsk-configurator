@@ -13,6 +13,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.lasy.dwbk.app.DwbkFramework;
+import com.lasy.dwbk.app.model.ModelTestSuite;
 import com.lasy.dwbk.app.service.ServiceTestSuite;
 import com.lasy.dwbk.db.DbTestSuite;
 import com.lasy.dwbk.util.DwbkUtilTestSuite;
@@ -21,6 +22,7 @@ import com.lasy.dwbk.ws.WsTestSuite;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+  ModelTestSuite.class,
   ServiceTestSuite.class,
   DbTestSuite.class,
   DwbkUtilTestSuite.class,
