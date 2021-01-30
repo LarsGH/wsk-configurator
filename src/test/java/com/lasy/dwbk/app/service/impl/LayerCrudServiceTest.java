@@ -36,7 +36,6 @@ public class LayerCrudServiceTest
   private static final String EXPECTED_LAYER_DESCRIPTION = "My layer description...";
   private static final String EXPECTED_LAYER_URI = "https://my-test-uri.com?service=wms&version=1.0.0&layer=test";
   private static final boolean EXPECTED_STORE_LOCAL = true;
-  private static final boolean EXPECTED_IS_SAVED = true;
   private static final boolean EXPECTED_IS_VISIBLE = true;
   private static final String EXPECTED_USER = "test-user";
   private static final String EXPECTED_PW = "test-pw-1234";
@@ -77,7 +76,6 @@ public class LayerCrudServiceTest
     layerA.setPw("changedPw");
     layerA.setStoreLocal(false);
     layerA.setMetersPerPixelText(null);
-    layerA.setSaved(false);
     layerA.setVisible(false);
     
     // save
@@ -115,7 +113,6 @@ public class LayerCrudServiceTest
       .withUri(expectedUri)
       .withStoreLocal(EXPECTED_STORE_LOCAL)
       .withMetersPerPixel("1;10;100")
-      .withSavedStatus(EXPECTED_IS_SAVED)
       .withDefaultVisible(EXPECTED_IS_VISIBLE)
       .withBboxId(bbox.getId())
       .withUser(EXPECTED_USER)
@@ -133,7 +130,6 @@ public class LayerCrudServiceTest
     expectedMetersPerPixelPerZoomLevel.put(2, 1);
     Assertions.assertThat(newLayer.getMetersPerPixelPerZoomLevel()).containsExactlyEntriesOf(expectedMetersPerPixelPerZoomLevel);
     
-    Assertions.assertThat(newLayer.isSaved()).isTrue();
     Assertions.assertThat(newLayer.isVisible()).isTrue();
     Assertions.assertThat(newLayer.getUser().get()).isEqualTo(EXPECTED_USER);
     Assertions.assertThat(newLayer.getPw().get()).isEqualTo(EXPECTED_PW);

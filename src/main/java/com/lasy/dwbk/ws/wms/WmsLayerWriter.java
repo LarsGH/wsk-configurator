@@ -258,7 +258,9 @@ public class WmsLayerWriter
       Set<String> supportedSrs = wms.getCapabilities().getLayer().getSrs();
       if(!supportedSrs.contains(BboxUtil.getEpsgStringForCode(BboxUtil.EPSG_3857)))
       {
-        throw new IllegalStateException("Service is not supported because it does not support EPSG:3857");
+        String msg = String.format("Service does not support EPSG:3857! %n"
+          + "GetCapabilities: %s", requestParams.getCapablitiesRequest());
+        throw new IllegalStateException(msg);
       }
       
       wms.getCapabilities().getRequest().getGetMap().setGet(createUrl(requestParams.getBaseRequest()));
@@ -267,7 +269,7 @@ public class WmsLayerWriter
     } 
     catch (Exception e)
     {
-      throw DwbkFrameworkException.failForReason(e, "GT WebMapServer konnte nicht erstellt werden oder wird nicht unterstützt!", e);
+      throw DwbkFrameworkException.failForReason(e, "GT WebMapServer konnte nicht erstellt werden oder wird nicht unterstützt!");
     }
   }
   

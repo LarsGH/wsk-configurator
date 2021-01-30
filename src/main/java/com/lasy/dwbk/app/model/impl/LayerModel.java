@@ -90,17 +90,6 @@ public class LayerModel extends AGtModel
     this.getFeature().setAttribute(LayerTable.COL_LAST_DL, insertDate);
   }
 
-  public boolean isSaved()
-  {
-    String isSaved = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_IS_SAVED, String.class);
-    return DbBoolean.fromDbValue(isSaved);
-  }
-
-  public void setSaved(boolean isSaved)
-  {
-    this.getFeature().setAttribute(LayerTable.COL_IS_SAVED, DbBoolean.toDbValue(isSaved));
-  }
-
   public boolean isVisible()
   {
     String isSaved = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_IS_VISIBLE, String.class);

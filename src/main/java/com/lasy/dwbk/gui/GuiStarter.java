@@ -23,8 +23,8 @@ public class GuiStarter extends Application
 {
 
   @Override
-  public void start(Stage stage) 
-  {    
+  public void start(Stage stage)
+  {
     Scene scene = new Scene(new BorderPane());
     MainPane mainPane = MainPane.create(scene);
     scene.setRoot(mainPane);
@@ -40,10 +40,10 @@ public class GuiStarter extends Application
   public static void main(String[] args)
   {
     Thread.setDefaultUncaughtExceptionHandler(handleUncaughtException());
-    
+
     try (DwbkFramework framework = DwbkFramework.getInstance())
     {
-//      migrate();
+      // migrate();
       // testWriter(framework);
       Application.launch();
     }
@@ -52,12 +52,14 @@ public class GuiStarter extends Application
       ErrorModule.handleError(t);
     }
   }
-  
+
+  @SuppressWarnings("unused")
   private static void testWriter(DwbkFramework framework)
   {
     // siedlung_luftbild Layer
     Optional<LayerModel> siedlungLuftbild = DwbkServiceProvider.getInstance().getLayerService().readById(8);
-    if(siedlungLuftbild.isPresent()) {
+    if (siedlungLuftbild.isPresent())
+    {
       WmsLayerWriter writer = WmsLayerWriter.createForLayer(siedlungLuftbild.get());
       writer.write();
     }
@@ -69,7 +71,7 @@ public class GuiStarter extends Application
       ErrorModule.handleError(thrown);
     };
   }
-  
+
   /**
    * Starts the migration.
    */
@@ -78,14 +80,14 @@ public class GuiStarter extends Application
   {
     LayerCrudService layerService = DwbkServiceProvider.getInstance().getLayerService();
     Collection<LayerModel> layers = layerService.readAll();
-    for(LayerModel model : layers)
+    for (LayerModel model : layers)
     {
       String localTableName = DbGeneratedLayerName.idToGeneratedTableName(model.getId());
       model.setLocalName(localTableName);
-      
+
       layerService.update(model);
     }
-    
+
     System.out.println("Migration abgeschlossen!");
   }
 

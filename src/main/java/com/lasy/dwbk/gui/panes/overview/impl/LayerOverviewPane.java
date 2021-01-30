@@ -77,9 +77,9 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
         {
           LocalDateTime dlDate = lastDownloadDate.get();
           
-          return dlDate.isAfter(layer.getLastChangedDate()) 
-            ? dlDate.toString()
-            : String.join(System.lineSeparator(), dlDate.toString(), "* Konfigurationsänderungen!");
+          return layer.getLastChangedDate().isAfter(dlDate) 
+            ? String.join(System.lineSeparator(), dlDate.toString(), "* Konfigurationsänderungen!")
+            : dlDate.toString();
         }
         return "NICHT LOKAL GESPEICHERT!";
       }

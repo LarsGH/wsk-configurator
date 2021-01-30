@@ -51,11 +51,17 @@ public class ButtonTableCell<TModelType> extends TableCell<TModelType, Button>
   {
     final Node graphic = this.actionButton.getGraphic();
     this.actionButton.setGraphic(new ImageView(GuiIcon.LOADING));
-
-    TModelType item = getCurrentItem().orElse(null);
-    modelConsumer.accept(item);
     
-    this.actionButton.setGraphic(graphic);
+    try 
+    {
+      TModelType item = getCurrentItem().orElse(null);
+      modelConsumer.accept(item);
+    }
+    finally
+    {
+      this.actionButton.setGraphic(graphic);
+      getTableView().refresh();
+    }
   }
 
   public Optional<TModelType> getCurrentItem()

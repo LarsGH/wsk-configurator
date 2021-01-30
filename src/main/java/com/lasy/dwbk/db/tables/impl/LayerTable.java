@@ -11,11 +11,6 @@ public class LayerTable  extends ADwbkTable
   public static final String TABLE_NAME = "dwbk_config_layer";
   
   public static final String COL_URI = "uri";
-  
-  /**
-   * boolean column to determine if the layer was saved after last change (important for store local layers).
-   */
-  public static final String COL_IS_SAVED = "is_saved";
   public static final String COL_STORE_LOCAL = "store_local";
   public static final String COL_LAST_DL = "last_dl";
   public static final String COL_IS_VISIBLE = "is_visible";

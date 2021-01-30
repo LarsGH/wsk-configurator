@@ -3,7 +3,6 @@ CREATE TABLE "dwbk_config_layer" (
 "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
 "name" VARCHAR(40) NOT NULL UNIQUE, 
 "description" VARCHAR(255),
-"is_saved" VARCHAR(1) NOT NULL, 
 "store_local" VARCHAR(1) NOT NULL, 
 "pixel_meters" VARCHAR(40), 
 "is_visible" VARCHAR(1) NOT NULL, 

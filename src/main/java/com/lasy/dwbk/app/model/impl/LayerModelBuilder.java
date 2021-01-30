@@ -19,7 +19,6 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   private String uri;
   private boolean storeLocal;
   private String metersPerPixel;
-  private boolean isSaved;
   private boolean isVisible;
   private Integer bboxId;
   private String user;
@@ -29,7 +28,6 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   {
     this.name = Check.trimmedNotEmpty(name, "name");
     this.storeLocal = false;
-    this.isSaved = true;
     this.isVisible = false;
   }
   
@@ -43,7 +41,6 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     featureBuilder.set(LayerTable.COL_URI, this.uri);
     featureBuilder.set(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(this.storeLocal));
     featureBuilder.set(LayerTable.COL_PIXEL_METERS, this.metersPerPixel);
-    featureBuilder.set(LayerTable.COL_IS_SAVED, DbBoolean.toDbValue(this.isSaved));
     featureBuilder.set(LayerTable.COL_IS_VISIBLE, DbBoolean.toDbValue(this.isVisible));
     featureBuilder.set(LayerTable.COL_BBOX_ID, this.bboxId);
     featureBuilder.set(LayerTable.COL_USER, this.user);
@@ -95,17 +92,6 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   public LayerModelBuilder withMetersPerPixel(String metersPerPixel)
   {
     this.metersPerPixel = Check.notNull(metersPerPixel, "metersPerPixel");
-    return this;
-  }
-  
-  /**
-   * Sets the value for the saved status (necessary if layer is stored locally).
-   * @param isSaved {@code true} if layer is saved.
-   * @return builder
-   */
-  public LayerModelBuilder withSavedStatus(boolean isSaved)
-  {
-    this.isSaved = isSaved;
     return this;
   }
   
