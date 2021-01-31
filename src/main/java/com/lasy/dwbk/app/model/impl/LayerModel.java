@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.google.gson.GsonBuilder;
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.model.AGtModel;
 import com.lasy.dwbk.db.tables.impl.LayerTable;
@@ -22,6 +23,8 @@ import com.lasy.dwbk.db.util.DbPasswordModifier;
 import com.lasy.dwbk.db.util.DbRowAccess;
 import com.lasy.dwbk.util.Check;
 import com.lasy.dwbk.util.Is;
+import com.lasy.dwbk.ws.IRequestParameters;
+import com.lasy.dwbk.ws.RequestParameters;
 
 /**
  * Entity for a row from {@link LayerTable}.
@@ -54,6 +57,9 @@ public class LayerModel extends AGtModel
   {
     Check.trimmedNotEmpty(uri, "uri");
     this.getFeature().setAttribute(LayerTable.COL_URI, uri);
+    
+    IRequestParameters requestParams = RequestParameters.fromLayerUri(uri);
+    this.setRequestParameters(requestParams);
   }
 
   public boolean isStoreLocal()
@@ -139,6 +145,10 @@ public class LayerModel extends AGtModel
 
   public void setPw(String pw)
   {
+    if(!Is.nullOrTrimmedEmpty(pw))
+    {
+      pw = DbPasswordModifier.toDbValue(pw);
+    }
     this.getFeature().setAttribute(LayerTable.COL_PW, pw);
   }
 
@@ -208,15 +218,18 @@ public class LayerModel extends AGtModel
    * 
    * @return parts of the query as JSON-String
    */
-  public String getQueryParts()
+  public IRequestParameters getRequestParameters()
   {
-    String queryParts = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_QUERY_PARTS, String.class);
-    return queryParts;
+    String parts = DbRowAccess.getMandatoryValue(getFeature(), LayerTable.COL_QUERY_PARTS, String.class);
+    return RequestParameters.fromJson(parts);
   }
   
-  public void setQueryParts(String queryParts)
+  private void setRequestParameters(IRequestParameters requestParams)
   {
-    this.getFeature().setAttribute(LayerTable.COL_QUERY_PARTS, queryParts);
+    String parts = requestParams != null
+      ? new GsonBuilder().setPrettyPrinting().create().toJson(requestParams.getParams())
+      : null;
+    this.getFeature().setAttribute(LayerTable.COL_QUERY_PARTS, parts);
   }
 
   private static final String MODEL_NAME = "Layer";

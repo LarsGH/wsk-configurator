@@ -138,11 +138,13 @@ public class LayerCrudServiceTest
     String expectedLocalName = DbGeneratedLayerName.idToGeneratedTableName(newLayer.getId());
     Assertions.assertThat(newLayer.getLocalName()).isEqualTo(expectedLocalName);
     
-    String expectedQueryParts = String.format("{\"base_url\":\"https://my-test-uri.com?\",\r\n"
-      + "\"layer\":\"test_%s\",\r\n"
-      + "\"service\":\"wms\",\r\n"
-      + "\"version\":\"1.0.0\"}", newLayer.getName());
-    Assertions.assertThat(newLayer.getQueryParts()).isEqualTo(expectedQueryParts);
+    String expectedQueryParts = String.format("{%n"
+      + "  \"base_url\": \"https://my-test-uri.com?\",%n"
+      + "  \"layer\": \"test_%s\",%n"
+      + "  \"service\": \"wms\",%n"
+      + "  \"version\": \"1.0.0\"%n"
+      + "}", newLayer.getName());
+    Assertions.assertThat(newLayer.getRequestParameters().toJson()).isEqualToIgnoringWhitespace(expectedQueryParts);
     
     return newLayer;
   }

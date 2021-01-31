@@ -6,8 +6,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.db.tables.IDwbkTable;
 import com.lasy.dwbk.db.tables.impl.LayerTable;
-import com.lasy.dwbk.db.util.DbBoolean;
-import com.lasy.dwbk.db.util.DbPasswordModifier;
 import com.lasy.dwbk.util.Check;
 
 public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
@@ -35,20 +33,20 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
   public LayerModel build()
   {
     SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(getTable().getSimpleFeatureType());
-    
-    featureBuilder.set(LayerTable.COL_NAME, this.name);
-    featureBuilder.set(LayerTable.COL_DESCRIPTION, this.description);
-    featureBuilder.set(LayerTable.COL_URI, this.uri);
-    featureBuilder.set(LayerTable.COL_STORE_LOCAL, DbBoolean.toDbValue(this.storeLocal));
-    featureBuilder.set(LayerTable.COL_PIXEL_METERS, this.metersPerPixel);
-    featureBuilder.set(LayerTable.COL_IS_VISIBLE, DbBoolean.toDbValue(this.isVisible));
-    featureBuilder.set(LayerTable.COL_BBOX_ID, this.bboxId);
-    featureBuilder.set(LayerTable.COL_USER, this.user);
-    featureBuilder.set(LayerTable.COL_PW, DbPasswordModifier.toDbValue(this.pw));
-    
     SimpleFeature feature = featureBuilder.buildFeature(GENERATE_ID);
+    LayerModel layer = new LayerModel(feature);
     
-    return new LayerModel(feature);
+    layer.setName(this.name);
+    layer.setDescription(this.description);
+    layer.setUri(this.uri);
+    layer.setStoreLocal(this.storeLocal);
+    layer.setMetersPerPixelText(this.metersPerPixel);
+    layer.setVisible(this.isVisible);
+    layer.setBboxId(this.bboxId);
+    layer.setUser(this.user);
+    layer.setPw(this.pw);
+    
+    return layer;
   }
   
   /**

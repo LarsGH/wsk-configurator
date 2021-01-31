@@ -33,6 +33,7 @@ import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.db.util.DbScriptUtil;
 import com.lasy.dwbk.util.BboxUtil;
 import com.lasy.dwbk.util.Check;
+import com.lasy.dwbk.ws.ILayerWriter;
 
 // TODO: Abstract class ALayerWriter for WMS / WFS impls?
 /**
@@ -40,25 +41,25 @@ import com.lasy.dwbk.util.Check;
  * @author larss
  *
  */
-public class WmsLayerWriter
+public class WmsLayerWriter implements ILayerWriter
 {
   
-  /**
-   * Creates a new WMS layer writer
-   * @param layer the layer to write
-   * @return layer writer
-   */
-  public static WmsLayerWriter createForLayer(LayerModel layer)
-  {
-    return new WmsLayerWriter(layer);
-  }
+//  /**
+//   * Creates a new WMS layer writer
+//   * @param layer the layer to write
+//   * @return layer writer
+//   */
+//  public static WmsLayerWriter createForLayer(LayerModel layer)
+//  {
+//    return new WmsLayerWriter(layer);
+//  }
 
   private final LayerModel layer;
   
   private final ExecutorService threadPool;
   private final LinkedBlockingQueue<Future<WmsTileResponse>> responseQueue;
   
-  private WmsLayerWriter(LayerModel layer)
+  public WmsLayerWriter(LayerModel layer)
   {
     this.layer = Check.notNull(layer, "layer");
     
@@ -68,10 +69,7 @@ public class WmsLayerWriter
     this.responseQueue = new LinkedBlockingQueue<>(5);
   }
   
-  /**
-   * Creates the local layer in the geopackage.
-   * @return {@code true} if the layer was written successfully
-   */
+  @Override
   public void write()
   {
     GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();

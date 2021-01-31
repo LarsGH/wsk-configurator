@@ -5,6 +5,7 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import com.google.gson.Gson;
 import com.lasy.dwbk.ws.wms.WmsQueryConst;
 
 /**
@@ -72,5 +73,31 @@ public class RequestParametersTest
     IRequestParameters sut = RequestParameters.fromLayerUri(GET_MAP_QUERY);
     
     Assertions.assertThat(sut.getBaseRequest()).isEqualTo("https://www.wms.nrw.de/geobasis/wms_nw_dvg?");
+  }
+  
+  /**
+   * Tests web service getter for WMS.
+   */
+  @Test
+  public void testGetWebServiceWms()
+  {    
+    Map<String, String> serviceParam = Map.of(QueryConst.SERVICE, "wms");
+    String json = new Gson().toJson(serviceParam);
+    IRequestParameters sut = RequestParameters.fromJson(json);
+    
+    Assertions.assertThat(sut.getWebService()).isEqualTo(EWebService.WMS);
+  }
+  
+  /**
+   * Tests web service getter for WFS.
+   */
+  @Test
+  public void testGetWebServiceWfs()
+  {    
+    Map<String, String> serviceParam = Map.of(QueryConst.SERVICE, "wfs");
+    String json = new Gson().toJson(serviceParam);
+    IRequestParameters sut = RequestParameters.fromJson(json);
+    
+    Assertions.assertThat(sut.getWebService()).isEqualTo(EWebService.WFS);
   }
 }

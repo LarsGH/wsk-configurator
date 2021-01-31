@@ -20,7 +20,7 @@ import com.lasy.dwbk.gui.util.ButtonTableCell;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 import com.lasy.dwbk.gui.util.ModelValueFactory;
-import com.lasy.dwbk.ws.wms.WmsLayerWriter;
+import com.lasy.dwbk.ws.ILayerWriter;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -141,7 +141,7 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
 
         if (result.isPresent() && result.get() == ButtonType.YES)
         {
-          WmsLayerWriter writer = WmsLayerWriter.createForLayer(layer);
+          ILayerWriter writer = ILayerWriter.createForLayer(layer);
           writer.write();
           
           layer.setLastDownloadDate(LocalDateTime.now());
