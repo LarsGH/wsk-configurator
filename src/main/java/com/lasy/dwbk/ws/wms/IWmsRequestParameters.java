@@ -11,12 +11,6 @@ public interface IWmsRequestParameters extends IRequestParameters
 {
 
   /**
-   * Returns the version parameter value.
-   * @return version
-   */
-  String getVersion();
-
-  /**
    * Returns the layers parameter value.
    * @return layers
    */

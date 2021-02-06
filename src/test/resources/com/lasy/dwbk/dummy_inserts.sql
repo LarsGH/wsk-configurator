@@ -107,4 +107,32 @@ VALUES
 "srs":"EPSG:4326",
 "test":"10",
 "version":"1.0.0",
-"width":"1000"}', 'dwbk_genlayer_ni', '2021-01-31T10:26:38');
+"width":"1000"}', 'dwbk_genlayer_ni', '2021-01-31T10:26:38'),
+(10, 'Notfalll-Info-Punkte WFS', 'NIPs im Kreis RE', 'N', '1', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetFeature&typeNames=BEVSchutz:NOTFALLINFOPUNKTE', 2, NULL, NULL, '{
+  "base_url": "https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?",
+  "request": "GetFeature",
+  "service": "WFS",
+  "typenames": "BEVSchutz:NOTFALLINFOPUNKTE",
+  "version": "1.0.0"
+}', 'dwbk_genlayer_onze', '2021-01-31T17:33:22'),
+(11, 'Rettungspunkte WFS', 'Rettungspunkte im Kreis RE', 'N', '10', 'Y', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetFeature&typeNames=BEVSchutz:RETTUNGSPUNKTE', 2, NULL, NULL, '{
+  "base_url": "https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?",
+  "request": "GetFeature",
+  "service": "WFS",
+  "typenames": "BEVSchutz:RETTUNGSPUNKTE",
+  "version": "1.0.0"
+}', 'dwbk_genlayer_onon', '2021-01-31T17:33:14'),
+(12, 'Sperrungen WFS', 'Sperrungen im Kreis RE', 'N', '10', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetFeature&typeNames=BEVSchutz:SPERRUNGEN', 2, NULL, NULL, '{
+  "base_url": "https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?",
+  "request": "GetFeature",
+  "service": "WFS",
+  "typenames": "BEVSchutz:SPERRUNGEN",
+  "version": "1.0.0"
+}', 'dwbk_genlayer_ontw', '2021-01-31T17:34:40'),
+(13, 'Stadtteile Dorsten WFS', 'Stadtteile Dorsten', 'N', '10', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_GEBIETE/guest?service=WFS&version=1.0.0&request=GetFeature&typeNames=Gebietsgliederung:STADTTEILE_DORSTEN', 2, NULL, NULL, '{
+  "base_url": "https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_GEBIETE/guest?",
+  "request": "GetFeature",
+  "service": "WFS",
+  "typenames": "Gebietsgliederung:STADTTEILE_DORSTEN",
+  "version": "1.0.0"
+}', 'dwbk_genlayer_onth', '2021-01-31T17:35:19');

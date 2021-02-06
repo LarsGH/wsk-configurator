@@ -2,8 +2,8 @@ package com.lasy.dwbk.ws.wms;
 
 import java.util.Map;
 
+import com.lasy.dwbk.util.Check;
 import com.lasy.dwbk.ws.IRequestParameters;
-import com.lasy.dwbk.ws.RequestParameters;
 
 /**
  * Query parameters for WMS requests.
@@ -12,14 +12,15 @@ import com.lasy.dwbk.ws.RequestParameters;
  */
 public class WmsRequestParameters implements IWmsRequestParameters
 {
+  
   /**
-   * Creates the query parameters from a layer URI.
-   * @param uri the layer URI.
-   * @return query parameters
+   * Creates the request parameters.
+   * @param params layer request parameters
+   * @return request parameters
    */
-  public static IWmsRequestParameters fromLayerUri(String uri)
+  public static IWmsRequestParameters fromRequestParameters(IRequestParameters params)
   {
-    IRequestParameters params = RequestParameters.fromLayerUri(uri);
+    Check.notNull(params, "params");
     return new WmsRequestParameters(params);
   }
   
@@ -34,12 +35,6 @@ public class WmsRequestParameters implements IWmsRequestParameters
   public Map<String, String> getParams()
   {
     return params.getParams();
-  }
-
-  @Override
-  public String getVersion()
-  {
-    return getParams().get(WmsQueryConst.GetMap.VERSION);
   }
 
   @Override

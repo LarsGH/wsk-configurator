@@ -100,14 +100,27 @@
 			<artifactId>gt-wms</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.geotools</groupId> <artifactId>gt-epsg-extension</artifactId> 
-			<version>${geotools.version}</version> </dependency> -->
+		<dependency>
+			<!-- https://mvnrepository.com/artifact/org.geotools/gt-wfs-ng -->
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-wfs-ng</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.geotools/gt-epsg-wkt -->
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-wkt</artifactId>
 			<version>24.0</version>
 		</dependency>
+
+		<!-- Necessary for WFS writer -->
+		<!-- https://mvnrepository.com/artifact/xpp3/xpp3 -->
+		<dependency>
+			<groupId>xpp3</groupId>
+			<artifactId>xpp3</artifactId>
+			<version>1.1.4c</version>
+		</dependency>
+
 
 
 

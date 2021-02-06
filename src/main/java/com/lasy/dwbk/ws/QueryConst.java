@@ -23,12 +23,12 @@ public class QueryConst
   public static final String BASE_URL = "base_url";
   
   /**
-   * Service name. Value is WMS. (mandatory).
+   * Service name. Value is (mandatory).
    */
   public static final String SERVICE = "service";
   
   /**
-   * Service version. Value is one of 1.0.0, 1.1.0, 1.1.1, 1.3.0. (mandatory).
+   * Service version. (mandatory).
    */
   public static final String VERSION = "version";
   

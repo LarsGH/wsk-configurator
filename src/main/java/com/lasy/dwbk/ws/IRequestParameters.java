@@ -60,4 +60,13 @@ public interface IRequestParameters
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     return gson.toJson(getParams());
   }
+  
+  /**
+   * Returns the version parameter value.
+   * @return version
+   */
+  default String getVersion()
+  {
+    return getParams().get(QueryConst.SERVICE);
+  }
 }

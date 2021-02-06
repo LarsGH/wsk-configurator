@@ -88,7 +88,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
       
       if(deleteLocalData)
       {
-        DbScriptUtil.deleteLocalLayerContentIfPresent(layer);
+        DbScriptUtil.deleteLocalWmsLayerContentIfPresent(layer);
       }
       
       storeLocal = !deleteLocalData;

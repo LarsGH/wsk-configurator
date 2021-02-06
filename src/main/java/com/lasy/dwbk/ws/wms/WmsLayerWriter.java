@@ -43,17 +43,6 @@ import com.lasy.dwbk.ws.ILayerWriter;
  */
 public class WmsLayerWriter implements ILayerWriter
 {
-  
-//  /**
-//   * Creates a new WMS layer writer
-//   * @param layer the layer to write
-//   * @return layer writer
-//   */
-//  public static WmsLayerWriter createForLayer(LayerModel layer)
-//  {
-//    return new WmsLayerWriter(layer);
-//  }
-
   private final LayerModel layer;
   
   private final ExecutorService threadPool;
@@ -73,7 +62,7 @@ public class WmsLayerWriter implements ILayerWriter
   public void write()
   {
     GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();
-    DbScriptUtil.deleteLocalLayerContentIfPresent(this.layer);
+    DbScriptUtil.deleteLocalWmsLayerContentIfPresent(this.layer);
 
     List<TileMatrixParams> tileMatrixParams = TileMatrixParams.createForLayer(this.layer);
     checkValidTileCount(tileMatrixParams);
@@ -110,7 +99,7 @@ public class WmsLayerWriter implements ILayerWriter
 
   private void queryAllTilesAndWriteToTileEntry(List<TileMatrixParams> tileMatrixParams, TileEntry tileEntry, GeoPackage gpkg)
   {
-    IWmsRequestParameters requestParams = WmsRequestParameters.fromLayerUri(this.layer.getUri());
+    IWmsRequestParameters requestParams = WmsRequestParameters.fromRequestParameters(layer.getRequestParameters());
     WebMapServer wms = createWebMapServer(requestParams);
     
     for(TileMatrixParams tileMatrixParam : tileMatrixParams)
@@ -173,7 +162,7 @@ public class WmsLayerWriter implements ILayerWriter
           {
             DwbkLog.log(Level.INFO, "%s/%s Tiles für Zoomstufe %s gespeichert.", tilesAddedCount, tileMatrixParam.getTotalTileCount(), currentZoom);
           }
-        }
+        } 
         catch (Exception e)
         {
           throw DwbkFrameworkException.failForReason(e, "Fehler beim Schreiben der Layer-Kacheln für den Layer '%s'!", this.layer.getName());

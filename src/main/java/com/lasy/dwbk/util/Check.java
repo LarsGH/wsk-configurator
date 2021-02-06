@@ -78,6 +78,10 @@ public class Check
    */
   public static String numbersSeparatedBySemicolons(String intString, String attrName)
   {
+    if(Is.nullOrTrimmedEmpty(intString))
+    {
+      return null;
+    }
     try
     {
       return Stream.of(intString.split(";"))

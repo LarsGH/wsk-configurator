@@ -27,6 +27,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
 import javafx.scene.control.TableColumn;
 
 /**
@@ -65,6 +66,8 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected List<TableColumn<LayerModel, ?>> createSpecificModelColumns()
   {
+    // TODO: Layer Typ in Overview (WMS / WFS)
+    
     TableColumn<LayerModel, String> isVisibleCol = new TableColumn<>("Initial sichtbar");
     isVisibleCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isVisible())));
 
@@ -86,6 +89,11 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
       // show nothing for layers that are not allowed to be stored locally
       return "";
     }));
+    // TODO: Buttons min size!
+    lastDownloadCol.setPrefWidth(Control.USE_COMPUTED_SIZE);
+    lastDownloadCol.setMaxWidth(Control.USE_COMPUTED_SIZE);
+    lastDownloadCol.setMinWidth(Control.USE_COMPUTED_SIZE);
+    
 
     return List.of(isVisibleCol, lastDownloadCol);
   }
@@ -169,7 +177,7 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected void doHandleDelete(LayerModel layer)
   {
-    DbScriptUtil.deleteLocalLayerContentIfPresent(layer);
+    DbScriptUtil.deleteLocalWmsLayerContentIfPresent(layer);
   }
 
 }

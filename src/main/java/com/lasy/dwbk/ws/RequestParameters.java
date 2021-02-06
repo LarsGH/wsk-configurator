@@ -19,7 +19,7 @@ public class RequestParameters implements IRequestParameters
   
   /**
    * Creates the query parameters from a layer URI.
-   * @param uri the layer URI.
+   * @param uri the layer URI. 
    * @return query parameters
    */
   public static IRequestParameters fromLayerUri(String uri)

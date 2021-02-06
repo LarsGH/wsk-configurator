@@ -188,11 +188,8 @@ public class LayerModel extends AGtModel
    */
   public void setMetersPerPixelText(String metersPerPixel)
   {
-    if(metersPerPixel != null)
-    {
-      // ensure correct formatting
-      metersPerPixel = Check.numbersSeparatedBySemicolons(metersPerPixel, "metersPerPixel");      
-    }
+    // ensure correct formatting
+    metersPerPixel = Check.numbersSeparatedBySemicolons(metersPerPixel, "metersPerPixel");
     this.getFeature().setAttribute(LayerTable.COL_PIXEL_METERS, metersPerPixel);
   }
   
