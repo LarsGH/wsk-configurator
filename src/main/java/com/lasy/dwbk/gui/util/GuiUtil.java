@@ -1,5 +1,10 @@
 package com.lasy.dwbk.gui.util;
 
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import com.lasy.dwbk.app.model.IGtModel;
 import com.lasy.dwbk.util.Check;
 
 import javafx.geometry.Insets;
@@ -9,6 +14,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -137,5 +143,31 @@ public class GuiUtil
     alert.setHeaderText(null);
     return alert;
   }
+  
+  /** Maximum width for overview button columns. */
+  private static final double MAX_BUTTON_COL_WIDTH = 100;
+  
+  /**
+   * Creates a new button grid column.
+   * @param <TModelType> the model
+   * @param columnHeader column header
+   * @param btnSupplier button supplier
+   * @param modelConsumer model consumer
+   * @param modelConsumer visibility predicate (may be null!)
+   * @return button grid column
+   */
+  public static<TModelType extends IGtModel> TableColumn<TModelType, Button> createGridButtonColumn(
+    String columnHeader,
+    Supplier<Button> btnSupplier,
+    Consumer<TModelType> modelConsumer,
+    Predicate<TModelType> btnVisibilityPredicate)
+  {
+    TableColumn<TModelType, Button> col = new TableColumn<>(columnHeader);
+    col.setCellFactory(ButtonTableCell.<TModelType> create(btnSupplier, modelConsumer, btnVisibilityPredicate));
+    col.setMaxWidth(MAX_BUTTON_COL_WIDTH);
+    col.setMinWidth(MAX_BUTTON_COL_WIDTH);
+    return col;
+  }
+  
   
 }

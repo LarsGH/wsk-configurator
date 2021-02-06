@@ -19,13 +19,15 @@ import javafx.util.Callback;
 public class ButtonTableCell<TModelType> extends TableCell<TModelType, Button>
 {
 
-  public static <TModelType> Callback<TableColumn<TModelType, Button>, TableCell<TModelType, Button>> create(Supplier<Button> button,
-    Consumer<TModelType> modelConsumer)
-  {
-    return create(button, modelConsumer, null);
-  }
-
-  // additional predicate to set button visibility
+  /**
+   * Creates a button table cell.
+   * @param <TModelType> the model type
+   * @param button button supplier
+   * @param modelConsumer model consumer
+   * @param btnVisibilityPredicate predicate to determine if the button should be visible.
+   *                                (may be {@code null} if button should always be shown)
+   * @return button table cell
+   */
   public static <TModelType> Callback<TableColumn<TModelType, Button>, TableCell<TModelType, Button>> create(Supplier<Button> button,
     Consumer<TModelType> modelConsumer, Predicate<TModelType> btnVisibilityPredicate)
   {

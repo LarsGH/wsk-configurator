@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import com.lasy.dwbk.app.model.IGtModel;
 import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.app.service.ADwbkCrudService;
 import com.lasy.dwbk.gui.panes.ADwbkPane;
 import com.lasy.dwbk.gui.panes.edit.AModelEditPane;
-import com.lasy.dwbk.gui.util.ButtonTableCell;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 import com.lasy.dwbk.gui.util.ModelValueFactory;
@@ -33,26 +31,26 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
 {
 
   private TableView<TModelType> modelTable;
-  
+
   public AOverviewPane(Scene mainScene, String header)
   {
     super(mainScene, header);
-    
+
     modelTable = createModelTable();
   }
-  
+
   private HBox createMainButtonBox()
   {
     Button mainBtn = GuiUtil.createIconButtonWithText(GuiIcon.HOME_DB, "Übersicht", "Wechsel zu Übersicht");
     mainBtn.setOnAction(e -> {
       goToMainPane();
     });
-    
+
     HBox box = new HBox(GuiUtil.DEFAULT_SPACING, mainBtn);
     box.setAlignment(Pos.CENTER_RIGHT);
     return box;
   }
-  
+
   @Override
   protected Node createCenterContent()
   {
@@ -60,14 +58,14 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
     Button btn = createNewModelButtonWithAction();
     BorderPane.setMargin(btn, new Insets(GuiUtil.DEFAULT_SPACING, 0, GuiUtil.DEFAULT_SPACING, 0));
     pane.setTop(btn);
-    
+
     Collection<TModelType> models = getCrudService().readAll();
     modelTable.getItems().addAll(models);
     pane.setCenter(modelTable);
-    
+
     return pane;
   }
-  
+
   @Override
   protected Node createBottomContent()
   {
@@ -86,18 +84,18 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
         alert.show();
         return;
       }
-      
+
       goToPane(getModelEditPane(null));
     });
     return newModelButton;
   }
-  
+
   /**
    * Returns the reason why a create might not be allowed.
    * @return reason why a create might not be allowed
    */
   protected abstract Optional<String> getCreateNotAllowedReason();
-  
+
   private TableView<TModelType> createModelTable()
   {
     TableView<TModelType> modelTable = new TableView<TModelType>();
@@ -109,7 +107,7 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
 
     return modelTable;
   }
-  
+
   private List<TableColumn<TModelType, ?>> createNameAndDescriptionColumns()
   {
     TableColumn<TModelType, String> nameCol = new TableColumn<>("Name");
@@ -117,35 +115,37 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
 
     TableColumn<TModelType, String> descriptionCol = new TableColumn<>("Beschreibung");
     descriptionCol.setCellValueFactory(new ModelValueFactory<TModelType>(bbox -> bbox.getDescription().orElse("")));
-    
+
     return List.of(nameCol, descriptionCol);
   }
-  
+
   private List<TableColumn<TModelType, ?>> createChangedAndButtonColumns()
   {
     List<TableColumn<TModelType, ?>> colList = new ArrayList<>();
-    
+
     TableColumn<TModelType, String> lastChangeCol = new TableColumn<>("Letzte Änderung");
     lastChangeCol.setCellValueFactory(new ModelValueFactory<TModelType>(model -> model.getLastChangedDate().toString()));
     colList.add(lastChangeCol);
-    
+
     // add more buttons before edit if necessary
     List<TableColumn<TModelType, Button>> additionalButtons = createAdditionalButtons();
     colList.addAll(additionalButtons);
-    
-    TableColumn<TModelType, Button> editCol = new TableColumn<>("Editieren");
-    Supplier<Button> btnEdit = () -> GuiUtil.createIconButton(GuiIcon.EDIT, "Ruft die Editieren-Maske auf");
-    editCol.setCellFactory(ButtonTableCell.<TModelType> create(btnEdit, this::handleEditModel));
+
+    TableColumn<TModelType, Button> editCol = GuiUtil.createGridButtonColumn("Editieren",
+      () -> GuiUtil.createIconButton(GuiIcon.EDIT, "Ruft die Editieren-Maske auf"), 
+      this::handleEditModel,
+      null);
     colList.add(editCol);
 
-    TableColumn<TModelType, Button> deleteCol = new TableColumn<>("Löschen");
-    Supplier<Button> btnDelete = () -> GuiUtil.createIconButton(GuiIcon.DELETE, "Löscht die Auswahl");
-    deleteCol.setCellFactory(ButtonTableCell.<TModelType> create(btnDelete, this::handleDeleteModel));
+    TableColumn<TModelType, Button> deleteCol = GuiUtil.createGridButtonColumn("Löschen",
+      () -> GuiUtil.createIconButton(GuiIcon.DELETE, "Löscht die Auswahl"), 
+      this::handleDeleteModel,
+      null);
     colList.add(deleteCol);
-    
+
     return colList;
   }
-  
+
   /**
    * Creates new buttons that are inserted before the edit button.
    * @return new buttons
@@ -159,7 +159,7 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
       goToPane(getModelEditPane(model));
     }
   }
-  
+
   private void handleDeleteModel(TModelType model)
   {
     if (model != null)
@@ -181,7 +181,7 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
         {
           // handle more delete logic besides CRUD service call if necessary
           doHandleDelete(model);
-          
+
           int deleteCount = getCrudService().deleteById(model.getId());
           if (deleteCount > 0)
           {
@@ -209,7 +209,7 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
     alert.setHeaderText(null);
     return alert;
   }
-  
+
   /**
    * Returns the reason why a delete might not be allowed.
    * @param model the model to check
@@ -222,7 +222,7 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
    * @return CRUD service
    */
   protected abstract ADwbkCrudService<TModelType, ? extends IGtModelBuilder<TModelType>> getCrudService();
-  
+
   /**
    * Creates the model specific columns that should be visible in the overview.
    * @return columns

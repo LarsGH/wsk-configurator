@@ -3,7 +3,6 @@ package com.lasy.dwbk.gui.panes.overview.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
 import com.lasy.dwbk.app.error.DwbkFrameworkException;
@@ -16,7 +15,6 @@ import com.lasy.dwbk.db.util.DbScriptUtil;
 import com.lasy.dwbk.gui.panes.edit.AModelEditPane;
 import com.lasy.dwbk.gui.panes.edit.impl.LayerEditPane;
 import com.lasy.dwbk.gui.panes.overview.AOverviewPane;
-import com.lasy.dwbk.gui.util.ButtonTableCell;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 import com.lasy.dwbk.gui.util.ModelValueFactory;
@@ -27,7 +25,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Control;
 import javafx.scene.control.TableColumn;
 
 /**
@@ -66,7 +63,8 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected List<TableColumn<LayerModel, ?>> createSpecificModelColumns()
   {
-    // TODO: Layer Typ in Overview (WMS / WFS)
+    TableColumn<LayerModel, String> serviceCol = new TableColumn<>("Service");
+    serviceCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> layer.getRequestParameters().getWebService().toString()));
     
     TableColumn<LayerModel, String> isVisibleCol = new TableColumn<>("Initial sichtbar");
     isVisibleCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isVisible())));
@@ -88,14 +86,9 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
       }
       // show nothing for layers that are not allowed to be stored locally
       return "";
-    }));
-    // TODO: Buttons min size!
-    lastDownloadCol.setPrefWidth(Control.USE_COMPUTED_SIZE);
-    lastDownloadCol.setMaxWidth(Control.USE_COMPUTED_SIZE);
-    lastDownloadCol.setMinWidth(Control.USE_COMPUTED_SIZE);
-    
+    }));    
 
-    return List.of(isVisibleCol, lastDownloadCol);
+    return List.of(serviceCol, isVisibleCol, lastDownloadCol);
   }
 
   @Override
@@ -129,11 +122,11 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected List<TableColumn<LayerModel, Button>> createAdditionalButtons()
   {
-    TableColumn<LayerModel, Button> downloadCol = new TableColumn<>("Herunterladen");
-    Supplier<Button> btnDownload = () -> GuiUtil.createIconButton(GuiIcon.DOWNLOAD, "Speichert den Layer lokal");
-    downloadCol.setCellFactory(ButtonTableCell.<LayerModel> create(btnDownload, this::handleDownload,
+    TableColumn<LayerModel, Button> downloadCol = GuiUtil.createGridButtonColumn("Herunterladen",
+      () -> GuiUtil.createIconButton(GuiIcon.DOWNLOAD, "Speichert den Layer lokal"), 
+      this::handleDownload,
       // just show button if it can be stored local
-      layer -> layer.isStoreLocal()));
+      layer -> layer.isStoreLocal());
 
     return List.of(downloadCol);
   }

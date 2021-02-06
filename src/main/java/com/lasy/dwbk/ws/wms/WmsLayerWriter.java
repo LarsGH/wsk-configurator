@@ -35,7 +35,6 @@ import com.lasy.dwbk.util.BboxUtil;
 import com.lasy.dwbk.util.Check;
 import com.lasy.dwbk.ws.ILayerWriter;
 
-// TODO: Abstract class ALayerWriter for WMS / WFS impls?
 /**
  * Writes the layer content to the geopackage.
  * @author larss
