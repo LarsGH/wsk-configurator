@@ -1,7 +1,9 @@
 package com.lasy.dwbk.gui.panes.overview.impl;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,12 +48,18 @@ public class BboxOverviewPane extends AOverviewPane<BboxModel>
   }
 
   @Override
-  protected Button createNewModelButton()
+  protected Map<Button, AModelEditPane<BboxModel>> createNewModelButtonsWithTargetPane()
   {
-    return GuiUtil.createIconButtonWithText(
+    Map<Button, AModelEditPane<BboxModel>> btnWithTargets = new LinkedHashMap<>();
+    
+    Button createBtn = GuiUtil.createIconButtonWithText(
       GuiIcon.CREATE, 
       "Erstellt eine neue Boundingbox",  
       "Neue Boundingbox erstellen");
+    AModelEditPane<BboxModel> pane = getModelEditPane(null);
+    
+    btnWithTargets.put(createBtn, pane);
+    return btnWithTargets;
   }
 
   @Override

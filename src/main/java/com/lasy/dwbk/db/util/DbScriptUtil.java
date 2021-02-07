@@ -14,8 +14,8 @@ import com.lasy.dwbk.app.DwbkFramework;
 import com.lasy.dwbk.app.error.DwbkFrameworkException;
 import com.lasy.dwbk.app.logging.DwbkLog;
 import com.lasy.dwbk.app.model.impl.LayerModel;
-import com.lasy.dwbk.ws.wfs.IWfsRequestParameters;
-import com.lasy.dwbk.ws.wfs.WfsRequestParameters;
+import com.lasy.dwbk.util.Check;
+import com.lasy.dwbk.ws.wfs.WfsConfig;
 
 /**
  * Helper to execute useful scripts on the geopackage file.
@@ -52,7 +52,7 @@ public class DbScriptUtil
    */
   public static void deleteLocalWmsLayerContentIfPresent(LayerModel layer)
   {
-    String localLayerName = layer.getLocalName();
+    String localLayerName = Check.notNull(layer, "layer").getLocalName();
     try
     {
       GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();
@@ -83,6 +83,7 @@ public class DbScriptUtil
    */
   public static void deleteLocalWfsLayerContentIfPresent(LayerModel layer)
   {
+    Check.notNull(layer, "layer");
     try
     {
       GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();
@@ -91,8 +92,8 @@ public class DbScriptUtil
       deleteWfsContentIfPresent(layer.getLocalName(), gpkg);
 
       // also delete content by service typeNames (necessary for write errors)
-      IWfsRequestParameters requestParameters = WfsRequestParameters.fromRequestParameters(layer.getRequestParameters());
-      String typeNames = requestParameters.getTypeNames();
+      WfsConfig wfsConfig = layer.getWfsConfig();
+      String typeNames = wfsConfig.getTypeNames();
       deleteWfsContentIfPresent(typeNames, gpkg);
 
       DwbkLog.log(Level.INFO, "WFS Layer '%s' hat keinen offline Content.", layer.getName());
@@ -129,7 +130,7 @@ public class DbScriptUtil
 
   public static void updateWfsLayerName(LayerModel layer, String wfsTableName)
   {
-    String localLayerName = layer.getLocalName();
+    String localLayerName = Check.notNull(layer, "layer").getLocalName();
     try
     {
       GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();

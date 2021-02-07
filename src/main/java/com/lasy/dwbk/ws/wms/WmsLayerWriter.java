@@ -25,6 +25,8 @@ import org.geotools.geopkg.TileMatrix;
 import org.geotools.ows.wms.WebMapServer;
 import org.geotools.ows.wms.request.GetMapRequest;
 import org.geotools.ows.wms.response.GetMapResponse;
+import org.opengis.geometry.BoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.lasy.dwbk.app.DwbkFramework;
 import com.lasy.dwbk.app.error.DwbkFrameworkException;
@@ -98,19 +100,19 @@ public class WmsLayerWriter implements ILayerWriter
 
   private void queryAllTilesAndWriteToTileEntry(List<TileMatrixParams> tileMatrixParams, TileEntry tileEntry, GeoPackage gpkg)
   {
-    IWmsRequestParameters requestParams = WmsRequestParameters.fromRequestParameters(layer.getRequestParameters());
-    WebMapServer wms = createWebMapServer(requestParams);
+    WebMapServer wms = createWebMapServer();
+    WmsConfig wmsConfig = this.layer.getWmsConfig();
     
     for(TileMatrixParams tileMatrixParam : tileMatrixParams)
     {
-      queryMatrixTilesAndWriteToTileEntry(wms, tileMatrixParam, requestParams, tileEntry, gpkg);
+      queryMatrixTilesAndWriteToTileEntry(wms, tileMatrixParam, wmsConfig, tileEntry, gpkg);
     }
   }
   
   private void queryMatrixTilesAndWriteToTileEntry(
     WebMapServer wms, 
     TileMatrixParams tileMatrixParam, 
-    IWmsRequestParameters requestParams, 
+    WmsConfig wmsConfig, 
     TileEntry tileEntry,
     GeoPackage gpkg)
   {
@@ -120,6 +122,11 @@ public class WmsLayerWriter implements ILayerWriter
     final int tileWidthInMeters = tileMatrixParam.getTileWidthInMeters();
     final int tileHeightInMeters = tileMatrixParam.getTileHeightInMeters();
     final int currentZoom = tileMatrixParam.getZoomLevel();
+    
+    int requestEpsg = wmsConfig.getRequestEpsg();
+    final CoordinateReferenceSystem transformCrs = requestEpsg != BboxUtil.EPSG_3857
+      ? BboxUtil.getCrsForEpsgCode(requestEpsg)
+      : null;
     
     int tilesAddedCount = 0;
     
@@ -142,11 +149,30 @@ public class WmsLayerWriter implements ILayerWriter
         final double currentMinLon = bboxMinLon + (col * tileWidthInMeters);
         final double currentMaxLon = currentMinLon + tileWidthInMeters;
 
+        // TODO: dummy inserts migrieren!
+        // TODO: test transformation! (WMS config mit EPSG 25832)
         try
         {
-          GetMapRequest request = createBasicRequest(wms, requestParams);
+          GetMapRequest request = createBasicRequest(wms, wmsConfig);
           request.setDimensions(tileMatrixParam.getTileWidthInPixels(), tileMatrixParam.getTileHeightInPixels());
-          request.setBBox(String.format("%s,%s,%s,%s", currentMinLon, currentMinLat, currentMaxLon, currentMaxLat));
+          
+          if(transformCrs != null)
+          {
+            // Transformation necessary!
+            ReferencedEnvelope envelope = new ReferencedEnvelope(
+              currentMinLon, 
+              currentMaxLon, 
+              currentMinLat, 
+              currentMaxLat, 
+              matrixBbox.getCoordinateReferenceSystem());
+            BoundingBox bbox = envelope.toBounds(transformCrs);
+            request.setBBox(bbox);
+          }
+          else
+          {
+            request.setBBox(String.format("%s,%s,%s,%s", currentMinLon, currentMinLat, currentMaxLon, currentMaxLat));
+          }
+          
           final int currentRow = row;
           final int currentCol = col;
           Future<WmsTileResponse> futureResponse = threadPool.submit(() -> {
@@ -214,42 +240,44 @@ public class WmsLayerWriter implements ILayerWriter
   /**
    * Creates the request with the basic parameters.
    * @param wms the GT WMS
-   * @param requestParams the layer URI query parameters
+   * @param wmsConfig the layer URI query parameters
    * @return request
    */
-  private GetMapRequest createBasicRequest(WebMapServer wms, IWmsRequestParameters requestParams)
+  private GetMapRequest createBasicRequest(WebMapServer wms, WmsConfig wmsConfig)
   {
     GetMapRequest request = wms.createGetMapRequest();
-    request.setVersion(requestParams.getVersion());
-    request.addLayer(requestParams.getLayer(), requestParams.getStyles());
+    request.setVersion(this.layer.getWebServiceVersion());
+    request.addLayer(wmsConfig.getLayer(), wmsConfig.getStyles());
     
-    request.setFormat(requestParams.getFormat());
-    request.setSRS(BboxUtil.getEpsgStringForCode(BboxUtil.EPSG_3857));
-    request.setTransparent(requestParams.isTransparent());
+    request.setFormat(wmsConfig.getFormat());
+    request.setTransparent(wmsConfig.isTransparent());
+    
+    String epsg = BboxUtil.getEpsgStringForCode(wmsConfig.getRequestEpsg());
+    request.setSRS(epsg);
     return request;
   }
 
   /**
    * Creates the GT WMS from the layer URI query parameters.
-   * @param queryParameters layer URI query parameters
    * @return GT WMS
    */
-  private WebMapServer createWebMapServer(IWmsRequestParameters requestParams)
+  private WebMapServer createWebMapServer()
   {
     try
     {
-      URL url = createUrl(requestParams.getCapablitiesRequest());
+      String getCapabilitiesRequest = this.layer.getRequest();
+      URL url = createUrl(getCapabilitiesRequest);
       WebMapServer wms = new WebMapServer(url);
       
       Set<String> supportedSrs = wms.getCapabilities().getLayer().getSrs();
       if(!supportedSrs.contains(BboxUtil.getEpsgStringForCode(BboxUtil.EPSG_3857)))
       {
         String msg = String.format("Service does not support EPSG:3857! %n"
-          + "GetCapabilities: %s", requestParams.getCapablitiesRequest());
+          + "GetCapabilities: %s", getCapabilitiesRequest);
         throw new IllegalStateException(msg);
       }
       
-      wms.getCapabilities().getRequest().getGetMap().setGet(createUrl(requestParams.getBaseRequest()));
+      wms.getCapabilities().getRequest().getGetMap().setGet(createUrl(this.layer.getBaseRequest()));
       
       return wms;
     } 

@@ -2,8 +2,6 @@ package com.lasy.dwbk.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -76,7 +74,7 @@ public class Check
    * @param attrName attribute name
    * @return the string with integers separated by semicolons without duplicates and in decreasing order.
    */
-  public static String numbersSeparatedBySemicolons(String intString, String attrName)
+  public static int[] numbersSeparatedBySemicolons(String intString, String attrName)
   {
     if(Is.nullOrTrimmedEmpty(intString))
     {
@@ -85,16 +83,14 @@ public class Check
     try
     {
       return Stream.of(intString.split(";"))
-        .map(str -> Integer.valueOf(str))
+        .mapToInt(str -> Integer.valueOf(str))
         .distinct()
-        .sorted(Comparator.reverseOrder())
-        .map(num -> num.toString())
-        .collect(Collectors.joining(";"));
+        .sorted()
+        .toArray();
     } catch (Exception e)
     {
       String msg = String.format("'%s' is not a valid list of numbers separated by ';'. Was: %s", attrName, intString);
       throw new IllegalArgumentException(msg);
     }
-    
   }
 }

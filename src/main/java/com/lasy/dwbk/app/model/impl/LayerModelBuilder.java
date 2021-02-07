@@ -1,5 +1,7 @@
 package com.lasy.dwbk.app.model.impl;
 
+import java.util.Objects;
+
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -7,20 +9,25 @@ import com.lasy.dwbk.app.model.IGtModelBuilder;
 import com.lasy.dwbk.db.tables.IDwbkTable;
 import com.lasy.dwbk.db.tables.impl.LayerTable;
 import com.lasy.dwbk.util.Check;
+import com.lasy.dwbk.ws.EWebServiceType;
+import com.lasy.dwbk.ws.wfs.WfsConfig;
+import com.lasy.dwbk.ws.wms.WmsConfig;
 
 public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
 {
   private static final IDwbkTable TABLE = new LayerTable();
-  
+
   private String name;
   private String description;
-  private String uri;
+  private String request;
   private boolean storeLocal;
-  private String metersPerPixel;
   private boolean isVisible;
   private Integer bboxId;
   private String user;
   private String pw;
+
+  private WmsConfig wmsConfig;
+  private WfsConfig wfsConfig;
 
   protected LayerModelBuilder(String name)
   {
@@ -28,27 +35,41 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     this.storeLocal = false;
     this.isVisible = false;
   }
-  
+
   @Override
   public LayerModel build()
   {
     SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(getTable().getSimpleFeatureType());
     SimpleFeature feature = featureBuilder.buildFeature(GENERATE_ID);
     LayerModel layer = new LayerModel(feature);
-    
+
     layer.setName(this.name);
     layer.setDescription(this.description);
-    layer.setUri(this.uri);
+    layer.setRequest(this.request);
     layer.setStoreLocal(this.storeLocal);
-    layer.setMetersPerPixelText(this.metersPerPixel);
     layer.setVisible(this.isVisible);
     layer.setBboxId(this.bboxId);
     layer.setUser(this.user);
     layer.setPw(this.pw);
-    
+
+    EWebServiceType webServiceType = layer.getWebServiceType();
+    if (Objects.equals(EWebServiceType.WMS, webServiceType))
+    {
+      layer.setWmsConfig(this.wmsConfig);
+    }
+    else if (Objects.equals(EWebServiceType.WFS, webServiceType))
+    {
+      layer.setWfsConfig(this.wfsConfig); 
+    }
+    else
+    {
+      String msg = String.format("No configuration defined for service type: '%s'", webServiceType);
+      throw new IllegalStateException(msg);
+    }
+
     return layer;
   }
-  
+
   /**
    * Sets the description
    * @param description description
@@ -59,18 +80,18 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     this.description = description;
     return this;
   }
-  
+
   /**
-   * Sets the URI.
-   * @param uri URI
+   * Sets the request.
+   * @param request GET_CAPABILITIES request
    * @return builder
    */
-  public LayerModelBuilder withUri(String uri)
+  public LayerModelBuilder withRequest(String request)
   {
-    this.uri = Check.trimmedNotEmpty(uri, "uri");
+    this.request = Check.trimmedNotEmpty(request, "request");
     return this;
   }
-  
+
   /**
    * Sets the value for store local.
    * @param storeLocal {@code true} if data should be stored in the GPKG.
@@ -81,18 +102,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     this.storeLocal = storeLocal;
     return this;
   }
-  
-  /**
-   * Sets the value for valid meters per pixels. Values must be separated by semicolon (';')!
-   * @param metersPerPixel the meters per pixel (used to build the tile matrix pyramid).
-   * @return builder
-   */
-  public LayerModelBuilder withMetersPerPixel(String metersPerPixel)
-  {
-    this.metersPerPixel = Check.notNull(metersPerPixel, "metersPerPixel");
-    return this;
-  }
-  
+
   /**
    * Sets the value for the default visibility enabled status.
    * @param isVisible {@code true} if layer should be visible by default.
@@ -103,7 +113,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     this.isVisible = isVisible;
     return this;
   }
-  
+
   /**
    * Sets boundingbox reference ID.
    * @param bboxId ID of the boundingbox entry to reference
@@ -114,7 +124,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     this.bboxId = bboxId;
     return this;
   }
-  
+
   /**
    * Sets the username.
    * @param user username (for logins)
@@ -125,7 +135,7 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     this.user = user;
     return this;
   }
-  
+
   /**
    * Sets the password.
    * @param pw password (for logins)
@@ -136,7 +146,29 @@ public class LayerModelBuilder implements IGtModelBuilder<LayerModel>
     this.pw = pw;
     return this;
   }
+
+  /**
+   * Sets the WMS configuration.
+   * @param config WMS configuration
+   * @return builder
+   */
+  public LayerModelBuilder withWmsConfig(WmsConfig config)
+  {
+    this.wmsConfig = config;
+    return this;
+  }
   
+  /**
+   * Sets the WFS configuration.
+   * @param config WFS configuration
+   * @return builder
+   */
+  public LayerModelBuilder withWfsConfig(WfsConfig config)
+  {
+    this.wfsConfig = config;
+    return this;
+  }
+
   @Override
   public IDwbkTable getTable()
   {

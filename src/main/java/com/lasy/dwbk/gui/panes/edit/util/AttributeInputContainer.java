@@ -204,10 +204,7 @@ public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extend
    */
   public void initValueFromModel(TModel model)
   {
-    if(model != null)
-    {
-      builder.initializeGuiValueConsumer.accept(builder.guiElement, model);
-    }
+    builder.initializeGuiValueConsumer.accept(builder.guiElement, model);
   }
   
   @Override

@@ -11,6 +11,7 @@ import com.lasy.dwbk.gui.panes.edit.util.AttributeInputContainer;
 import com.lasy.dwbk.gui.panes.overview.impl.BboxOverviewPane;
 import com.lasy.dwbk.gui.util.AttributeInputValidator;
 import com.lasy.dwbk.gui.util.PatternTextField;
+import com.lasy.dwbk.util.BboxUtil;
 import com.lasy.dwbk.util.Is;
 
 import javafx.scene.Scene;
@@ -138,7 +139,10 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
     return AttributeInputContainer.<BboxModel, CheckBox, Boolean>builer("Standard Kartenbegrenzung")
       .withGuiElement(new CheckBox("Als Kartenbegrenzung verwenden?"))
       .withGuiValueInitialization((cb, bbox) -> {
-        cb.setSelected(bbox.isMapBoundary());
+        boolean isMapBoundary = bbox != null
+          ? bbox.isMapBoundary()
+          : false;
+        cb.setSelected(isMapBoundary);
       })
       .withGuiElementToModelAttributeFunc(CheckBox::isSelected)
       .withInfoAlertMessage("Wenn aktiviert, wird dieser Ausschnitt als Standardbegrenzung für die Karte in der App verwendet. "
@@ -153,7 +157,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
   {
     return AttributeInputContainer.<BboxModel, TextField, String>builer(displayValue)
       .withGuiElement(PatternTextField.createCoordinateTextField())
-      .withGuiValueInitialization(initializeGuiValueConsumer)
+      .withGuiValueInitializationIfModelNotNull(initializeGuiValueConsumer)
       .withGuiElementToModelAttributeFunc(TextField::getText)
       .withInfoAlertMessage(info)
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
@@ -165,7 +169,10 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
     return AttributeInputContainer.<BboxModel, TextField, Integer>builer("EPSG-Code")
       .withGuiElement(PatternTextField.createIntegersOnlyTextField())
       .withGuiValueInitialization((txtField, bbox) -> {
-        txtField.setText(String.valueOf(bbox.getEpsg()));
+        int epsg = bbox != null
+          ? bbox.getEpsg()
+          : BboxUtil.EPSG_4326;
+        txtField.setText(String.valueOf(epsg));
       })
       .withGuiElementToModelAttributeFunc(txtField -> {
         String txt = txtField.getText();
@@ -182,7 +189,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
   {
     return AttributeInputContainer.<BboxModel, TextField, String>builer("Boundingbox-Beschreibung")
       .withGuiElement(PatternTextField.createAcceptAllTextField())
-      .withGuiValueInitialization((txtField, bbox) -> {
+      .withGuiValueInitializationIfModelNotNull((txtField, bbox) -> {
         txtField.setText(bbox.getDescription().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
@@ -193,7 +200,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
   {
     return AttributeInputContainer.<BboxModel, TextField, String>builer("Boundingbox-Name")
       .withGuiElement(PatternTextField.createTextOnlyTextField())
-      .withGuiValueInitialization((txtField, bbox) -> {
+      .withGuiValueInitializationIfModelNotNull((txtField, bbox) -> {
         txtField.setText(bbox.getName());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)

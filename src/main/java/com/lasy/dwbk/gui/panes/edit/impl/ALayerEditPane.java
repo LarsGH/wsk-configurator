@@ -13,7 +13,6 @@ import com.lasy.dwbk.gui.panes.edit.util.BboxComboBox;
 import com.lasy.dwbk.gui.panes.overview.impl.LayerOverviewPane;
 import com.lasy.dwbk.gui.util.AttributeInputValidator;
 import com.lasy.dwbk.gui.util.PatternTextField;
-import com.lasy.dwbk.util.Is;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -23,38 +22,28 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-public class LayerEditPane extends AModelEditPane<LayerModel>
+public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
 {
   
-  /**
-   * Creates the fully initialized layer pane.
-   * @param mainScene main scene
-   * @param layer the layer (may be {@code null} to create new layers).
-   * @return fully initialized layer pane
-   */
-  public static LayerEditPane create(Scene mainScene, LayerModel layer)
-  {
-    return createInitializedPane(new LayerEditPane(mainScene, layer));
-  }
-  
-  private AttributeInputContainer<LayerModel, TextField, String> attrName;
-  private AttributeInputContainer<LayerModel, TextField, String> attrDescription;
-  private AttributeInputContainer<LayerModel, TextField, String> attrUri;
-  private AttributeInputContainer<LayerModel, TextField, String> attrMetersPerPixel;
-  private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrStoreLocal;
-  private AttributeInputContainer<LayerModel, CheckBox, Boolean> attrIsVisible;
-  private AttributeInputContainer<LayerModel, BboxComboBox, Integer> attrBboxId;
+  protected AttributeInputContainer<LayerModel, TextField, String> attrName;
+  protected AttributeInputContainer<LayerModel, TextField, String> attrDescription;
+  protected AttributeInputContainer<LayerModel, TextField, String> attrRequest;
+  protected AttributeInputContainer<LayerModel, CheckBox, Boolean> attrStoreLocal;
+  protected AttributeInputContainer<LayerModel, CheckBox, Boolean> attrIsVisible;
+  protected AttributeInputContainer<LayerModel, BboxComboBox, Integer> attrBboxId;
+  protected AttributeInputContainer<LayerModel, TextField, String> attrServiceLayerName;
 //  private AttributeInputContainer<LayerModel, TextField, String> attrUser;
 //  private AttributeInputContainer<LayerModel, TextField, String> attrPw;
   
   /**
    * Layer create / edit GUI.
    * @param mainScene main scene
+   * @param title the title
    * @param layer the layer (may be {@code null} to create new layers).
    */
-  private LayerEditPane(Scene mainScene, LayerModel layer)
+  protected ALayerEditPane(Scene mainScene, String title, LayerModel layer)
   {
-    super(mainScene, "Layer Verwalten", layer);
+    super(mainScene, title, layer);
   }
 
   @Override
@@ -62,18 +51,25 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   {
     layer.setName(attrName.getConfiguredValue());
     layer.setDescription(attrDescription.getConfiguredValue());
-    layer.setUri(attrUri.getConfiguredValue());
-    layer.setMetersPerPixelText(attrMetersPerPixel.getConfiguredValue());
+    layer.setRequest(attrRequest.getConfiguredValue());
     layer.setVisible(attrIsVisible.getConfiguredValue());
     layer.setBboxId(attrBboxId.getConfiguredValue());
 //    layer.setUser(attrUser.getConfiguredValue());
 //    getConfiguredPw().ifPresent(layer::setPw);
+    
+    doHandleServiceSpecificUpdateModel(layer);
     
     boolean storeLocal = attrStoreLocal.getConfiguredValue();
     handleStoreLocalSelection(layer, storeLocal);
     
     layerService().update(layer);
   }
+  
+  /**
+   * Add service specific configuration.
+   * @param layer
+   */
+  protected abstract void doHandleServiceSpecificUpdateModel(LayerModel layer);
 
   private void handleStoreLocalSelection(LayerModel layer, boolean storeLocal)
   {
@@ -115,17 +111,24 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   {
     LayerModelBuilder builder = LayerModel.builder(attrName.getConfiguredValue());
     builder.withDescription(attrDescription.getConfiguredValue());
-    builder.withUri(attrUri.getConfiguredValue());
-    builder.withMetersPerPixel(attrMetersPerPixel.getConfiguredValue());
+    builder.withRequest(attrRequest.getConfiguredValue());
     builder.withStoreLocal(attrStoreLocal.getConfiguredValue());
     builder.withDefaultVisible(attrIsVisible.getConfiguredValue());
     builder.withBboxId(attrBboxId.getConfiguredValue());
+    
+    doHandleServiceSpecificNewModel(builder);
 //    builder.withUser(attrUser.getConfiguredValue());
 //    getConfiguredPw().ifPresent(builder::withPassword);
     
     layerService().create(builder);
   }
   
+  /**
+   * Add service specific configuration.
+   * @param builder
+   */
+  protected abstract void doHandleServiceSpecificNewModel(LayerModelBuilder builder);
+
 //  private Optional<String> getConfiguredPw()
 //  {
 //    if(DwbkFramework.getInstance().getSettings().isSavePasswordAllowed())
@@ -151,21 +154,20 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     this.attrDescription = createAttrDescription();
     addAttributeInputContainer(attrDescription);
     
-    this.attrUri = createAttrUri();
-    addAttributeInputContainer(attrUri);
-    
-    this.attrStoreLocal = createAttrStoreLocal();
-    addAttributeInputContainer(attrStoreLocal);
-    
-    this.attrMetersPerPixel = createAttrMetersPerPixel();
-    addAttributeInputContainer(attrMetersPerPixel);
+    this.attrBboxId = createAttrBbox();
+    addAttributeInputContainer(attrBboxId);
     
     this.attrIsVisible = createAttrIsVisible();
     addAttributeInputContainer(attrIsVisible);
     
-    this.attrBboxId = createAttrBbox();
-    addAttributeInputContainer(attrBboxId);
+    this.attrRequest = createAttrUri();
+    addAttributeInputContainer(attrRequest);
     
+    this.attrStoreLocal = createAttrStoreLocal();
+    addAttributeInputContainer(attrStoreLocal);
+    
+    this.attrServiceLayerName = createAttrServiceLayerName();
+    addAttributeInputContainer(attrServiceLayerName);
     // authentication is not supported (yet)
     
 //    this.attrUser = createAttrUser();
@@ -178,27 +180,17 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
 //    }
   }
   
-  private AttributeInputContainer<LayerModel, TextField, String> createAttrMetersPerPixel()
+  private AttributeInputContainer<LayerModel, TextField, String> createAttrServiceLayerName()
   {
-    return AttributeInputContainer.<LayerModel, TextField, String>builer("Auflösung pro Zoomstufe")
-      .withGuiElement(PatternTextField.createNumbersSeparatedBySemicolonsTextField())
-      .withGuiValueInitialization((txtField, layer) -> {
-        txtField.setText(layer.getMetersPerPixelText());
+    return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Layer-Name")
+      .withGuiElement(PatternTextField.createAcceptAllTextField())
+      .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
+        txtField.setText(layer.getName());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
-      .withInfoAlertMessage("Die Auflösung pro Pixel. Kann mehrere Werte (absteigend) getrennt durch ';' enthalten. "
-        + "Die Werte müssen Teiler von 500 sein (500 % <Auflösung> = 0). Die Liste wird beim Speichern automatisch geordnet.")
-      .withDependingContainerValidator(attrStoreLocal, (storeLocalObj, metersPerPixel) -> {
-        Boolean storeLocal = storeLocalObj == null
-          ? false
-          : (Boolean) storeLocalObj;
-        if (storeLocal && Is.nullOrTrimmedEmpty(metersPerPixel))
-        {
-          return Optional.of("Es muss mindestens eine Auflösung angegeben werden, wenn der Layer lokal gespeichert wird!");
-        }
-        return Optional.empty();
-      })
-      .withInputValidationError(AttributeInputValidator.createDivisorInputFunction(500))
+      .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
+      .withInfoAlertMessage("Der Name (inklusive Namespace) des Layers wie im Service definiert. "
+        + "Der Name kann aus dem GetCapabilities-Request kopiert werden.")
       .build();
   }
 
@@ -208,7 +200,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Passwort")
       .withGuiElement(new PasswordField())
-      .withGuiValueInitialization((txtField, layer) -> {
+      .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
         txtField.setText(layer.getPw().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
@@ -222,7 +214,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Benutzername")
       .withGuiElement(PatternTextField.createAcceptAllTextField())
-      .withGuiValueInitialization((txtField, layer) -> {
+      .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
         txtField.setText(layer.getUser().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
@@ -234,7 +226,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   {
     return AttributeInputContainer.<LayerModel, BboxComboBox, Integer>builer("Layer-Begrenzung")
       .withGuiElement(new BboxComboBox())
-      .withGuiValueInitialization((comboBox, layer) -> {
+      .withGuiValueInitializationIfModelNotNull((comboBox, layer) -> {
         comboBox.setSelectedBboxById(layer.getBboxId());
       })
       .withGuiElementToModelAttributeFunc(BboxComboBox::getSelectedBboxId)
@@ -249,7 +241,10 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     return AttributeInputContainer.<LayerModel, CheckBox, Boolean>builer("Initiale Layer-Sichtbarkeit")
       .withGuiElement(new CheckBox("Initial sichtbar?"))
       .withGuiValueInitialization((cb, layer) -> {
-        cb.setSelected(layer.isVisible());
+        boolean visible = layer != null
+          ? layer.isVisible()
+          : false;
+        cb.setSelected(visible);
       })
       .withGuiElementToModelAttributeFunc(CheckBox::isSelected)
       .withInfoAlertMessage("Wenn aktiviert, ist der Layer in der App initial sichtbar geschaltet!")
@@ -261,7 +256,10 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
     return AttributeInputContainer.<LayerModel, CheckBox, Boolean>builer("Layer lokal speichern")
       .withGuiElement(new CheckBox("Lokal speichern?"))
       .withGuiValueInitialization((cb, layer) -> {
-        cb.setSelected(layer.isStoreLocal());
+        boolean storeLocal = layer != null
+          ? layer.isStoreLocal()
+          : false;
+        cb.setSelected(storeLocal);
       })
       .withGuiElementToModelAttributeFunc(CheckBox::isSelected)
       .withInfoAlertMessage("Wenn aktiviert, werden die Daten des Layers lokal gespeichert und sind somit auch offline verfügbar!")
@@ -270,15 +268,14 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
 
   private AttributeInputContainer<LayerModel, TextField, String> createAttrUri()
   {
-    return AttributeInputContainer.<LayerModel, TextField, String>builer("Layer-URI")
+    return AttributeInputContainer.<LayerModel, TextField, String>builer("GetCapabilities-Request")
       .withGuiElement(PatternTextField.createAcceptAllTextField())
-      .withGuiValueInitialization((txtField, layer) -> {
-        txtField.setText(layer.getUri());
+      .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
+        txtField.setText(layer.getRequest());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
-      .withInfoAlertMessage("Die URI wird verwendet um einen WMS- oder WFS-Service anzufragen. "
-        + "Für WMS-Services muss ein GetMap-Request angegeben werden."
-        + "Für WFS-Services muss ein GetFeature-Request angegeben werden.")
+      .withInfoAlertMessage("Der GetCapabilities-Request für den anzufragenden Service. "
+        + "Der Request kann im Browser getestet werden.")
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
       .withInputValidationError(AttributeInputValidator.createLayerServiceFunction())
       .build();
@@ -288,7 +285,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Layer-Beschreibung")
       .withGuiElement(PatternTextField.createAcceptAllTextField())
-      .withGuiValueInitialization((txtField, layer) -> {
+      .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
         txtField.setText(layer.getDescription().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
@@ -299,7 +296,7 @@ public class LayerEditPane extends AModelEditPane<LayerModel>
   {
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Layer-Name")
       .withGuiElement(PatternTextField.createAcceptAllTextField())
-      .withGuiValueInitialization((txtField, layer) -> {
+      .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
         txtField.setText(layer.getName());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)

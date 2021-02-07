@@ -2,8 +2,6 @@ package com.lasy.dwbk.app.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.geotools.data.DataStore;
@@ -18,6 +16,9 @@ import com.lasy.dwbk.app.model.impl.BboxModel;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.db.util.DbGeneratedLayerName;
 import com.lasy.dwbk.db.util.DwbkEmptyModelsRule;
+import com.lasy.dwbk.db.util.DwbkTestFactory;
+import com.lasy.dwbk.ws.EWebServiceType;
+import com.lasy.dwbk.ws.wms.WmsConfig;
 
 /**
  * Testet {@link LayerCrudService}.
@@ -34,7 +35,7 @@ public class LayerCrudServiceTest
   private static final String EXPECTED_BBOX_MAX_LAT = "11.99999";
   
   private static final String EXPECTED_LAYER_DESCRIPTION = "My layer description...";
-  private static final String EXPECTED_LAYER_URI = "https://my-test-uri.com?service=wms&version=1.0.0&layer=test";
+  private static final String EXPECTED_REQUEST = "https://my-test-uri.com?service=wms&version=1.0.0&request=GetCapabilities";
   private static final boolean EXPECTED_STORE_LOCAL = true;
   private static final boolean EXPECTED_IS_VISIBLE = true;
   private static final String EXPECTED_USER = "test-user";
@@ -75,7 +76,6 @@ public class LayerCrudServiceTest
     layerA.setName("changedName");
     layerA.setPw("changedPw");
     layerA.setStoreLocal(false);
-    layerA.setMetersPerPixelText(null);
     layerA.setVisible(false);
     
     // save
@@ -86,7 +86,6 @@ public class LayerCrudServiceTest
       .orElseThrow(() -> new AssertionError("Load by ID did not work!"));
     
     Assertions.assertThat(layerA).isEqualTo(reloadedLayerA);
-    Assertions.assertThat(reloadedLayerA.getMetersPerPixelPerZoomLevel()).isEmpty();
     
     LayerModel layerB = assertThatLayerIsCreatedWithExpectedContent("Test-Layer-B");
     
@@ -107,28 +106,23 @@ public class LayerCrudServiceTest
 
   private LayerModel assertThatLayerIsCreatedWithExpectedContent(String name)
   {
-    String expectedUri = EXPECTED_LAYER_URI + "_" + name;
+    String expectedUri = EXPECTED_REQUEST + "_" + name;
+    WmsConfig wmsConfig = DwbkTestFactory.createWmsConfig();
     LayerModel newLayer = sut.create(LayerModel.builder(name)
       .withDescription(EXPECTED_LAYER_DESCRIPTION)
-      .withUri(expectedUri)
+      .withRequest(expectedUri)
       .withStoreLocal(EXPECTED_STORE_LOCAL)
-      .withMetersPerPixel("1;10;100")
       .withDefaultVisible(EXPECTED_IS_VISIBLE)
       .withBboxId(bbox.getId())
       .withUser(EXPECTED_USER)
+      .withWmsConfig(wmsConfig)
       .withPassword(EXPECTED_PW));
           
     Assertions.assertThat(newLayer.getId()).isNotNull();
     Assertions.assertThat(newLayer.getName()).isEqualTo(name);
     Assertions.assertThat(newLayer.getDescription().get()).isEqualTo(EXPECTED_LAYER_DESCRIPTION);
-    Assertions.assertThat(newLayer.getUri()).isEqualTo(expectedUri);
+    Assertions.assertThat(newLayer.getRequest()).isEqualTo(expectedUri);
     Assertions.assertThat(newLayer.isStoreLocal()).isTrue();
-    
-    Map<Integer, Integer> expectedMetersPerPixelPerZoomLevel = new LinkedHashMap<Integer, Integer>();
-    expectedMetersPerPixelPerZoomLevel.put(0, 100);
-    expectedMetersPerPixelPerZoomLevel.put(1, 10);
-    expectedMetersPerPixelPerZoomLevel.put(2, 1);
-    Assertions.assertThat(newLayer.getMetersPerPixelPerZoomLevel()).containsExactlyEntriesOf(expectedMetersPerPixelPerZoomLevel);
     
     Assertions.assertThat(newLayer.isVisible()).isTrue();
     Assertions.assertThat(newLayer.getUser().get()).isEqualTo(EXPECTED_USER);
@@ -137,14 +131,8 @@ public class LayerCrudServiceTest
     Assertions.assertThat(newLayer.getLastChangedDate()).isEqualToIgnoringSeconds(LocalDateTime.now());
     String expectedLocalName = DbGeneratedLayerName.idToGeneratedTableName(newLayer.getId());
     Assertions.assertThat(newLayer.getLocalName()).isEqualTo(expectedLocalName);
-    
-    String expectedQueryParts = String.format("{%n"
-      + "  \"base_url\": \"https://my-test-uri.com?\",%n"
-      + "  \"layer\": \"test_%s\",%n"
-      + "  \"service\": \"wms\",%n"
-      + "  \"version\": \"1.0.0\"%n"
-      + "}", newLayer.getName());
-    Assertions.assertThat(newLayer.getRequestParameters().toJson()).isEqualToIgnoringWhitespace(expectedQueryParts);
+    Assertions.assertThat(newLayer.getWebServiceType()).isEqualTo(EWebServiceType.WMS);
+    Assertions.assertThat(newLayer.getWmsConfig()).isEqualTo(wmsConfig);
     
     return newLayer;
   }

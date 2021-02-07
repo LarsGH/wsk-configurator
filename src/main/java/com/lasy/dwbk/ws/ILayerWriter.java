@@ -1,6 +1,7 @@
 package com.lasy.dwbk.ws;
 
 import com.lasy.dwbk.app.model.impl.LayerModel;
+import com.lasy.dwbk.util.Check;
 import com.lasy.dwbk.ws.wfs.WfsLayerWriter;
 import com.lasy.dwbk.ws.wms.WmsLayerWriter;
 
@@ -19,7 +20,8 @@ public interface ILayerWriter
    */
   public static ILayerWriter createForLayer(LayerModel layer)
   {
-    EWebService webService = layer.getRequestParameters().getWebService();
+    Check.notNull(layer, "layer");
+    EWebServiceType webService = layer.getWebServiceType();
     switch(webService)
     {
       case WMS: 

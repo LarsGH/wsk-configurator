@@ -5,17 +5,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.lasy.dwbk.app.error.DwbkFrameworkException;
 import com.lasy.dwbk.app.logging.DwbkLog;
+import com.lasy.dwbk.util.IDwbkJson;
 
 /**
  * The user settings. The settings will be written to a file {@link DwbkSettings#SETTINGS_FILE_NAME}.
  * @author larss
  *
  */
-public class DwbkSettings
+public class DwbkSettings implements IDwbkJson
 {
   /** 
    * The name of the setting file. The file will be stored relative to {@link DwbkEnvironment#getConfigDirectory()}. 
@@ -31,7 +30,7 @@ public class DwbkSettings
   {
     try
     {
-      DwbkSettings settings = new Gson().fromJson(settingFileContent, DwbkSettings.class);
+      DwbkSettings settings = IDwbkJson.createFromJson(DwbkSettings.class, settingFileContent);
       settings.validateAllFields();
       return settings;
     }
@@ -133,8 +132,7 @@ public class DwbkSettings
   @Override
   public String toString()
   {
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    return gson.toJson(this);
+    return asJson();
   }
 
 }

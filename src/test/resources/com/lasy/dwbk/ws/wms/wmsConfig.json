@@ -1,0 +1,8 @@
+{
+  "layer": "testLayer",
+  "styles": "testStyle",
+  "format": "jpg",
+  "isTransparent": false,
+  "metersPerPixel": [1,5,10],
+  "requestEpsg": 25832
+}

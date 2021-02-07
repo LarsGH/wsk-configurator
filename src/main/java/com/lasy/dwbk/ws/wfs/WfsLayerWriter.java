@@ -50,11 +50,11 @@ public class WfsLayerWriter implements ILayerWriter
       DbScriptUtil.deleteLocalWfsLayerContentIfPresent(this.layer);
 
       // Get WFS datastore
-      IWfsRequestParameters requestParameters = WfsRequestParameters.fromRequestParameters(this.layer.getRequestParameters());
-      Map<String, String> connectionParameters = createWfsDatastoreParams(requestParameters);
+      Map<String, String> connectionParameters = Map.of("WFSDataStoreFactory:GET_CAPABILITIES_URL", this.layer.getRequest());
       DataStore dataStore = DataStoreFinder.getDataStore(connectionParameters);
 
-      String typeNames = requestParameters.getTypeNames();
+      WfsConfig wfsConfig = this.layer.getWfsConfig();
+      String typeNames = wfsConfig.getTypeNames();
       SimpleFeatureSource source = dataStore.getFeatureSource(typeNames);
 
       // Bbox filter
@@ -91,12 +91,6 @@ public class WfsLayerWriter implements ILayerWriter
     entry.setSrid(epsg);
     entry.setBounds(BboxUtil.getEnvelopeForBboxInCrs(this.layer.getBbox(), crs));
     return entry;
-  }
-
-  private Map<String, String> createWfsDatastoreParams(IWfsRequestParameters requestParameters)
-  {
-    String capablitiesRequest = requestParameters.getCapablitiesRequest();
-    return Map.of("WFSDataStoreFactory:GET_CAPABILITIES_URL", capablitiesRequest);
   }
 
   private BBOX createBboxFilter(SimpleFeatureType schema)

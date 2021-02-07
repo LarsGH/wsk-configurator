@@ -5,7 +5,7 @@ package com.lasy.dwbk.ws;
  * @author larss
  *
  */
-public enum EWebService {
+public enum EWebServiceType {
   /** WMS. */
   WMS,
   /** WFS. */

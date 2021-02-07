@@ -10,7 +10,7 @@ public class LayerTable  extends ADwbkTable
 {
   public static final String TABLE_NAME = "dwbk_config_layer";
   
-  public static final String COL_URI = "uri";
+  public static final String COL_REQUEST = "request";
   public static final String COL_STORE_LOCAL = "store_local";
   public static final String COL_LAST_DL = "last_dl";
   public static final String COL_IS_VISIBLE = "is_visible";
@@ -18,9 +18,10 @@ public class LayerTable  extends ADwbkTable
   public static final String COL_USER = "user";
   public static final String COL_PW = "pw";
   
-  public static final String COL_PIXEL_METERS = "pixel_meters";
   public static final String COL_LOCAL_NAME = "local_name";
-  public static final String COL_QUERY_PARTS = "query_parts";
+  
+  public static final String COL_SERVICE = "service";
+  public static final String COL_SERVICE_CONFIG = "service_config";
   
   public static final String COL_BBOX_ID = "bbox_id";
   

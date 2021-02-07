@@ -33,7 +33,7 @@ public class TileMatrixParamsTest
   @Before
   public void setUp()
   {
-    layer = DwbkTestFactory.createLayer();
+    layer = DwbkTestFactory.createWmsLayer();
     bbox = layer.getBbox(); 
   }
   
@@ -43,7 +43,7 @@ public class TileMatrixParamsTest
   @Test
   public void testCreateForLayerCreatesParamsForEachZoomLevel()
   {
-    layer.setMetersPerPixelText("1;2;5;20");
+    setMetersPerPixelText(layer, "1;2;5;20");
     
     List<TileMatrixParams> tileMatrixParams = TileMatrixParams.createForLayer(layer);
     
@@ -78,12 +78,21 @@ public class TileMatrixParamsTest
   
   private void useMetersPerPixelAndBboxSize(int metersPerPixel, int bBoxHeight, int bBoxWidth)
   {
-    layer.setMetersPerPixelText(String.valueOf(metersPerPixel));
+    setMetersPerPixelText(layer, String.valueOf(metersPerPixel));
     bbox.setMinLon("0");
     bbox.setMinLat("0");
     bbox.setMaxLon(String.valueOf(bBoxWidth));
     bbox.setMaxLat(String.valueOf(bBoxHeight));
     DwbkServiceProvider.getInstance().getBboxService().update(bbox);
+  }
+  
+  private void setMetersPerPixelText(LayerModel layer, String metersPerPixel)
+  {
+    WmsConfig wmsConfig = layer.getWmsConfig();
+    wmsConfig.setMetersPerPixel(metersPerPixel);
+    layer.setWmsConfig(wmsConfig);
+    
+    DwbkServiceProvider.getInstance().getLayerService().update(layer);
   }
   
 }

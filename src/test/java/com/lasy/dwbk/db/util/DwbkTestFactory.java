@@ -6,6 +6,8 @@ import com.lasy.dwbk.app.model.impl.BboxModelBuilder;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.model.impl.LayerModelBuilder;
 import com.lasy.dwbk.util.BboxUtil;
+import com.lasy.dwbk.ws.wfs.WfsConfig;
+import com.lasy.dwbk.ws.wms.WmsConfig;
 
 /**
  * Factory for test models.
@@ -16,14 +18,25 @@ public class DwbkTestFactory
 {
 
   /**
-   * Creates a layer with default values. The layer is automatically saved.
+   * Creates a WMS layer with default values. The layer is automatically saved.
    * A bbox will be created and saved as well.
    * @return layer with default values
    */
-  public static LayerModel createLayer()
+  public static LayerModel createWmsLayer()
   {
     return DwbkServiceProvider.getInstance().getLayerService()
-      .create(createLayerBuilderWithDefaultValues());
+      .create(createWmsLayerBuilderWithDefaultValues());
+  }
+  
+  /**
+   * Creates a WFS layer with default values. The layer is automatically saved.
+   * A bbox will be created and saved as well.
+   * @return layer with default values
+   */
+  public static LayerModel createWfsLayer()
+  {
+    return DwbkServiceProvider.getInstance().getLayerService()
+      .create(createWfsLayerBuilderWithDefaultValues());
   }
   
   /**
@@ -39,8 +52,31 @@ public class DwbkTestFactory
       .withDescription("Layer for unit tests")
       .withDefaultVisible(true)
       .withBboxId(bbox.getId())
-      .withMetersPerPixel("10")
-      .withUri("http://testUrl?service=WMS&version=1.0.0&request=GetMap");
+      .withRequest("http://testUrl?service=WMS&version=1.0.0&request=GetCapabilities");
+  }
+  
+  /**
+   * Returns a WMS layer builder with default values.
+   * A bbox will be created and saved as well.
+   * @return builder with default values
+   */
+  public static LayerModelBuilder createWmsLayerBuilderWithDefaultValues()
+  {
+    return createLayerBuilderWithDefaultValues()
+      .withRequest("http://testUrl?service=WMS&version=1.0.0&request=GetCapabilities")
+      .withWmsConfig(createWmsConfig());
+  }
+  
+  /**
+   * Returns a WFS layer builder with default values.
+   * A bbox will be created and saved as well.
+   * @return builder with default values
+   */
+  public static LayerModelBuilder createWfsLayerBuilderWithDefaultValues()
+  {
+    return createLayerBuilderWithDefaultValues()
+      .withRequest("http://testUrl?service=WFS&version=1.0.0&request=GetCapabilities")
+      .withWfsConfig(createWfsConfig());
   }
   
   /**
@@ -67,5 +103,23 @@ public class DwbkTestFactory
       .withMinLat("0")
       .withMaxLon("10000")
       .withMaxLat("10000");
+  }
+  
+  public static WmsConfig createWmsConfig()
+  {
+    WmsConfig config = new WmsConfig();
+    config.setMetersPerPixel("1;5;10");
+    config.setLayer("testLayer");
+    config.setStyles("testStyles");
+    
+    return config;
+  }
+  
+  public static WfsConfig createWfsConfig()
+  {
+    WfsConfig config = new WfsConfig();
+    config.setTypeNames("testLayer");
+    
+    return config;
   }
 }

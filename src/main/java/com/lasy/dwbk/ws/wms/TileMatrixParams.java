@@ -44,7 +44,8 @@ public final class TileMatrixParams
       final int bboxWidthInMeters = (int) matrixBbox.getWidth();
       final int bboxHeightInMeters= (int) matrixBbox.getHeight();
       
-      for(Map.Entry<Integer, Integer> metersPerPixelPerZoom : layer.getMetersPerPixelPerZoomLevel().entrySet())
+      WmsConfig wmsConfig = layer.getWmsConfig();      
+      for(Map.Entry<Integer, Integer> metersPerPixelPerZoom : wmsConfig.getMetersPerPixelPerZoomLevel().entrySet())
       {
         final int zoomLevel = metersPerPixelPerZoom.getKey();
         final int metersPerPixel = metersPerPixelPerZoom.getValue();

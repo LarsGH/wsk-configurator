@@ -1,7 +1,10 @@
 package com.lasy.dwbk.gui.panes.overview.impl;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
@@ -13,11 +16,13 @@ import com.lasy.dwbk.app.service.ADwbkCrudService;
 import com.lasy.dwbk.app.service.impl.BboxCrudService;
 import com.lasy.dwbk.db.util.DbScriptUtil;
 import com.lasy.dwbk.gui.panes.edit.AModelEditPane;
-import com.lasy.dwbk.gui.panes.edit.impl.LayerEditPane;
+import com.lasy.dwbk.gui.panes.edit.impl.WfsLayerEditPane;
+import com.lasy.dwbk.gui.panes.edit.impl.WmsLayerEditPane;
 import com.lasy.dwbk.gui.panes.overview.AOverviewPane;
 import com.lasy.dwbk.gui.util.GuiIcon;
 import com.lasy.dwbk.gui.util.GuiUtil;
 import com.lasy.dwbk.gui.util.ModelValueFactory;
+import com.lasy.dwbk.ws.EWebServiceType;
 import com.lasy.dwbk.ws.ILayerWriter;
 
 import javafx.scene.Scene;
@@ -47,11 +52,27 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   {
     super(mainScene, "Layer-Übersicht");
   }
-
+  
   @Override
-  protected Button createNewModelButton()
+  protected Map<Button, AModelEditPane<LayerModel>> createNewModelButtonsWithTargetPane()
   {
-    return GuiUtil.createIconButtonWithText(GuiIcon.CREATE, "Erstellt einen neuen Layer", "Neuen Layer erstellen");
+    Map<Button, AModelEditPane<LayerModel>> btnWithTargets = new LinkedHashMap<>();
+    
+    Button wmsBtn = GuiUtil.createIconButtonWithText(
+      GuiIcon.CREATE, 
+      "Erstellt einen neuen WMS Layer", 
+      "Neuen WMS Layer erstellen");
+    AModelEditPane<LayerModel> wmsPane = WmsLayerEditPane.create(getMainScene(), null);
+    btnWithTargets.put(wmsBtn, wmsPane);
+    
+    Button wfsBtn = GuiUtil.createIconButtonWithText(
+      GuiIcon.CREATE, 
+      "Erstellt einen neuen WFS Layer", 
+      "Neuen WFS Layer erstellen");
+    AModelEditPane<LayerModel> wfsPane = WfsLayerEditPane.create(getMainScene(), null);
+    btnWithTargets.put(wfsBtn, wfsPane);
+    
+    return btnWithTargets;
   }
 
   @Override
@@ -64,7 +85,7 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   protected List<TableColumn<LayerModel, ?>> createSpecificModelColumns()
   {
     TableColumn<LayerModel, String> serviceCol = new TableColumn<>("Service");
-    serviceCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> layer.getRequestParameters().getWebService().toString()));
+    serviceCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> layer.getWebServiceType().toString()));
     
     TableColumn<LayerModel, String> isVisibleCol = new TableColumn<>("Initial sichtbar");
     isVisibleCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isVisible())));
@@ -94,7 +115,20 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected AModelEditPane<LayerModel> getModelEditPane(LayerModel model)
   {
-    return LayerEditPane.create(getMainScene(), model);
+    if(model != null)
+    {
+      EWebServiceType webServiceType = model.getWebServiceType();
+      if(Objects.equals(webServiceType, EWebServiceType.WMS))
+      {
+        return WmsLayerEditPane.create(getMainScene(), model);
+      }
+      else if(Objects.equals(webServiceType, EWebServiceType.WFS))
+      {
+        return WfsLayerEditPane.create(getMainScene(), model);
+      }
+    }
+      
+    return null;
   }
 
   @Override

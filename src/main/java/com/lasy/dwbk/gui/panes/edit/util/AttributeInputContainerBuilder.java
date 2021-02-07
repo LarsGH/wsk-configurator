@@ -66,7 +66,7 @@ public class AttributeInputContainerBuilder<TModel extends IGtModel, TGuiElement
   }
   
   /**
-   * Sets the Consumer to set the initial GUI value from a model (if present).
+   * Sets the Consumer to set the initial GUI value from a model (model may be null!).
    * @param initializeGuiValueConsumer consumer
    * @return builder
    */
@@ -74,6 +74,25 @@ public class AttributeInputContainerBuilder<TModel extends IGtModel, TGuiElement
     BiConsumer<TGuiElement, TModel> initializeGuiValueConsumer)
   {
     this.initializeGuiValueConsumer = Check.notNull(initializeGuiValueConsumer, "initializeGuiValueConsumer");
+    return this;
+  }
+  
+  /**
+   * Sets the Consumer to set the initial GUI value from a model (if present).
+   * @param initializeGuiValueConsumer consumer
+   * @return builder
+   */
+  public AttributeInputContainerBuilder<TModel, TGuiElement, TModelAttribute> withGuiValueInitializationIfModelNotNull(
+    BiConsumer<TGuiElement, TModel> initializeGuiValueConsumer)
+  {
+    Check.notNull(initializeGuiValueConsumer, "initializeGuiValueConsumer");
+
+    this.initializeGuiValueConsumer = (guiElement, model) -> {
+      if (model != null)
+      {
+        initializeGuiValueConsumer.accept(guiElement, model);
+      }
+    };
     return this;
   }
   

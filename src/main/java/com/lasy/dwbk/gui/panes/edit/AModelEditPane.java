@@ -49,11 +49,7 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends ADwbkP
   public void init()
   {
     super.init();
-    
-    if(getModel() != null)
-    {
-      initAttributeContainerValues(getModel());
-    }
+    initAttributeContainerValues(getModel());
   }
   
   /**

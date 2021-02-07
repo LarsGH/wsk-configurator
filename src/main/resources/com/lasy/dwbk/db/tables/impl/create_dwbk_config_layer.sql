@@ -3,17 +3,17 @@ CREATE TABLE "dwbk_config_layer" (
 "id" INTEGER PRIMARY KEY AUTOINCREMENT, 
 "name" VARCHAR(40) NOT NULL UNIQUE, 
 "description" VARCHAR(255),
-"store_local" VARCHAR(1) NOT NULL, 
-"pixel_meters" VARCHAR(40), 
+"store_local" VARCHAR(1) NOT NULL,
 "is_visible" VARCHAR(1) NOT NULL, 
-"uri" VARCHAR(1000) NOT NULL UNIQUE, 
-"bbox_id" MEDIUMINT NOT NULL, 
+"request" VARCHAR(1000) NOT NULL, 
+"bbox_id" MEDIUMINT NOT NULL,
 "user" VARCHAR(40), 
 "pw" VARCHAR(40),
-"query_parts" VARCHAR(1000), 
 "local_name" VARCHAR(40),
 "last_dl" VARCHAR(19),
 "last_changed" VARCHAR(19) NOT NULL,
+"service" VARCHAR(3) NOT NULL,
+"service_config" VARCHAR(2000) NOT NULL,
 FOREIGN KEY("bbox_id") REFERENCES dwbk_config_bbox("id")
 );
 

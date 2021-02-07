@@ -3,6 +3,7 @@ package com.lasy.dwbk.gui.panes.overview;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.lasy.dwbk.app.model.IGtModel;
@@ -55,9 +56,12 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
   protected Node createCenterContent()
   {
     BorderPane pane = new BorderPane();
-    Button btn = createNewModelButtonWithAction();
-    BorderPane.setMargin(btn, new Insets(GuiUtil.DEFAULT_SPACING, 0, GuiUtil.DEFAULT_SPACING, 0));
-    pane.setTop(btn);
+    List<Button> createButtons = createNewModelButtonWithAction();
+    HBox hBox = new HBox(GuiUtil.DEFAULT_SPACING);
+    hBox.getChildren().addAll(createButtons);
+    
+    BorderPane.setMargin(hBox, new Insets(GuiUtil.DEFAULT_SPACING, 0, GuiUtil.DEFAULT_SPACING, 0));
+    pane.setTop(hBox);
 
     Collection<TModelType> models = getCrudService().readAll();
     modelTable.getItems().addAll(models);
@@ -72,22 +76,26 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
     return createMainButtonBox();
   }
 
-  private Button createNewModelButtonWithAction()
+  private List<Button> createNewModelButtonWithAction()
   {
-    Button newModelButton = createNewModelButton();
-    newModelButton.setOnMouseClicked(e -> {
-      // Prevent delete for reasons
-      Optional<String> createNotAllowedReason = getCreateNotAllowedReason();
-      if (createNotAllowedReason.isPresent())
-      {
-        Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Erstellen nicht möglich", createNotAllowedReason.get());
-        alert.show();
-        return;
-      }
-
-      goToPane(getModelEditPane(null));
+    List<Button> buttons = new ArrayList<>();
+    Map<Button, AModelEditPane<TModelType>> btnTargetMapping = createNewModelButtonsWithTargetPane();
+    btnTargetMapping.forEach((btn, pane) -> {
+      btn.setOnMouseClicked(e -> {
+        // Prevent creation for reasons
+        Optional<String> createNotAllowedReason = getCreateNotAllowedReason();
+        if (createNotAllowedReason.isPresent())
+        {
+          Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Erstellen nicht möglich", createNotAllowedReason.get());
+          alert.show();
+          return;
+        }
+        
+        goToPane(pane);
+      });
+      buttons.add(btn);
     });
-    return newModelButton;
+    return buttons;
   }
 
   /**
@@ -237,9 +245,10 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends ADwbkPa
   protected abstract AModelEditPane<TModelType> getModelEditPane(TModelType model);
 
   /**
-   * Creates the button to create a new model (without action!).
-   * @return button
+   * Creates the buttons to create a new model (without action!).
+   * Mapping defines button -> target pane.
+   * @return buttons
    */
-  protected abstract Button createNewModelButton();
+  protected abstract Map<Button, AModelEditPane<TModelType>> createNewModelButtonsWithTargetPane();
 
 }
