@@ -1,6 +1,13 @@
 package com.lasy.dwbk.ws.wms;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+
 import org.geotools.ows.wms.response.GetMapResponse;
+
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
 
 /**
  * WMS tile response wrapper.
@@ -23,9 +30,33 @@ public class WmsTileResponse
     this.col = col;
   }
 
+  private GetMapResponse checkResponse(GetMapResponse response)
+  {
+    String contentType = response.getContentType();
+    if(!contentType.contains("image"))
+    {
+      throw DwbkFrameworkException.failForReason(createIllegalStateException(response), 
+        "Fehlerhafte Antwort von GetMap-Request (Content type: '%s'). "
+        + "Erwartet wird ein 'image/*' Content type.", contentType);
+    }
+    return response;
+  }
+
+  private IllegalStateException createIllegalStateException(GetMapResponse response)
+  {
+    if (response.getContentType().contains("text"))
+    {
+      String responseContent = new BufferedReader(new InputStreamReader(response.getInputStream(), StandardCharsets.UTF_8))
+        .lines()
+        .collect(Collectors.joining(System.lineSeparator()));
+      return new IllegalStateException(responseContent);
+    }
+    return new IllegalStateException();
+  }
+
   public GetMapResponse getResponse()
   {
-    return response;
+    return checkResponse(response);
   }
   
   public int getZoom()

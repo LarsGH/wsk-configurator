@@ -180,15 +180,18 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
           writer.write();
           
           layer.setLastDownloadDate(LocalDateTime.now());
-          DwbkServiceProvider.getInstance().getLayerService().update(layer);
         }
       }
       catch (Exception e)
       {
+        layer.setLastDownloadDate(null);
         throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
           .failForReason(t, "Fehler beim Speichern des lokalen layers '%s'", layer.getName()));
       }
-
+      finally
+      {
+        DwbkServiceProvider.getInstance().getLayerService().update(layer);
+      }
     }
   }
 

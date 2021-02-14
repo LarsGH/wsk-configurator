@@ -20,7 +20,7 @@ import com.lasy.dwbk.util.IDwbkJson;
 public class WmsConfig implements IDwbkJson
 {
   /** Default format for WMS tile requests. */
-  public static final String DEFAULT_FORMAT = "png";
+  public static final String DEFAULT_FORMAT = "image/png";
   
   /** Default EPSG for WMS tile requests. */
   public static final int DEFAULT_REQUEST_EPSG = BboxUtil.EPSG_3857;

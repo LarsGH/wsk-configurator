@@ -7,12 +7,12 @@ CREATE TABLE "dwbk_config_layer" (
 "is_visible" VARCHAR(1) NOT NULL, 
 "request" VARCHAR(1000) NOT NULL, 
 "bbox_id" MEDIUMINT NOT NULL,
-"user" VARCHAR(40), 
-"pw" VARCHAR(40),
 "local_name" VARCHAR(40),
 "last_dl" VARCHAR(19),
 "last_changed" VARCHAR(19) NOT NULL,
 "service" VARCHAR(3) NOT NULL,
+"user" VARCHAR(40), 
+"pw" VARCHAR(40),
 "service_config" VARCHAR(2000) NOT NULL,
 FOREIGN KEY("bbox_id") REFERENCES dwbk_config_bbox("id")
 );

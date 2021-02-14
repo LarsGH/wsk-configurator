@@ -1,5 +1,6 @@
 package com.lasy.dwbk.gui.panes.edit.impl;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import com.lasy.dwbk.app.DwbkServiceProvider;
@@ -13,6 +14,7 @@ import com.lasy.dwbk.gui.panes.edit.util.BboxComboBox;
 import com.lasy.dwbk.gui.panes.overview.impl.LayerOverviewPane;
 import com.lasy.dwbk.gui.util.AttributeInputValidator;
 import com.lasy.dwbk.gui.util.PatternTextField;
+import com.lasy.dwbk.ws.EWebServiceType;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -185,7 +187,14 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Service Layer-Name")
       .withGuiElement(PatternTextField.createAcceptAllTextField())
       .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
-        txtField.setText(layer.getName());
+        if(Objects.equals(layer.getWebServiceType(), EWebServiceType.WMS))
+        {
+          txtField.setText(layer.getWmsConfig().getLayer());
+        }
+        else if(Objects.equals(layer.getWebServiceType(), EWebServiceType.WFS))
+        {
+          txtField.setText(layer.getWfsConfig().getTypeNames());
+        }
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())

@@ -7,132 +7,61 @@ VALUES
 
 
 -- LAYER
-INSERT INTO dwbk_config_layer (id, name, description, store_local, pixel_meters, is_visible, uri, bbox_id, "user", pw, query_parts, local_name, last_changed) 
-VALUES
-(1, 'Luftbild NRW 1', 'Luftbild Auflösung 1m', 'Y', '1', 'Y', 'https://www.wms.nrw.de/geobasis/wms_nw_dop?service=WMS&version=1.0.0&request=GetMap&layers=nw_dop_rgb&srs=EPSG:4326&bbox=6.95187,51.67352,6.95547,51.67529&width=1000&height=1000&format=image/png&test=1', 1, '', '', '{"base_url":"https://www.wms.nrw.de/geobasis/wms_nw_dop?",
-"bbox":"6.95187,51.67352,6.95547,51.67529",
-"format":"image/png",
-"height":"1000",
-"layers":"WMS_NW_DOP",
-"request":"GetMap",
-"service":"WMS",
-"srs":"EPSG:4326",
-"test":"1",
-"version":"1.0.0",
-"width":"1000"}', 'dwbk_genlayer_on', '2021-01-30T18:29:40'),
-(2, 'Flurstücke NRW WMS', 'Zeigt Flurstuecke', 'N', '1;10;', 'N', 'https://www.wms.nrw.de/geobasis/wms_nw_inspire-flurstuecke_alkis?service=WMS&version=1.3.0&request=GetMap&layers=CP.CadastralParcel&crs=EPSG:4326&bbox=51.67352,6.95187,51.67529,6.95547&width=1000&height=1000&format=image/png&styles=CP.CadastralParcel.Default', 1, '', '', '{"base_url":"https://www.wms.nrw.de/geobasis/wms_nw_inspire-flurstuecke_alkis?",
-"bbox":"51.67352,6.95187,51.67529,6.95547",
-"crs":"EPSG:4326",
-"format":"image/png",
-"height":"1000",
-"layers":"CP.CadastralParcel",
-"request":"GetMap",
-"service":"WMS",
-"styles":"CP.CadastralParcel.Default",
-"version":"1.3.0",
-"width":"1000"}', 'dwbk_genlayer_tw', '2021-01-15T17:20:11'),
-(3, 'Gemeindegrenzen', 'Zeigt die Gemeindegrenzen in NRW', 'N', '10', 'Y', 'https://www.wms.nrw.de/geobasis/wms_nw_dvg?service=WMS&version=1.3.0&request=GetMap&layers=nw_dvg_gem&crs=EPSG:4326&bbox=51.67352,6.95187,51.67529,6.95547&width=1000&height=1000&format=image/png&styles=default', 2, '', '', '{"base_url":"https://www.wms.nrw.de/geobasis/wms_nw_dvg?",
-"bbox":"51.67352,6.95187,51.67529,6.95547",
-"crs":"EPSG:4326",
-"format":"image/png",
-"height":"1000",
-"layers":"nw_dvg_gem",
-"request":"GetMap",
-"service":"WMS",
-"styles":"default",
-"version":"1.3.0",
-"width":"1000"}', 'dwbk_genlayer_th', '2021-01-30T18:29:29'),
-(4, 'Notfall-Informations-Punkte', 'NIPs im Kreis RE', 'N', '10', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_BEVSCHUTZ/guest?service=WMS&version=1.3.0&request=GetMap&layers=NOTFALLINFOPUNKTE&crs=EPSG:4326&bbox=51.67352,6.95187,51.67529,6.95547&width=1000&height=1000&format=image/png&styles=Infopunkte', 2, '', '', '{"base_url":"https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_BEVSCHUTZ/guest?",
-"bbox":"51.67352,6.95187,51.67529,6.95547",
-"crs":"EPSG:4326",
-"format":"image/png",
-"height":"1000",
-"layers":"NOTFALLINFOPUNKTE",
-"request":"GetMap",
-"service":"WMS",
-"styles":"Infopunkte",
-"version":"1.3.0",
-"width":"1000"}', 'dwbk_genlayer_fo', '2021-01-30T18:37:50'),
-(5, 'Rettungspunkte', 'Rettungspunkte im Kreis RE', 'N', '1;10;', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_BEVSCHUTZ/guest?service=WMS&version=1.3.0&request=GetMap&layers=RETTUNGSPUNKTE&crs=EPSG:4326&bbox=51.67352,6.95187,51.67529,6.95547&width=1000&height=1000&format=image/png&styles=BEVSchutz:Rettungspunkte', 2, '', '', '{"base_url":"https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_BEVSCHUTZ/guest?",
-"bbox":"51.67352,6.95187,51.67529,6.95547",
-"crs":"EPSG:4326",
-"format":"image/png",
-"height":"1000",
-"layers":"RETTUNGSPUNKTE",
-"request":"GetMap",
-"service":"WMS",
-"styles":"BEVSchutz:Rettungspunkte",
-"version":"1.3.0",
-"width":"1000"}', 'dwbk_genlayer_fi', '2021-01-15T17:20:11'),
-(6, 'Stadtteile Dorsten WMS', 'Zeigt die Stadtteile von Dorsten', 'N', '1;10;', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_GEBIETE/guest?service=WMS&version=1.3.0&request=GetMap&layers=STADTTEILE_DORSTEN&crs=EPSG:4326&bbox=51.67352,6.95187,51.67529,6.95547&width=1000&height=1000&format=image/png&styles=Stadtteile', 2, '', '', '{"base_url":"https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_GEBIETE/guest?",
-"bbox":"51.67352,6.95187,51.67529,6.95547",
-"crs":"EPSG:4326",
-"format":"image/png",
-"height":"1000",
-"layers":"STADTTEILE_DORSTEN",
-"request":"GetMap",
-"service":"WMS",
-"styles":"Stadtteile",
-"version":"1.3.0",
-"width":"1000"}', 'dwbk_genlayer_si', '2021-01-15T17:20:11'),
-(7, 'Luftbild NRW 2', 'Luftbild Auflösung 2m', 'Y', '2', 'Y', 'https://www.wms.nrw.de/geobasis/wms_nw_dop?service=WMS&version=1.0.0&request=GetMap&layers=nw_dop_rgb&srs=EPSG:4326&bbox=6.95187,51.67352,6.95547,51.67529&width=1000&height=1000&format=image/png&test=2', 1, '', '', '{"base_url":"https://www.wms.nrw.de/geobasis/wms_nw_dop?",
-"bbox":"6.95187,51.67352,6.95547,51.67529",
-"format":"image/png",
-"height":"1000",
-"layers":"WMS_NW_DOP",
-"request":"GetMap",
-"service":"WMS",
-"srs":"EPSG:4326",
-"test":"2",
-"version":"1.0.0",
-"width":"1000"}', 'dwbk_genlayer_se', '2021-01-30T18:29:09'),
-(8, 'Luftbild NRW 5', 'Luftbild Auflösung 5m', 'N', '5', 'Y', 'https://www.wms.nrw.de/geobasis/wms_nw_dop?service=WMS&version=1.0.0&request=GetMap&layers=nw_dop_rgb&srs=EPSG:4326&bbox=6.95187,51.67352,6.95547,51.67529&width=1000&height=1000&format=image/png&test=5', 1, '', '', '{"base_url":"https://www.wms.nrw.de/geobasis/wms_nw_dop?",
-"bbox":"6.95187,51.67352,6.95547,51.67529",
-"format":"image/png",
-"height":"1000",
-"layers":"WMS_NW_DOP",
-"request":"GetMap",
-"service":"WMS",
-"srs":"EPSG:4326",
-"test":"5",
-"version":"1.0.0",
-"width":"1000"}', 'dwbk_genlayer_ei', '2021-01-31T10:26:33'),
-(9, 'Luftbild NRW 10', 'Luftbild Auflösung 10m', 'N', '10', 'Y', 'https://www.wms.nrw.de/geobasis/wms_nw_dop?service=WMS&version=1.0.0&request=GetMap&layers=nw_dop_rgb&srs=EPSG:4326&bbox=6.95187,51.67352,6.95547,51.67529&width=1000&height=1000&format=image/png&test=10', 1, '', '', '{"base_url":"https://www.wms.nrw.de/geobasis/wms_nw_dop?",
-"bbox":"6.95187,51.67352,6.95547,51.67529",
-"format":"image/png",
-"height":"1000",
-"layers":"WMS_NW_DOP",
-"request":"GetMap",
-"service":"WMS",
-"srs":"EPSG:4326",
-"test":"10",
-"version":"1.0.0",
-"width":"1000"}', 'dwbk_genlayer_ni', '2021-01-31T10:26:38'),
-(10, 'Notfalll-Info-Punkte WFS', 'NIPs im Kreis RE', 'N', '1', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetFeature&typeNames=BEVSchutz:NOTFALLINFOPUNKTE', 2, NULL, NULL, '{
-  "base_url": "https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?",
-  "request": "GetFeature",
-  "service": "WFS",
-  "typenames": "BEVSchutz:NOTFALLINFOPUNKTE",
-  "version": "1.0.0"
-}', 'dwbk_genlayer_onze', '2021-01-31T17:33:22'),
-(11, 'Rettungspunkte WFS', 'Rettungspunkte im Kreis RE', 'N', '10', 'Y', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetFeature&typeNames=BEVSchutz:RETTUNGSPUNKTE', 2, NULL, NULL, '{
-  "base_url": "https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?",
-  "request": "GetFeature",
-  "service": "WFS",
-  "typenames": "BEVSchutz:RETTUNGSPUNKTE",
-  "version": "1.0.0"
-}', 'dwbk_genlayer_onon', '2021-01-31T17:33:14'),
-(12, 'Sperrungen WFS', 'Sperrungen im Kreis RE', 'N', '10', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetFeature&typeNames=BEVSchutz:SPERRUNGEN', 2, NULL, NULL, '{
-  "base_url": "https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?",
-  "request": "GetFeature",
-  "service": "WFS",
-  "typenames": "BEVSchutz:SPERRUNGEN",
-  "version": "1.0.0"
-}', 'dwbk_genlayer_ontw', '2021-01-31T17:34:40'),
-(13, 'Stadtteile Dorsten WFS', 'Stadtteile Dorsten', 'N', '10', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_GEBIETE/guest?service=WFS&version=1.0.0&request=GetFeature&typeNames=Gebietsgliederung:STADTTEILE_DORSTEN', 2, NULL, NULL, '{
-  "base_url": "https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_GEBIETE/guest?",
-  "request": "GetFeature",
-  "service": "WFS",
-  "typenames": "Gebietsgliederung:STADTTEILE_DORSTEN",
-  "version": "1.0.0"
-}', 'dwbk_genlayer_onth', '2021-01-31T17:35:19');
+INSERT INTO dwbk_config_layer(id, name, description, store_local, is_visible, request, bbox_id, "user", pw, local_name, last_dl, last_changed, service, service_config)
+VALUES(1, 'Luftbild NRW', 'Luftbild NRW in Farbe', 'Y', 'Y', 'https://www.wms.nrw.de/geobasis/wms_nw_dop?service=WMS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_on', NULL, '2021-02-08T17:27:44', 'WMS', '{
+  "layer": "Luftbild NRW",
+  "styles": "default",
+  "format": "image/png",
+  "isTransparent": true,
+  "metersPerPixel": [
+    2
+  ],
+  "requestEpsg": 3857
+}'),
+(2, 'Flurstücke NRW', 'Flurstücke in NRW', 'N', 'N', 'https://www.wms.nrw.de/geobasis/wms_nw_inspire-flurstuecke_alkis?service=WMS&version=1.3.0&request=GetCapabilities', 1, NULL, NULL, 'dwbk_genlayer_tw', NULL, '2021-02-08T17:29:57', 'WMS', '{
+  "layer": "CP.CadastralParcel",
+  "styles": "CP.CadastralParcel.Default",
+  "format": "image/png",
+  "isTransparent": true,
+  "requestEpsg": 3857
+}'),
+(3, 'Gemeindegrenzen', 'Gemeindegrenzen in NRW', 'N', 'N', 'https://www.wms.nrw.de/geobasis/wms_nw_dvg?service=WMS&version=1.3.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_th', NULL, '2021-02-08T17:34:38', 'WMS', '{
+  "layer": "nw_dvg_gem",
+  "styles": "default",
+  "format": "image/png",
+  "isTransparent": true,
+  "requestEpsg": 3857
+}'),
+(4, 'Notfall-Informations-Punkte', 'NIPs im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_BEVSCHUTZ/guest?service=WMS&version=1.3.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_fo', NULL, '2021-02-08T17:36:30', 'WMS', '{
+  "layer": "NOTFALLINFOPUNKTE",
+  "styles": "Infopunkte",
+  "format": "image/png",
+  "isTransparent": true,
+  "requestEpsg": 25832
+}'),
+(5, 'Rettungspunkte', 'Rettungspunkte im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_BEVSCHUTZ/guest?service=WMS&version=1.3.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_fi', NULL, '2021-02-08T17:38', 'WMS', '{
+  "layer": "RETTUNGSPUNKTE",
+  "styles": "BEVSchutz:Rettungspunkte",
+  "format": "image/png",
+  "isTransparent": true,
+  "requestEpsg": 25832
+}'),
+(6, 'Stadtteile Dorsten', 'Dorstener Stadtteile', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_KRE-I03_GEBIETE/guest?service=WMS&version=1.3.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_si', NULL, '2021-02-08T17:39:29', 'WMS', '{
+  "layer": "STADTTEILE_DORSTEN",
+  "styles": "Stadtteile",
+  "format": "image/png",
+  "isTransparent": true,
+  "requestEpsg": 25832
+}'),
+(7, 'Notfalll-Info-Punkte', 'NIPs im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_se', NULL, '2021-02-08T17:41:06', 'WFS', '{
+  "typeNames": "BEVSchutz:NOTFALLINFOPUNKTE"
+}'),
+(8, 'Rettungspunkte WFS', 'Rettungspunkte im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_ei', NULL, '2021-02-08T17:43:13', 'WFS', '{
+  "typeNames": "BEVSchutz:RETTUNGSPUNKTE"
+}'),
+(9, 'Sperrungen WFS', 'Sperrungen im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_ni', NULL, '2021-02-08T17:44:45', 'WFS', '{
+  "typeNames": "BEVSchutz:SPERRUNGEN"
+}'),
+(10, 'Stadtteile Dorsten WFS', 'Dorstener Stadtteile', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_GEBIETE/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_onze', NULL, '2021-02-08T17:45:47', 'WFS', '{
+  "typeNames": "Gebietsgliederung:STADTTEILE_DORSTEN"
+}');

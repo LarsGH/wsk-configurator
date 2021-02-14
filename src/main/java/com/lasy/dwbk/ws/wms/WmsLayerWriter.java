@@ -30,6 +30,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.lasy.dwbk.app.DwbkFramework;
 import com.lasy.dwbk.app.error.DwbkFrameworkException;
+import com.lasy.dwbk.app.error.ErrorModule;
 import com.lasy.dwbk.app.logging.DwbkLog;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.db.util.DbScriptUtil;
@@ -49,6 +50,9 @@ public class WmsLayerWriter implements ILayerWriter
   private final ExecutorService threadPool;
   private final LinkedBlockingQueue<Future<WmsTileResponse>> responseQueue;
   
+  /** Exception in case something goes wrong while trying to query / write tiles. */
+  private DwbkFrameworkException writerException;
+  
   public WmsLayerWriter(LayerModel layer)
   {
     this.layer = Check.notNull(layer, "layer");
@@ -62,21 +66,36 @@ public class WmsLayerWriter implements ILayerWriter
   @Override
   public void write()
   {
-    GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();
-    DbScriptUtil.deleteLocalWmsLayerContentIfPresent(this.layer);
-
-    List<TileMatrixParams> tileMatrixParams = TileMatrixParams.createForLayer(this.layer);
-    checkValidTileCount(tileMatrixParams);
-    
-    TileEntry tileEntry = createTileEntry(tileMatrixParams, gpkg);
-
-    // Single thread to write tiles
-    threadPool.execute(createTileWriterThread(tileEntry, gpkg));
-    
-    queryAllTilesAndWriteToTileEntry(tileMatrixParams, tileEntry, gpkg);
-    
-    threadPool.shutdown();
-    DwbkLog.log(Level.INFO, "Alle Tiles für Layer '%s' geschrieben.", this.layer.getName());
+    try
+    {
+      GeoPackage gpkg = DwbkFramework.getInstance().getDwbkGeoPackage().getGtGeoPackage();
+      DbScriptUtil.deleteLocalWmsLayerContentIfPresent(this.layer);
+      
+      List<TileMatrixParams> tileMatrixParams = TileMatrixParams.createForLayer(this.layer);
+      checkValidTileCount(tileMatrixParams);
+      
+      TileEntry tileEntry = createTileEntry(tileMatrixParams, gpkg);
+      
+      // Single thread to write tiles
+      this.threadPool.execute(createTileWriterThread(tileEntry, gpkg));
+      
+      queryAllTilesAndWriteToTileEntry(tileMatrixParams, tileEntry, gpkg);
+      
+      DwbkLog.log(Level.INFO, "Alle Tiles für Layer '%s' geschrieben.", this.layer.getName());
+    }
+    catch (Exception e)
+    {
+      if(this.writerException != null)
+      {
+        throw this.writerException;
+      }
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
+        .failForReason(t, "Unbekannter Fehler beim Schreiben der WMS-Kacheln."));
+    }
+    finally
+    {
+      this.threadPool.shutdown();
+    }
   }
 
   /**
@@ -91,8 +110,8 @@ public class WmsLayerWriter implements ILayerWriter
     
     if(totalTileCount < 1)
     {
-      String msg = String.format("No Tiles to write for layer: %s", this.layer.getName());
-      throw new IllegalStateException(msg);
+      throw DwbkFrameworkException.failForReason(new IllegalStateException(), 
+        "Für den Layer ('%s') konnten keine Kacheln berechnet werden.%n", this.layer.getName());
     }
     
     DwbkLog.log(Level.INFO, "Gesamtanzahl der zu schreibenden Tiles: %s", totalTileCount);
@@ -149,8 +168,6 @@ public class WmsLayerWriter implements ILayerWriter
         final double currentMinLon = bboxMinLon + (col * tileWidthInMeters);
         final double currentMaxLon = currentMinLon + tileWidthInMeters;
 
-        // TODO: dummy inserts migrieren!
-        // TODO: test transformation! (WMS config mit EPSG 25832)
         try
         {
           GetMapRequest request = createBasicRequest(wms, wmsConfig);
@@ -175,10 +192,14 @@ public class WmsLayerWriter implements ILayerWriter
           
           final int currentRow = row;
           final int currentCol = col;
+          
+          if(isFirstRequest(currentZoom, currentRow, currentCol))
+          {
+            checkForValidRequestAndResponse(wms, currentZoom, request, currentRow, currentCol);
+          }
+          
           Future<WmsTileResponse> futureResponse = threadPool.submit(() -> {
-            DwbkLog.log(Level.FINER, "Sending request: %n%s", request.getFinalURL());
-            GetMapResponse response = wms.issueRequest(request);
-            return new WmsTileResponse(response, currentZoom, currentRow, currentCol);
+            return createWmsTileResponse(wms, currentZoom, request, currentRow, currentCol);
           });
           responseQueue.put(futureResponse);
           
@@ -190,7 +211,8 @@ public class WmsLayerWriter implements ILayerWriter
         } 
         catch (Exception e)
         {
-          throw DwbkFrameworkException.failForReason(e, "Fehler beim Schreiben der Layer-Kacheln für den Layer '%s'!", this.layer.getName());
+          throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
+            .failForReason(t, "Fehler beim Schreiben der Layer-Kacheln für den Layer '%s'!", this.layer.getName()));
         }
       }
     }
@@ -202,6 +224,43 @@ public class WmsLayerWriter implements ILayerWriter
       tileMatrixParam.getTotalTileCount(), 
       currentZoom,
       seconds);
+  }
+
+  private boolean isFirstRequest(int zoom, int row, int col)
+  {
+    return zoom == 0
+      && row == 0
+      && col == 0;
+  }
+
+  private void checkForValidRequestAndResponse(WebMapServer wms, int currentZoom, GetMapRequest request, int currentRow, int currentCol)
+  {
+    try
+    {
+      // if no exception is thrown, request & response are valid
+      WmsTileResponse response = createWmsTileResponse(wms, currentZoom, request, currentRow, currentCol);
+      response.getResponse();
+    }
+    catch (Exception e)
+    {
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
+        .failForReason(t, "Request / Response für WMS GetMap ist fehlerhaft. URL: %s", request.getFinalURL()));
+    }
+  }
+
+  private WmsTileResponse createWmsTileResponse(WebMapServer wms, final int currentZoom, GetMapRequest request, final int currentRow, final int currentCol)
+  {
+    try
+    {
+      DwbkLog.log(Level.FINER, "Sending request: %n%s", request.getFinalURL());
+      GetMapResponse response = wms.issueRequest(request);
+      return new WmsTileResponse(response, currentZoom, currentRow, currentCol);
+    }
+    catch (Exception e)
+    {
+      this.setWriterException(e);
+      return null;
+    }
   }
 
   private Runnable createTileWriterThread(TileEntry tileEntry, GeoPackage gpkg)
@@ -231,10 +290,16 @@ public class WmsLayerWriter implements ILayerWriter
       }
       catch (Exception e)
       {
-        threadPool.shutdownNow();
-        throw DwbkFrameworkException.failForReason(e, "Beim Schreiben der Tiles ist ein unerwarteter Fehler aufgetreten!");
+        this.setWriterException(e);
       }
     };
+  }
+
+  private void setWriterException(Exception e)
+  {
+    this.writerException = ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
+      .failForReason(t, "Fehler beim Speichern von WMS-Kacheln."));
+    Thread.currentThread().interrupt();
   }
 
   /**
@@ -269,12 +334,15 @@ public class WmsLayerWriter implements ILayerWriter
       URL url = createUrl(getCapabilitiesRequest);
       WebMapServer wms = new WebMapServer(url);
       
+      WmsConfig config = this.layer.getWmsConfig();
+      int requestEpsg = config.getRequestEpsg();
+      
       Set<String> supportedSrs = wms.getCapabilities().getLayer().getSrs();
-      if(!supportedSrs.contains(BboxUtil.getEpsgStringForCode(BboxUtil.EPSG_3857)))
+      if(!supportedSrs.contains(BboxUtil.getEpsgStringForCode(requestEpsg)))
       {
-        String msg = String.format("Service does not support EPSG:3857! %n"
-          + "GetCapabilities: %s", getCapabilitiesRequest);
-        throw new IllegalStateException(msg);
+        throw DwbkFrameworkException.failForReason(new IllegalStateException(), 
+          "Service unterstützt das angegebene Referenzsystem (EPSG:%s) nicht! %n"
+          + "GetCapabilities: %s", requestEpsg, getCapabilitiesRequest);
       }
       
       wms.getCapabilities().getRequest().getGetMap().setGet(createUrl(this.layer.getBaseRequest()));
@@ -283,7 +351,8 @@ public class WmsLayerWriter implements ILayerWriter
     } 
     catch (Exception e)
     {
-      throw DwbkFrameworkException.failForReason(e, "GT WebMapServer konnte nicht erstellt werden oder wird nicht unterstützt!");
+      throw ErrorModule.createFrameworkException(e, t -> DwbkFrameworkException
+        .failForReason(t, "GT WebMapServer konnte nicht erstellt werden oder wird nicht unterstützt!"));
     }
   }
   
