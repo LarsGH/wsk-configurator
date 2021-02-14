@@ -2,6 +2,7 @@ package com.lasy.dwbk.ws.wfs;
 
 import java.util.Objects;
 
+import com.lasy.dwbk.util.BboxUtil;
 import com.lasy.dwbk.util.IDwbkJson;
 
 /**
@@ -11,8 +12,11 @@ import com.lasy.dwbk.util.IDwbkJson;
  */
 public class WfsConfig implements IDwbkJson
 {
+  /** Default EPSG for WMS tile requests. */
+  public static final int DEFAULT_REQUEST_EPSG = BboxUtil.EPSG_3857;
   
   private String typeNames = null;
+  private int requestEpsg = DEFAULT_REQUEST_EPSG;
 
   /**
    * Returns the layers to display on map. Value is a comma-separated list of layer names. (mandatory request parameter).
@@ -30,6 +34,24 @@ public class WfsConfig implements IDwbkJson
   public void setTypeNames(String layer)
   {
     this.typeNames = layer;
+  }
+  
+  /**
+   * Returns the request EPSG (default 3857).
+   * @return request EPSG
+   */
+  public int getRequestEpsg()
+  {
+    return this.requestEpsg;
+  }
+  
+  /**
+   * Sets the request EPSG code.
+   * @param epsg
+   */
+  public void setRequestEpsg(int epsg)
+  {
+    this.requestEpsg = epsg;
   }
   
   @Override

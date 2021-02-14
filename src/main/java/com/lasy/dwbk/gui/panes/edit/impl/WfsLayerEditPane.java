@@ -2,9 +2,14 @@ package com.lasy.dwbk.gui.panes.edit.impl;
 
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.app.model.impl.LayerModelBuilder;
+import com.lasy.dwbk.gui.panes.edit.util.AttributeInputContainer;
+import com.lasy.dwbk.gui.util.AttributeInputValidator;
+import com.lasy.dwbk.gui.util.PatternTextField;
+import com.lasy.dwbk.util.Is;
 import com.lasy.dwbk.ws.wfs.WfsConfig;
 
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 
 public class WfsLayerEditPane extends ALayerEditPane
 {
@@ -20,6 +25,8 @@ public class WfsLayerEditPane extends ALayerEditPane
     return createInitializedPane(new WfsLayerEditPane(mainScene, layer));
   }
   
+  private AttributeInputContainer<LayerModel, TextField, Integer> attrRequestEpsg;
+  
   /**
    * Layer create / edit GUI.
    * @param mainScene main scene
@@ -33,21 +40,22 @@ public class WfsLayerEditPane extends ALayerEditPane
   @Override
   protected void doHandleServiceSpecificUpdateModel(LayerModel layer)
   {
-    WfsConfig config = createWmsConfigWithConfiguredValues();
+    WfsConfig config = createWfsConfigWithConfiguredValues();
     layer.setWfsConfig(config);
   }
 
   @Override
   protected void doHandleServiceSpecificNewModel(LayerModelBuilder builder)
   {
-    WfsConfig config = createWmsConfigWithConfiguredValues();
+    WfsConfig config = createWfsConfigWithConfiguredValues();
     builder.withWfsConfig(config);
   }
   
-  private WfsConfig createWmsConfigWithConfiguredValues()
+  private WfsConfig createWfsConfigWithConfiguredValues()
   {
     WfsConfig config = new WfsConfig();
     config.setTypeNames(attrServiceLayerName.getConfiguredValue());
+    config.setRequestEpsg(attrRequestEpsg.getConfiguredValue());
     
     return config;
   }
@@ -56,6 +64,32 @@ public class WfsLayerEditPane extends ALayerEditPane
   protected void doCreateAttributeInputContainers()
   {
     super.doCreateAttributeInputContainers();
+    
+    this.attrRequestEpsg = createAttrRequestEpsg();
+    addAttributeInputContainer(attrRequestEpsg);
+  }
+  
+  private AttributeInputContainer<LayerModel, TextField, Integer> createAttrRequestEpsg()
+  {
+    return AttributeInputContainer.<LayerModel, TextField, Integer>builer("GetFeature-Request EPSG-Code")
+      .withGuiElement(PatternTextField.createIntegersOnlyTextField())
+      .withGuiValueInitialization((txtField, layer) -> {
+        int epsg = layer != null
+          ? layer.getWfsConfig().getRequestEpsg()
+          : WfsConfig.DEFAULT_REQUEST_EPSG;
+        txtField.setText(String.valueOf(epsg));
+      })
+      .withGuiElementToModelAttributeFunc(txtField -> {
+        String txt = txtField.getText();
+        return Is.nullOrTrimmedEmpty(txt)
+          ? null
+          : Integer.valueOf(txt);
+      })
+      .withInfoAlertMessage("Eindeutiger Schlüssel für das Koordinatensystem. "
+        + "Unterstützte EPSG-Codes werden vom Service definiert. "
+        + "Siehe GetCapabilities-Request.")
+      .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
+      .build();
   }
 
 }

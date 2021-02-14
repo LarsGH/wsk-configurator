@@ -1,5 +1,6 @@
 package com.lasy.dwbk.ws;
 
+import com.lasy.dwbk.app.error.DwbkFrameworkException;
 import com.lasy.dwbk.app.model.impl.LayerModel;
 import com.lasy.dwbk.util.Check;
 import com.lasy.dwbk.ws.wfs.WfsLayerWriter;
@@ -20,7 +21,12 @@ public interface ILayerWriter
    */
   public static ILayerWriter createForLayer(LayerModel layer)
   {
-    Check.notNull(layer, "layer");
+    boolean storeLocal = Check.notNull(layer, "layer").isStoreLocal();
+    if(!storeLocal)
+    {
+      throw DwbkFrameworkException.failForReason(new IllegalStateException(), 
+        "Die Konfiguration des Layers ('%s') erlaubt keine lokale Speicherung!", layer.getLocalName());
+    }
     EWebServiceType webService = layer.getWebServiceType();
     switch(webService)
     {

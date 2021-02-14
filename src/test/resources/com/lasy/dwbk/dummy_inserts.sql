@@ -9,7 +9,7 @@ VALUES
 -- LAYER
 INSERT INTO dwbk_config_layer(id, name, description, store_local, is_visible, request, bbox_id, "user", pw, local_name, last_dl, last_changed, service, service_config)
 VALUES(1, 'Luftbild NRW', 'Luftbild NRW in Farbe', 'Y', 'Y', 'https://www.wms.nrw.de/geobasis/wms_nw_dop?service=WMS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_on', NULL, '2021-02-08T17:27:44', 'WMS', '{
-  "layer": "Luftbild NRW",
+  "layer": "nw_dop_rgb",
   "styles": "default",
   "format": "image/png",
   "isTransparent": true,
@@ -54,14 +54,18 @@ VALUES(1, 'Luftbild NRW', 'Luftbild NRW in Farbe', 'Y', 'Y', 'https://www.wms.nr
   "requestEpsg": 25832
 }'),
 (7, 'Notfalll-Info-Punkte', 'NIPs im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_se', NULL, '2021-02-08T17:41:06', 'WFS', '{
-  "typeNames": "BEVSchutz:NOTFALLINFOPUNKTE"
+  "typeNames": "BEVSchutz:NOTFALLINFOPUNKTE",
+  "requestEpsg": 25832
 }'),
 (8, 'Rettungspunkte WFS', 'Rettungspunkte im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_ei', NULL, '2021-02-08T17:43:13', 'WFS', '{
-  "typeNames": "BEVSchutz:RETTUNGSPUNKTE"
+  "typeNames": "BEVSchutz:RETTUNGSPUNKTE",
+  "requestEpsg": 25832
 }'),
 (9, 'Sperrungen WFS', 'Sperrungen im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_ni', NULL, '2021-02-08T17:44:45', 'WFS', '{
-  "typeNames": "BEVSchutz:SPERRUNGEN"
+  "typeNames": "BEVSchutz:SPERRUNGEN",
+  "requestEpsg": 25832
 }'),
 (10, 'Stadtteile Dorsten WFS', 'Dorstener Stadtteile', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_GEBIETE/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_onze', NULL, '2021-02-08T17:45:47', 'WFS', '{
-  "typeNames": "Gebietsgliederung:STADTTEILE_DORSTEN"
+  "typeNames": "Gebietsgliederung:STADTTEILE_DORSTEN",
+  "requestEpsg": 25832
 }');

@@ -238,6 +238,7 @@ public class WmsLayerWriter implements ILayerWriter
     try
     {
       // if no exception is thrown, request & response are valid
+//      DwbkLog.log(Level.INFO, "Request", args);
       WmsTileResponse response = createWmsTileResponse(wms, currentZoom, request, currentRow, currentCol);
       response.getResponse();
     }
@@ -254,7 +255,7 @@ public class WmsLayerWriter implements ILayerWriter
     {
       DwbkLog.log(Level.FINER, "Sending request: %n%s", request.getFinalURL());
       GetMapResponse response = wms.issueRequest(request);
-      return new WmsTileResponse(response, currentZoom, currentRow, currentCol);
+      return new WmsTileResponse(response, currentZoom, currentRow, currentCol, request.getFinalURL());
     }
     catch (Exception e)
     {
