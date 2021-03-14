@@ -152,7 +152,8 @@ public class WfsLayerEditPane extends ALayerEditPane
   private String createRgbaInfo(String msg)
   {
     return String.join(System.lineSeparator(), msg, 
-      "Die RGBA-Werte werden mit Semikolons getrennt angegeben. Angabe Rot, Grün und Blau: 0-255, Alpha: 0-100");
+      "Die RGBA-Werte werden mit Semikolons getrennt angegeben. "
+      + "Angabe Rot, Grün und Blau: 0-255, Alpha: 0-100 (0 -> transparent)");
   }
   
   private AttributeInputContainerBuilder<LayerModel, TextField, String> createRgbaAttribute(String label, String infoMsg)

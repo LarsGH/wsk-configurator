@@ -58,8 +58,8 @@ VALUES(1, 'Luftbild NRW', 'Luftbild NRW in Farbe', 'Y', 'Y', 'https://www.wms.nr
   "requestEpsg": 25832,
   "styleConfig": {
     "geomType": "POINT",
-    "lineColor": "255;0;0;0",
-    "fillColor": "0;100;0;0"
+    "lineColor": "255;0;0;1",
+    "fillColor": "0;100;0;1"
   }
 }'),
 (8, 'Rettungspunkte WFS', 'Rettungspunkte im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_ei', NULL, '2021-02-08T17:43:13', 'WFS', '{
@@ -67,8 +67,8 @@ VALUES(1, 'Luftbild NRW', 'Luftbild NRW in Farbe', 'Y', 'Y', 'https://www.wms.nr
   "requestEpsg": 25832,
   "styleConfig": {
     "geomType": "POINT",
-    "lineColor": "255;0;0;0",
-    "fillColor": "139;0;139;0"
+    "lineColor": "255;0;0;1",
+    "fillColor": "139;0;139;1"
   }
 }'),
 (9, 'Sperrungen WFS', 'Sperrungen im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_ni', NULL, '2021-02-08T17:44:45', 'WFS', '{
@@ -76,7 +76,7 @@ VALUES(1, 'Luftbild NRW', 'Luftbild NRW in Farbe', 'Y', 'Y', 'https://www.wms.nr
   "requestEpsg": 25832,
   "styleConfig": {
     "geomType": "POLYGON",
-    "lineColor": "255;0;0;0",
+    "lineColor": "255;0;0;1",
     "fillColor": "139;0;139;50"
   }
 }'),
@@ -85,6 +85,6 @@ VALUES(1, 'Luftbild NRW', 'Luftbild NRW in Farbe', 'Y', 'Y', 'https://www.wms.nr
   "requestEpsg": 25832,
   "styleConfig": {
     "geomType": "POLYGON",
-    "lineColor": "255;0;0;0"
+    "lineColor": "255;0;0;1"
   }
 }');
