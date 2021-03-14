@@ -5,6 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import com.lasy.dwbk.ws.wfs.WfsConfigTest;
+import com.lasy.dwbk.ws.wfs.style.WfsStyleConfigTest;
 import com.lasy.dwbk.ws.wms.TileMatrixParamsTest;
 import com.lasy.dwbk.ws.wms.WmsConfigTest;
 
@@ -12,6 +13,7 @@ import com.lasy.dwbk.ws.wms.WmsConfigTest;
 @SuiteClasses({
   TileMatrixParamsTest.class,
   WfsConfigTest.class,
+  WfsStyleConfigTest.class,
   WmsConfigTest.class,
 })
 public class WsTestSuite

@@ -55,17 +55,36 @@ VALUES(1, 'Luftbild NRW', 'Luftbild NRW in Farbe', 'Y', 'Y', 'https://www.wms.nr
 }'),
 (7, 'Notfalll-Info-Punkte', 'NIPs im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_se', NULL, '2021-02-08T17:41:06', 'WFS', '{
   "typeNames": "BEVSchutz:NOTFALLINFOPUNKTE",
-  "requestEpsg": 25832
+  "requestEpsg": 25832,
+  "styleConfig": {
+    "geomType": "POINT",
+    "lineColor": "255;0;0;0",
+    "fillColor": "0;100;0;0"
+  }
 }'),
 (8, 'Rettungspunkte WFS', 'Rettungspunkte im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_ei', NULL, '2021-02-08T17:43:13', 'WFS', '{
   "typeNames": "BEVSchutz:RETTUNGSPUNKTE",
-  "requestEpsg": 25832
+  "requestEpsg": 25832,
+  "styleConfig": {
+    "geomType": "POINT",
+    "lineColor": "255;0;0;0",
+    "fillColor": "139;0;139;0"
+  }
 }'),
 (9, 'Sperrungen WFS', 'Sperrungen im Kreis RE', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_BEVSCHUTZ/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_ni', NULL, '2021-02-08T17:44:45', 'WFS', '{
   "typeNames": "BEVSchutz:SPERRUNGEN",
-  "requestEpsg": 25832
+  "requestEpsg": 25832,
+  "styleConfig": {
+    "geomType": "POLYGON",
+    "lineColor": "255;0;0;0",
+    "fillColor": "139;0;139;50"
+  }
 }'),
 (10, 'Stadtteile Dorsten WFS', 'Dorstener Stadtteile', 'N', 'N', 'https://geoservice.gkd-re.de/wss/service/KreisRE_WFS_KRE-I03_GEBIETE/guest?service=WFS&version=1.0.0&request=GetCapabilities', 2, NULL, NULL, 'dwbk_genlayer_onze', NULL, '2021-02-08T17:45:47', 'WFS', '{
   "typeNames": "Gebietsgliederung:STADTTEILE_DORSTEN",
-  "requestEpsg": 25832
+  "requestEpsg": 25832,
+  "styleConfig": {
+    "geomType": "POLYGON",
+    "lineColor": "255;0;0;0"
+  }
 }');

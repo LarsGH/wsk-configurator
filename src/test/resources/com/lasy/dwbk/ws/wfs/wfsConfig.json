@@ -1,3 +1,9 @@
 {
-  "typeNames": "testLayer"
+  "typeNames": "testLayer",
+  "requestEpsg": 25832,
+  "styleConfig": {
+    "geomType": "POLYGON",
+    "lineColor": "255;0;0;0",
+    "fillColor": "100;100;100;50"
+  }
 }

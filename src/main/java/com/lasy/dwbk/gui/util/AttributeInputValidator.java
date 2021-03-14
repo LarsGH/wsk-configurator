@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import com.lasy.dwbk.util.Is;
 import com.lasy.dwbk.validation.impl.LayerServiceUriValidator;
+import com.lasy.dwbk.validation.impl.RgbaValidator;
 import com.lasy.dwbk.validation.impl.TextOnlyValidator;
 
 /**
@@ -40,6 +41,19 @@ public class AttributeInputValidator
       if(!isValid)
       {
         return Optional.of("Die URI muss den anzufragenden Service (WMS / WFS) spezifizieren!");
+      }
+      return Optional.empty();
+    };
+  }
+  
+  public static final Function<String, Optional<String>> createRgbaValidationFunction() {
+    return  val -> {      
+      boolean isValid = new RgbaValidator().isValid(val);
+      if(!isValid)
+      {
+        return Optional.of("Die Werte entsprechen nicht dem erlaubten RGBA-Format! "
+          + "Werte mit Semikolon separiert. "
+          + "RGB: 0-255, Alpha: 0-100");
       }
       return Optional.empty();
     };

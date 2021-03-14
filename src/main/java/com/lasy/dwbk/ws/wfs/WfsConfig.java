@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import com.lasy.dwbk.util.BboxUtil;
 import com.lasy.dwbk.util.IDwbkJson;
+import com.lasy.dwbk.ws.wfs.style.WfsStyleConfig;
 
 /**
  * WFS request and display configuration.
@@ -17,6 +18,7 @@ public class WfsConfig implements IDwbkJson
   
   private String typeNames = null;
   private int requestEpsg = DEFAULT_REQUEST_EPSG;
+  private WfsStyleConfig styleConfig = null;
 
   /**
    * Returns the layers to display on map. Value is a comma-separated list of layer names. (mandatory request parameter).
@@ -54,6 +56,24 @@ public class WfsConfig implements IDwbkJson
     this.requestEpsg = epsg;
   }
   
+  /**
+   * Returns the style config.
+   * @return style config
+   */
+  public WfsStyleConfig getStyleConfig()
+  {
+    return styleConfig;
+  }
+
+  /**
+   * Sets the style config.
+   * @param styleConfig style config
+   */
+  public void setStyleConfig(WfsStyleConfig styleConfig)
+  {
+    this.styleConfig = styleConfig;
+  }
+
   @Override
   public boolean equals(Object obj)
   {

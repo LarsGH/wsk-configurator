@@ -93,4 +93,58 @@ public class Check
       throw new IllegalArgumentException(msg);
     }
   }
+
+  /**
+   * Checks if the value is a valid RGB value.
+   * @param val the RGB value
+   * @return {@code true} if the value is a valid RGB value
+   */
+  public static int validRgbValue(int val)
+  {
+    if(!isValidRgbValue(val))
+    {
+      String msg = String.format("%s is not a valid RGB value (0-255).", val);
+      throw new IllegalArgumentException(msg);
+    }
+    return val;
+  }
+  
+  /**
+   * Checks if the value is a valid alpha value.
+   * @param val the alpha value
+   * @return {@code true} if the value is a valid alpha value
+   */
+  public static int validAplhaValue(int val)
+  {
+    if(!isValidAplhaValue(val))
+    {
+      String msg = String.format("%s is not a valid alpha value (0-100).", val);
+      throw new IllegalArgumentException(msg);
+    }
+    return val;
+  }
+  
+  private static final int RGBA_MIN = 0;
+  private static final int RGB_MAX = 255;
+  private static final int ALPHA_MAX = 100;
+  
+  /**
+   * Returns {@code true}, if the RGB value is valid.
+   * @param rgbVal value for red, green or blue
+   * @return {@code true}, if the RGB value is valid
+   */
+  private static boolean isValidRgbValue(int rgbVal)
+  {
+    return rgbVal >= RGBA_MIN && rgbVal <= RGB_MAX;
+  }
+  
+  /**
+   * Returns {@code true}, if the alpha value is valid.
+   * @param alphaVal alpha value
+   * @return {@code true}, if the alpha value is valid
+   */
+  private static boolean isValidAplhaValue(int alphaVal)
+  {
+    return alphaVal >= RGBA_MIN && alphaVal <= ALPHA_MAX;
+  }
 }

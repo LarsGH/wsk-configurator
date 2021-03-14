@@ -9,6 +9,7 @@ import com.lasy.dwbk.validation.impl.CoordinateValidatorTest;
 import com.lasy.dwbk.validation.impl.IntegersOnlyValidatorTest;
 import com.lasy.dwbk.validation.impl.IntegersSeparatedBySemicolonValidatorTest;
 import com.lasy.dwbk.validation.impl.LayerServiceUriValidatorTest;
+import com.lasy.dwbk.validation.impl.RgbaValidatorTest;
 import com.lasy.dwbk.validation.impl.TextOnlyValidatorTest;
 
 @RunWith(Suite.class)
@@ -18,6 +19,7 @@ import com.lasy.dwbk.validation.impl.TextOnlyValidatorTest;
   IntegersOnlyValidatorTest.class,
   IntegersSeparatedBySemicolonValidatorTest.class, 
   LayerServiceUriValidatorTest.class,
+  RgbaValidatorTest.class,
   TextOnlyValidatorTest.class,
 })
 public class ValidationTestSuite
