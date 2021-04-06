@@ -100,8 +100,7 @@ public class WmsLayerEditPane extends ALayerEditPane
         txtField.setText(layer.getWmsConfig().getMetersPerPixelAsText());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
-      .withInfoAlertMessage("Die Auflösung pro Pixel in Meter. Kann mehrere Werte getrennt durch ';' enthalten. "
-        + "Die Werte müssen Teiler von 500 sein (500 % <Auflösung> = 0).")
+      .withInfoAlertMessage("Die Auflösung pro Pixel in Meter. Kann mehrere Werte getrennt durch ';' enthalten.")
       .withDependingContainerValidator(attrStoreLocal, (storeLocalObj, metersPerPixel) -> {
         Boolean storeLocal = storeLocalObj == null
           ? false
@@ -112,7 +111,7 @@ public class WmsLayerEditPane extends ALayerEditPane
         }
         return Optional.empty();
       })
-      .withInputValidationError(AttributeInputValidator.createDivisorInputFunction(500))
+      .withInputValidationError(AttributeInputValidator.createDivisorInputFunction(1000))
       .build();
   }
   
@@ -149,7 +148,7 @@ public class WmsLayerEditPane extends ALayerEditPane
   
   private AttributeInputContainer<LayerModel, TextField, Integer> createAttrRequestEpsg()
   {
-    return AttributeInputContainer.<LayerModel, TextField, Integer>builer("GetMap-Request EPSG-Code")
+    return AttributeInputContainer.<LayerModel, TextField, Integer>builer("Service EPSG-Code")
       .withGuiElement(PatternTextField.createIntegersOnlyTextField())
       .withGuiValueInitialization((txtField, layer) -> {
         int epsg = layer != null

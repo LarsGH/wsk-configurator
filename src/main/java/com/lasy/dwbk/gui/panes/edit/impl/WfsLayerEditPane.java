@@ -126,7 +126,7 @@ public class WfsLayerEditPane extends ALayerEditPane
   private AttributeInputContainer<LayerModel, TextField, String> createAttrStyleLineColor()
   {    
     return createRgbaAttribute("Linien-Farbe (RGBA)",
-      createRgbaInfo("Farbe der Linie. Polygone und Kreise (Punkt) haben jeweils eine umgebende Linie."))
+      createRgbaInfo("Farbe der Linie. Polygone und Punkte (Darstellung als Kreis) werden jeweils von einer Linie umrandet."))
       .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
         getWfsStyleConfig(layer).ifPresent(styleConfig -> {
           txtField.setText(styleConfig.getLineColor());
@@ -140,7 +140,7 @@ public class WfsLayerEditPane extends ALayerEditPane
   {    
     return createRgbaAttribute("Füll-Farbe (RGBA)",
       createRgbaInfo("Füll-Farbe für die Geometrie. Default transparent. "
-        + "Polygone und Punkte (Darstellung als Kreis) haben jeweils eine umgebende Linie. "))
+        + "Polygone und Punkte (Darstellung als Kreis) werden jeweils von einer Linie umrandet. "))
       .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
         getWfsStyleConfig(layer).ifPresent(styleConfig -> {
           txtField.setText(styleConfig.getFillColor());
@@ -167,7 +167,7 @@ public class WfsLayerEditPane extends ALayerEditPane
 
   private AttributeInputContainer<LayerModel, TextField, Integer> createAttrRequestEpsg()
   {
-    return AttributeInputContainer.<LayerModel, TextField, Integer>builer("GetFeature-Request EPSG-Code")
+    return AttributeInputContainer.<LayerModel, TextField, Integer>builer("Service EPSG-Code")
       .withGuiElement(PatternTextField.createIntegersOnlyTextField())
       .withGuiValueInitialization((txtField, layer) -> {
         int epsg = layer != null

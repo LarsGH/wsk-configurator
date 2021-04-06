@@ -43,7 +43,7 @@ public class TileMatrixParamsTest
   @Test
   public void testCreateForLayerCreatesParamsForEachZoomLevel()
   {
-    setMetersPerPixelText(layer, "1;2;5;20");
+    setMetersPerPixelText(layer, "1;2;5;10");
     
     List<TileMatrixParams> tileMatrixParams = TileMatrixParams.createForLayer(layer);
     
@@ -68,11 +68,11 @@ public class TileMatrixParamsTest
     List<TileMatrixParams> tileMatrixParams = TileMatrixParams.createForLayer(layer);
     
     TileMatrixParams params = tileMatrixParams.get(0);
-    Assertions.assertThat(params.getMatrixHeight()).isEqualTo(4);
-    Assertions.assertThat(params.getMatrixWidth()).isEqualTo(4);
+    Assertions.assertThat(params.getMatrixHeight()).isEqualTo(2);
+    Assertions.assertThat(params.getMatrixWidth()).isEqualTo(2);
     Assertions.assertThat(params.getMetersPerPixel()).isEqualTo(2);
-    Assertions.assertThat(params.getTileHeightInPixels()).isEqualTo(500);
-    Assertions.assertThat(params.getTileWidthInPixels()).isEqualTo(500);
+    Assertions.assertThat(params.getTileHeightInPixels()).isEqualTo(1000);
+    Assertions.assertThat(params.getTileWidthInPixels()).isEqualTo(1000);
     Assertions.assertThat(params.getZoomLevel()).isEqualTo(0);
   }
   

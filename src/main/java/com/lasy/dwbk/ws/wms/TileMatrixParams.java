@@ -21,13 +21,13 @@ import com.lasy.dwbk.util.Check;
 public final class TileMatrixParams
 {
   /** The default tile length in pixels. */
-  public static final int DEFAULT_TILE_LENGTH = 500;
+  public static final int DEFAULT_TILE_LENGTH = 1000;
   
   /** 
    * The default tolerance in pixels.
    * A tile side in pixels must be <= ({@link DEFAULT_TILE_LENGTH} + {@link DEFAULT_TOLERANCE})
    */
-  public static final int DEFAULT_TOLERANCE = 100;
+  public static final int DEFAULT_TOLERANCE = 200;
   
   /**
    * Creates the tile matrix parameters for each configured pixel size of the layer.
