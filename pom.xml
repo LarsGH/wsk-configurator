@@ -2,14 +2,14 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>dwbk-configurator</groupId>
-	<artifactId>dwbk-configurator</artifactId>
-	<version>0.0.1</version>
-	<name>DWBK Configurator</name>
+	<groupId>wsk-configurator</groupId>
+	<artifactId>wsk-configurator</artifactId>
+	<version>1.0.0</version>
+	<name>WSK Configurator</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<app.main.class>com.lasy.dwbk.gui.GuiStarter</app.main.class>
+		<app.main.class>com.lasy.wsk.gui.GuiStarter</app.main.class>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<geotools.version>24.0</geotools.version>
