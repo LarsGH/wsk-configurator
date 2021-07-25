@@ -77,6 +77,7 @@ public class WskFramework implements AutoCloseable
     }
     catch (Exception e)
     {
+      // Writing settings failed
       throw WskFrameworkException.failForReason(e, "Die Settings ('%s') konnten nicht geschrieben werden!", WskSettings.SETTINGS_FILE_NAME);
     }
   }
@@ -92,6 +93,7 @@ public class WskFramework implements AutoCloseable
       }
       catch (Exception e)
       {
+        // Loading settings failed
         throw WskFrameworkException.failForReason(e, "Die Settings ('%s') konnten nicht geladen werden!", WskSettings.SETTINGS_FILE_NAME);
       }
     }
@@ -106,6 +108,7 @@ public class WskFramework implements AutoCloseable
   {    
     createConfigTables(gpkg);
     WskServiceProvider.initialize(gpkg.getDataStore());
+    // framework initialization success
     WskLog.log(Level.INFO, "Framwork erfolgreich initialisiert!");
     
     // Use configured log-level after init!
@@ -139,6 +142,7 @@ public class WskFramework implements AutoCloseable
     }
     catch (Exception e)
     {
+      // Mandatory config table could not be created
       throw WskFrameworkException.failForReason(e, 
         "Zwingend erforderliche Konfigurationstabelle '%s' konnte nicht erstellt werden!", 
         table.getTableName());

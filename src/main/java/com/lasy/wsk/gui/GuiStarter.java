@@ -88,6 +88,7 @@ public class GuiStarter extends Application
       layerService.update(model);
     }
 
+    // migration success
     System.out.println("Migration abgeschlossen!");
   }
 

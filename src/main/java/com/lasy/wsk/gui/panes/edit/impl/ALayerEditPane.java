@@ -96,8 +96,10 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
   
   private Alert createDeleteLocalDataAlert()
   {
+    // are you sure you want to delete all locally saved data?
     String deleteMsg = "Sollen alle lokal gespeicherten Daten wirklich gelöscht werden?";
     Alert alert = new Alert(AlertType.CONFIRMATION, deleteMsg, ButtonType.YES, ButtonType.NO);
+    // delete local data
     alert.setTitle("Lokale Daten löschen");
     alert.setHeaderText(null);
     return alert;
@@ -198,6 +200,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
+      // name (inclusive namespace) of the layer like defined by the service. the name can be copied from the GetCapabilities-request
       .withInfoAlertMessage("Der Name (inklusive Namespace) des Layers wie im Service definiert. "
         + "Der Name kann aus dem GetCapabilities-Request kopiert werden.")
       .build();
@@ -213,6 +216,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
         txtField.setText(layer.getPw().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
+      // PW for layer request
       .withInfoAlertMessage("Das Passwort zur Layer-Abfrage.")
       .build();
   }
@@ -227,6 +231,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
         txtField.setText(layer.getUser().orElse(null));
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
+      // user for layer request
       .withInfoAlertMessage("Der Benutzername zur Layer-Abfrage.")
       .build();
   }
@@ -239,6 +244,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
         comboBox.setSelectedBboxById(layer.getBboxId());
       })
       .withGuiElementToModelAttributeFunc(BboxComboBox::getSelectedBboxId)
+      // selection of a boundingbox is especially useful to reduce memory when layer is stored locally
       .withInfoAlertMessage("Die Auswahl einer Boundingbox macht insbesondere Sinn um die Datenmenge zu begrenzen "
         + "wenn der Layer lokal gespeichert werden soll.")
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
@@ -247,6 +253,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
   
   private AttributeInputContainer<LayerModel, CheckBox, Boolean> createAttrIsVisible()
   {
+    // initial visibility
     return AttributeInputContainer.<LayerModel, CheckBox, Boolean>builer("Initiale Layer-Sichtbarkeit")
       .withGuiElement(new CheckBox("Initial sichtbar?"))
       .withGuiValueInitialization((cb, layer) -> {
@@ -256,12 +263,14 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
         cb.setSelected(visible);
       })
       .withGuiElementToModelAttributeFunc(CheckBox::isSelected)
+      // if activated, the layer is initially visible in the app
       .withInfoAlertMessage("Wenn aktiviert, ist der Layer in der App initial sichtbar geschaltet!")
       .build();
   }
   
   private AttributeInputContainer<LayerModel, CheckBox, Boolean> createAttrStoreLocal()
   {
+    // save locally
     return AttributeInputContainer.<LayerModel, CheckBox, Boolean>builer("Layer lokal speichern")
       .withGuiElement(new CheckBox("Lokal speichern?"))
       .withGuiValueInitialization((cb, layer) -> {
@@ -271,6 +280,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
         cb.setSelected(storeLocal);
       })
       .withGuiElementToModelAttributeFunc(CheckBox::isSelected)
+      // if activated, the layer is stored locally and therefore available offline
       .withInfoAlertMessage("Wenn aktiviert, werden die Daten des Layers lokal gespeichert und sind somit auch offline verfügbar!")
       .build();
   }
@@ -283,6 +293,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
         txtField.setText(layer.getRequest());
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
+      // the GetCapabilities request for the service. The request can be tested in the browser
       .withInfoAlertMessage("Der GetCapabilities-Request für den anzufragenden Service. "
         + "Der Request kann im Browser getestet werden.")
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
@@ -292,6 +303,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
 
   private AttributeInputContainer<LayerModel, TextField, String> createAttrDescription()
   {
+    // layer description
     return AttributeInputContainer.<LayerModel, TextField, String>builer("Layer-Beschreibung")
       .withGuiElement(PatternTextField.createAcceptAllTextField())
       .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
@@ -310,6 +322,7 @@ public abstract class ALayerEditPane extends AModelEditPane<LayerModel>
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
+      // the layer name is used in the client user interface
       .withInfoAlertMessage("Der Layername wird in der Client Benutzeroberfläche verwendet.")
       .build();
   }

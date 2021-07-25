@@ -45,6 +45,7 @@ public class ErrorModule
     }
     else
     {
+      // unexpected error
       WskFrameworkException frameworkException = WskFrameworkException.failForReason(thrown, "Unerwarteter Fehler");
       handleFrameworkException(frameworkException);
     }

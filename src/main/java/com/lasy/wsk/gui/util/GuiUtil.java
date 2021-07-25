@@ -40,8 +40,10 @@ public class GuiUtil
    */ 
   public static String createBooleanDisplayValue(boolean bool)
   {
-    return bool 
-      ? "Ja" 
+    return bool
+      // Yes
+      ? "Ja"
+      // No
       : "Nein";
   }
   
@@ -184,6 +186,5 @@ public class GuiUtil
     BackgroundFill backgroundFill = new BackgroundFill(fillColor, CornerRadii.EMPTY, Insets.EMPTY);
     return new Background(backgroundFill);
   }
-  
-  
+
 }

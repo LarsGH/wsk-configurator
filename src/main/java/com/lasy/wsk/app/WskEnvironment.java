@@ -1,6 +1,7 @@
 package com.lasy.wsk.app;
 
 import java.io.File;
+import java.util.Locale;
 
 import com.lasy.wsk.app.error.WskFrameworkException;
 import com.lasy.wsk.util.Is;
@@ -31,21 +32,25 @@ public class WskEnvironment
     String path = System.getenv(CONFIG_DIRECTORY);
     if (Is.nullOrTrimmedEmpty(path))
     {
+      // target directory is mandatory!
       throw exitForReason(CONFIG_DIRECTORY, path, "das Zielverzeichnis ist zwingend erforderlich!");
     }
     
     File configDirectory = new File(path);
     if(!configDirectory.isDirectory())
     {
+      // target needs to be a directory!
       throw exitForReason(CONFIG_DIRECTORY, path, "das Zielverzeichnis muss ein Ordner sein!");
     }
     
     if(!configDirectory.canRead())
     {
+      // read permission for target directory is mandatory!
       throw exitForReason(CONFIG_DIRECTORY, path, "Leserechte für das Zielverzeichnis sind zwingend erforderlich!");
     }
     if(!configDirectory.canWrite())
     {
+      // write permission for target directory is mandatory!
       throw exitForReason(CONFIG_DIRECTORY, path, "Schreibrechte für das Zielverzeichnis sind zwingend erforderlich!");
     }
     
@@ -54,6 +59,7 @@ public class WskEnvironment
   
   private WskFrameworkException exitForReason(String envName, String value, String reason)
   {
+    // bad configuration for env variable
     return WskFrameworkException.exitForReason(null, 
       "Umgebungsvariable-Fehlkonfiguration (%s=%s): %s", envName, value, reason); 
   }

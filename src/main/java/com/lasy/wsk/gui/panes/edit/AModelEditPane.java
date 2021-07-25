@@ -135,6 +135,7 @@ public abstract class AModelEditPane<TModelType extends IGtModel> extends AWskPa
 
   private void showInvalidInputAlert()
   {
+    // invalid input / please check the input
     Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Fehlerhafte Eingabe", "Bitte überprüfen Sie die Eingaben");
     alert.show();
   }

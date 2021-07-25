@@ -42,6 +42,7 @@ public class WfsLayerEditPane extends ALayerEditPane
    */
   private WfsLayerEditPane(Scene mainScene, LayerModel layer)
   {
+    // WFS layer administration
     super(mainScene, "WFS Layer verwalten", layer);
   }
   
@@ -98,6 +99,7 @@ public class WfsLayerEditPane extends ALayerEditPane
   
   private AttributeInputContainer<LayerModel, WfsStyleGeometryComboBox, String> createAttrStyleGeometry()
   {
+    // layer geometry style
     return AttributeInputContainer.<LayerModel, WfsStyleGeometryComboBox, String>builer("Layer Geometrie (Style)")
       .withGuiElement(new WfsStyleGeometryComboBox())
       .withGuiValueInitializationIfModelNotNull((comboBox, layer) -> {
@@ -106,6 +108,7 @@ public class WfsLayerEditPane extends ALayerEditPane
         });
       })
       .withGuiElementToModelAttributeFunc(WfsStyleGeometryComboBox::getSelectedWfsStyleGeomConfigValue)
+      // defines the layer geometry. lines do not have fillings. polygons and points (displayed as circles) are surrounded by a line and can be filled.
       .withInfoAlertMessage("Gibt die Geometrie des Layers an. Linien können keine Füllung enthalten. "
         + "Polygone und Punkte (Darstellung als Kreise) werden mit einer Linie umrandet und können farblich gefüllt werden.")
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
@@ -124,8 +127,10 @@ public class WfsLayerEditPane extends ALayerEditPane
   }
   
   private AttributeInputContainer<LayerModel, TextField, String> createAttrStyleLineColor()
-  {    
+  {
+    // line color
     return createRgbaAttribute("Linien-Farbe (RGBA)",
+      // color of the line. polygons and points (displayed as circles) are surrounded by a line
       createRgbaInfo("Farbe der Linie. Polygone und Punkte (Darstellung als Kreis) werden jeweils von einer Linie umrandet."))
       .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
         getWfsStyleConfig(layer).ifPresent(styleConfig -> {
@@ -137,8 +142,10 @@ public class WfsLayerEditPane extends ALayerEditPane
   }
   
   private AttributeInputContainer<LayerModel, TextField, String> createAttrStyleFillColor()
-  {    
+  {
+    // file color
     return createRgbaAttribute("Füll-Farbe (RGBA)",
+      // fill color for the geometry. default transparent. polygons and points (displayed as circles) are surrounded by a line.
       createRgbaInfo("Füll-Farbe für die Geometrie. Default transparent. "
         + "Polygone und Punkte (Darstellung als Kreis) werden jeweils von einer Linie umrandet. "))
       .withGuiValueInitializationIfModelNotNull((txtField, layer) -> {
@@ -151,6 +158,7 @@ public class WfsLayerEditPane extends ALayerEditPane
   
   private String createRgbaInfo(String msg)
   {
+    // RGBA-values are delimited by semicolons. red, green, blue: 0-255, alpha: 0-100
     return String.join(System.lineSeparator(), msg, 
       "Die RGBA-Werte werden mit Semikolons getrennt angegeben. "
       + "Angabe Rot, Grün und Blau: 0-255, Alpha: 0-100 (0 -> transparent)");
@@ -181,6 +189,7 @@ public class WfsLayerEditPane extends ALayerEditPane
           ? null
           : Integer.valueOf(txt);
       })
+      // unique key for the coordinate system. supported codes are defined by the service. see GetCapabilities-request
       .withInfoAlertMessage("Eindeutiger Schlüssel für das Koordinatensystem. "
         + "Unterstützte EPSG-Codes werden vom Service definiert. "
         + "Siehe GetCapabilities-Request.")

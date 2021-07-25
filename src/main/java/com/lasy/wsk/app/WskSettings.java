@@ -40,6 +40,7 @@ public class WskSettings implements IWskJson
     }
     catch (Exception e)
     {
+      // settings could not be created
       throw WskFrameworkException.exitForReason(e, "Settings ('%s') konnten nicht erstellt werden. Inhalt: %n%s", 
         SETTINGS_FILE_NAME, settingFileContent);
     }
@@ -89,10 +90,12 @@ public class WskSettings implements IWskJson
     
     if(invalidSettings.isEmpty())
     {
+      // settings validation success
       WskLog.log(Level.INFO, "Settings ('%s') erfolgreich validiert: %n%s", SETTINGS_FILE_NAME, this.toString());
     }
     else
     {
+      // Setting error
       String errors = String.join(System.lineSeparator(), invalidSettings);
       throw WskFrameworkException.exitForReason(new IllegalStateException("Fehlerhafte Settings."), 
         "Settings ('%s') sind fehlerhaft: %n%s", SETTINGS_FILE_NAME, errors);
@@ -103,6 +106,7 @@ public class WskSettings implements IWskJson
   {
     if(this.wmsMaxThreads < 1)
     {
+      // please provide an integer > 0
       return Optional.of(createValidationError("wmsMaxThreads", this.wmsMaxThreads, "Bitte geben Sie eine Ganzzahl > 0 ein."));
     }
     return Optional.empty();
@@ -118,6 +122,7 @@ public class WskSettings implements IWskJson
     }
     catch (Exception e)
     {
+      // log level must be one of...
       String expectedMsg = "Das Log-Level muss einem der folgenden Werte entsprechen: 'SEVERE', 'WARNING', 'INFO', 'CONFIG', 'FINE', 'FINER', 'FINEST'";
       return Optional.of(createValidationError("logLevel", this.logLevel, expectedMsg));
     }
@@ -125,6 +130,7 @@ public class WskSettings implements IWskJson
   
   private String createValidationError(String attributeName, Object attributeValue, String expectedMsg)
   {
+    // configuration error. attribute requirement: *
     return String.format("Konfigurationsfehler [%s=%s]. Anforderungen an das Attribut '%s': %s", 
       attributeName, attributeValue, attributeName, expectedMsg);
   }

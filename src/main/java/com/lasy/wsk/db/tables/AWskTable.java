@@ -45,6 +45,7 @@ public abstract class AWskTable implements IWskTable
     }
     catch (IOException e)
     {
+      // could not access table schema
       throw WskFrameworkException.failForReason(null, "Auf das Schema der Tabelle '%s' kann nicht zugegriffen werden!", getTableName());
     }
   }

@@ -44,6 +44,7 @@ public class BboxOverviewPane extends AOverviewPane<BboxModel>
   
   private BboxOverviewPane(Scene mainScene)
   {
+    // boundingbox overview
     super(mainScene, "Boundingbox-Übersicht");
   }
 
@@ -53,8 +54,10 @@ public class BboxOverviewPane extends AOverviewPane<BboxModel>
     Map<Button, AModelEditPane<BboxModel>> btnWithTargets = new LinkedHashMap<>();
     
     Button createBtn = GuiUtil.createIconButtonWithText(
-      GuiIcon.CREATE, 
-      "Erstellt eine neue Boundingbox",  
+      GuiIcon.CREATE,
+      // creates a new boundingbox
+      "Erstellt eine neue Boundingbox",
+      // create a new boundingbox
       "Neue Boundingbox erstellen");
     AModelEditPane<BboxModel> pane = getModelEditPane(null);
     
@@ -104,6 +107,7 @@ public class BboxOverviewPane extends AOverviewPane<BboxModel>
     List<String> layersWithBbox = getLayersWithBbox(bbox);
     if(!layersWithBbox.isEmpty())
     {
+      // boundingbox cannot be deleted because it is used by the following layers
       String reason = String.format("Boundingbox '%s' kann nicht gelöscht werden, da sie von folgenden Layern verwendet wird: %s",
         bbox.getName(),
         String.join(", ", layersWithBbox));

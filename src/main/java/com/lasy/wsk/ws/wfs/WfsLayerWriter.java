@@ -62,18 +62,21 @@ public class WfsLayerWriter implements ILayerWriter
       BBOX filter = createBboxFilter(origFeatureType);
 
       SimpleFeatureCollection features = source.getFeatures(filter);
+      // feature loaded successfully
       WskLog.log(Level.INFO, "WFS Features '%s' erfolgreich geladen.", typeNames);
 
       // Write features to geopackage
       FeatureEntry entry = createFeatureEntry(origFeatureType);
       GeoPackage gpkg = WskFramework.getInstance().getWskGeoPackage().getGtGeoPackage();
       gpkg.add(entry, features);
+      // feature successfully saved in geopackage
       WskLog.log(Level.INFO, "WFS Features '%s' erfolgreich in Geopackage gespeichert.", typeNames);
 
       // Update new tablename (default name is the WFS service layer name)
       String wfsTableName = origFeatureType.getTypeName();
       DbScriptUtil.updateWfsLayerName(this.layer, wfsTableName);
-      
+
+      // layer written successfully
       WskLog.log(Level.INFO, "WFS Layer '%s' erfolgreich geschrieben.", this.layer.getName());
     }
     catch (Exception e)

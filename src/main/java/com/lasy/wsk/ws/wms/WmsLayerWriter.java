@@ -80,7 +80,8 @@ public class WmsLayerWriter implements ILayerWriter
       this.threadPool.execute(createTileWriterThread(tileEntry, gpkg));
       
       queryAllTilesAndWriteToTileEntry(tileMatrixParams, tileEntry, gpkg);
-      
+
+      // all tiles written for layer
       WskLog.log(Level.INFO, "Alle Tiles für Layer '%s' geschrieben.", this.layer.getName());
     }
     catch (Exception e)
@@ -90,6 +91,7 @@ public class WmsLayerWriter implements ILayerWriter
         throw this.writerException;
       }
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
+        // unknown error while writing WMS tiles
         .failForReason(t, "Unbekannter Fehler beim Schreiben der WMS-Kacheln."));
     }
     finally
@@ -110,10 +112,12 @@ public class WmsLayerWriter implements ILayerWriter
     
     if(totalTileCount < 1)
     {
-      throw WskFrameworkException.failForReason(new IllegalStateException(), 
+      throw WskFrameworkException.failForReason(new IllegalStateException(),
+        // Could not calculate tiles for layer
         "Für den Layer ('%s') konnten keine Kacheln berechnet werden.%n", this.layer.getName());
     }
-    
+
+    // total amount of tiles to write
     WskLog.log(Level.INFO, "Gesamtanzahl der zu schreibenden Tiles: %s", totalTileCount);
   }
 
@@ -206,12 +210,14 @@ public class WmsLayerWriter implements ILayerWriter
           tilesAddedCount++ ;
           if (tilesAddedCount % 100 == 0)
           {
+            // tiles saved for zoom level
             WskLog.log(Level.INFO, "%s/%s Tiles für Zoomstufe %s gespeichert.", tilesAddedCount, tileMatrixParam.getTotalTileCount(), currentZoom);
           }
         } 
         catch (Exception e)
         {
           throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
+            // error while writing tiles for layer
             .failForReason(t, "Fehler beim Schreiben der Layer-Kacheln für den Layer '%s'!", this.layer.getName()));
         }
       }
@@ -219,7 +225,8 @@ public class WmsLayerWriter implements ILayerWriter
     
     LocalDateTime end = LocalDateTime.now();
     long seconds = Duration.between(start, end).getSeconds();
-    
+
+    // all tiles saved for zoomlevel. duration:
     WskLog.log(Level.INFO, "Alle Tiles (%s) für Zoomstufe %s gespeichert. Dauer: %s", 
       tileMatrixParam.getTotalTileCount(), 
       currentZoom,
@@ -244,6 +251,7 @@ public class WmsLayerWriter implements ILayerWriter
     catch (Exception e)
     {
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
+        // request / response for WMS GetMap has errors
         .failForReason(t, "Request / Response für WMS GetMap ist fehlerhaft. URL: %s", request.getFinalURL()));
     }
   }
@@ -278,7 +286,8 @@ public class WmsLayerWriter implements ILayerWriter
           {
             Tile tile = new Tile(response.getZoom(), response.getCol(), response.getRow(), is.readAllBytes());
             gpkg.add(tileEntry, tile);
-            
+
+            // tile written
             WskLog.log(Level.FINEST, "Tile geschrieben: [z:%s, r:%s, c:%s]", 
               response.getZoom(), response.getRow(), response.getCol());
           }
@@ -298,6 +307,7 @@ public class WmsLayerWriter implements ILayerWriter
   private void setWriterException(Exception e)
   {
     this.writerException = ErrorModule.createFrameworkException(e, t -> WskFrameworkException
+      // error while saving WMS tiles
       .failForReason(t, "Fehler beim Speichern von WMS-Kacheln."));
     Thread.currentThread().interrupt();
   }
@@ -340,7 +350,8 @@ public class WmsLayerWriter implements ILayerWriter
       Set<String> supportedSrs = wms.getCapabilities().getLayer().getSrs();
       if(!supportedSrs.contains(BboxUtil.getEpsgStringForCode(requestEpsg)))
       {
-        throw WskFrameworkException.failForReason(new IllegalStateException(), 
+        throw WskFrameworkException.failForReason(new IllegalStateException(),
+          // service does not support the reference system
           "Service unterstützt das angegebene Referenzsystem (EPSG:%s) nicht! %n"
           + "GetCapabilities: %s", requestEpsg, getCapabilitiesRequest);
       }
@@ -352,6 +363,7 @@ public class WmsLayerWriter implements ILayerWriter
     catch (Exception e)
     {
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
+         // GT WebMapServer could not be created or is not supported
         .failForReason(t, "GT WebMapServer konnte nicht erstellt werden oder wird nicht unterstützt!"));
     }
   }
@@ -403,11 +415,13 @@ public class WmsLayerWriter implements ILayerWriter
     try
     {
       gpkg.create(tileEntry);
+      // created new tile table
       WskLog.log(Level.INFO, "Neue Tile-Tabelle '%s' angelegt.", this.layer.getLocalName());
       return tileEntry;
     }
     catch (IOException e)
     {
+      // error while creating local layer
       throw WskFrameworkException.failForReason(e, "Fehler beim Erstellen des lokalen Layers '%s'", this.layer.getName());
     }
   }

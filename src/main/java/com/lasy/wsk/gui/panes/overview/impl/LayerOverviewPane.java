@@ -59,14 +59,16 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
     Map<Button, AModelEditPane<LayerModel>> btnWithTargets = new LinkedHashMap<>();
     
     Button wmsBtn = GuiUtil.createIconButtonWithText(
-      GuiIcon.CREATE, 
+      GuiIcon.CREATE,
+      // creates a new WMS layer
       "Erstellt einen neuen WMS Layer", 
       "Neuen WMS Layer erstellen");
     AModelEditPane<LayerModel> wmsPane = WmsLayerEditPane.create(getMainScene(), null);
     btnWithTargets.put(wmsBtn, wmsPane);
     
     Button wfsBtn = GuiUtil.createIconButtonWithText(
-      GuiIcon.CREATE, 
+      GuiIcon.CREATE,
+      // creates a new WFS layer
       "Erstellt einen neuen WFS Layer", 
       "Neuen WFS Layer erstellen");
     AModelEditPane<LayerModel> wfsPane = WfsLayerEditPane.create(getMainScene(), null);
@@ -86,7 +88,8 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   {
     TableColumn<LayerModel, String> serviceCol = new TableColumn<>("Service");
     serviceCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> layer.getWebServiceType().toString()));
-    
+
+    // initially visible
     TableColumn<LayerModel, String> isVisibleCol = new TableColumn<>("Initial sichtbar");
     isVisibleCol.setCellValueFactory(new ModelValueFactory<LayerModel>(layer -> GuiUtil.createBooleanDisplayValue(layer.isVisible())));
 
@@ -99,10 +102,12 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
         {
           LocalDateTime dlDate = lastDownloadDate.get();
           
-          return layer.getLastChangedDate().isAfter(dlDate) 
+          return layer.getLastChangedDate().isAfter(dlDate)
+            // configuration changes
             ? String.join(System.lineSeparator(), dlDate.toString(), "* Konfigurationsänderungen!")
             : dlDate.toString();
         }
+        // NOT SAVED LOCALLY
         return "NICHT LOKAL GESPEICHERT!";
       }
       // show nothing for layers that are not allowed to be stored locally
@@ -142,6 +147,7 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   {
     if (noBboxesExist())
     {
+      // at least one boundingbox must be present to assign the map boundary
       return Optional.of("Es muss mindestens eine Boundingbox vorhanden sein um den Kartenausschnitt festzulegen!");
     }
     return Optional.empty();
@@ -156,7 +162,9 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
   @Override
   protected List<TableColumn<LayerModel, Button>> createAdditionalButtons()
   {
+    // download
     TableColumn<LayerModel, Button> downloadCol = GuiUtil.createGridButtonColumn("Herunterladen",
+      // saves the layer locally
       () -> GuiUtil.createIconButton(GuiIcon.DOWNLOAD, "Speichert den Layer lokal"), 
       this::handleDownload,
       // just show button if it can be stored local
@@ -186,6 +194,7 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
       {
         layer.setLastDownloadDate(null);
         throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
+          // error while saving the local layer *
           .failForReason(t, "Fehler beim Speichern des lokalen layers '%s'", layer.getName()));
       }
       finally
@@ -197,8 +206,10 @@ public class LayerOverviewPane extends AOverviewPane<LayerModel>
 
   private Alert createDownloadAlert(LayerModel layer)
   {
+    // download * now? the download may take some minutes.
     String msg = String.format("'%s' jetzt herunterladen? Das Herunterladen kann einige Minuten dauern.", layer.getName());
     Alert alert = new Alert(AlertType.CONFIRMATION, msg, ButtonType.YES, ButtonType.NO);
+    // download layer
     alert.setTitle("Layer Herunterladen");
     alert.setHeaderText(null);
     return alert;

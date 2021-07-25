@@ -152,6 +152,7 @@ public class BboxUtil
     }
     catch (Exception e)
     {
+      // Coordinate system for EPSG * could not be created
       throw WskFrameworkException.failForReason(e, "Koordinatensystem für EPSG:%s konnte nicht erstellt werden!", code);
     }
   }

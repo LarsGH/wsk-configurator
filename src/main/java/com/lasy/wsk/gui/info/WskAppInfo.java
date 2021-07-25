@@ -71,20 +71,19 @@ public class WskAppInfo
 
     Label versionInfo = new Label("Version: " + getVersion());
 
+    // icon creator
     Label iconCreator = new Label("Icon-Ersteller: Freepik");
+    // open site to icon creator
     Button iconCreatorBtn = createBrowseButton("Öffnet die Seite des Icon-Erstellers", ICON_CREATOR_URL);
     HBox iconCreatorInfo = new HBox(GuiUtil.DEFAULT_SPACING, iconCreatorBtn, iconCreator);
     iconCreatorInfo.setAlignment(Pos.CENTER_LEFT);
 
+    // icon platform
     Label iconSite = new Label("Icon-Plattform: Flaticon.com");
+    // open site to icon platform
     Button iconSiteBtn = createBrowseButton("Öffnet die Seite der Icon-Plattform", ICON_SITE_URL);
     HBox iconSiteInfo = new HBox(GuiUtil.DEFAULT_SPACING, iconSiteBtn, iconSite);
     iconSiteInfo.setAlignment(Pos.CENTER_LEFT);
-    
-//    Label copyRightMainPage = new Label("Copyright Bild Konfigurations-Übersicht: "
-//      + "Photo taken by John McColgan, "
-//      + "employed as a fire behavior analyst at the Forest Service, "
-//      + "an agency of the U.S. Department of Agriculture");
 
     return new VBox(GuiUtil.DEFAULT_SPACING, 
       header, 
@@ -119,7 +118,9 @@ public class WskAppInfo
       }
     }
 
+    // Opening of site * is not supported
     String msg = String.format("Das Öffnen der Seite (%s) wird nicht unterstützt!", site);
+    // function not supported
     Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Funktion nicht unterstützt", msg);
     alert.show();
   }
@@ -127,6 +128,7 @@ public class WskAppInfo
   public static Alert getInfoAlert()
   {
     Alert info = new Alert(AlertType.INFORMATION, null, ButtonType.OK);
+    // application information
     info.setTitle("Anwendungs-Informationen");
     info.setHeaderText(null);
     info.getDialogPane().setContent(getInfoBox());

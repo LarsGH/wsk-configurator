@@ -128,6 +128,7 @@ public class AttributeInputContainer<TModel extends IGtModel, TGuiElement extend
 
   private Button createInfoButton(String infoAlertMessage)
   {
+    // attribute hint
     Button btn = GuiUtil.createIconButton(GuiIcon.INFO, "Attribut-Hinweis");
     btn.setOnAction(e -> {
       Alert alert = GuiUtil.createOkAlert(AlertType.INFORMATION, "Attribut-Hinweis", infoAlertMessage);

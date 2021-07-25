@@ -63,11 +63,13 @@ public class DbScriptUtil
         Map<String, String> params = Map.of(TABLENAME_PARAM, localLayerName);
         InputStream is = DbScriptUtil.class.getResourceAsStream(DELETE_WMS_TABLE_SCRIPT);
         SqlUtil.runScript(is, connection, params);
+        // offline content of WMS layer successfully deleted
         WskLog.log(Level.INFO, "Offline Content von WMS Layer '%s' wurde erfolgreich gelöscht. (Tabelle: '%s')", layer.getName(), localLayerName);
       }
     }
     catch (Exception e)
     {
+      // offline content of WMS layer could not be deleted
       throw WskFrameworkException.failForReason(e, "Aktueller offline Content von WMS Layer '%s' konnte nicht gelöscht werden!", layer.getName());
     }
   }
@@ -96,10 +98,12 @@ public class DbScriptUtil
       String typeNames = wfsConfig.getTypeNames();
       deleteWfsContentIfPresent(typeNames, gpkg);
 
+      // WFS layer does not have offline content
       WskLog.log(Level.INFO, "WFS Layer '%s' hat keinen offline Content.", layer.getName());
     }
     catch (Exception e)
     {
+      // current offline content of WFS layer could not be deleted
       throw WskFrameworkException.failForReason(e, "Aktueller offline Content von WFS Layer '%s' konnte nicht gelöscht werden!", layer.getName());
     }
   }
@@ -115,15 +119,18 @@ public class DbScriptUtil
         Map<String, String> params = Map.of(TABLENAME_PARAM, tableName);
         InputStream is = DbScriptUtil.class.getResourceAsStream(DELETE_WFS_TABLE_SCRIPT);
         SqlUtil.runScript(is, connection, params);
+        // table deleted (if present)
         WskLog.log(Level.INFO, "Tabelle gelöscht (falls vorhanden): '%s'", tableName);
       }
       else
       {
+        // no offline content for table found
         WskLog.log(Level.INFO, "Kein offline Content für Tabelle gefunden: '%s'", tableName);
       }
     }
     catch (Exception e)
     {
+      // table was not be deleted
       throw WskFrameworkException.failForReason(e, "Tabelle '%s' konnte nicht gelöscht werden!", tableName);
     }
   }
@@ -141,11 +148,13 @@ public class DbScriptUtil
         Map<String, String> params = Map.of(TABLENAME_PARAM, wfsTableName, NEW_TABLENAME_PARAM, localLayerName);
         InputStream is = DbScriptUtil.class.getResourceAsStream(UPDATE_WFS_TABLE_NAME_SCRIPT);
         SqlUtil.runScript(is, connection, params);
+        // table was renamed successfully
         WskLog.log(Level.INFO, "WFS Layer ('%s') Tabelle wurde erfolgreich umbenannt. '%s' -> '%s'", layer.getName(), wfsTableName, localLayerName);
       }
     }
     catch (Exception e)
     {
+      // table rename failed
       throw WskFrameworkException.failForReason(e, "WFS Layer ('%s') Tabelle konnte nicht umbenannt werden! Tabelle: '%s'", layer.getName(), wfsTableName);
     }
   }

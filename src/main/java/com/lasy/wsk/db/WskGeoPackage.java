@@ -42,6 +42,7 @@ public class WskGeoPackage implements AutoCloseable
     {
       if(f.createNewFile())
       {
+        // new geopackage created
         String msg = String.format("Neues Geopackage wurde angelegt: %s", f.getAbsolutePath());
         WskLog.log(Level.INFO, msg);
       }

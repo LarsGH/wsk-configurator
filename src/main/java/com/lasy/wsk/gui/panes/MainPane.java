@@ -44,6 +44,7 @@ public class MainPane extends AWskPane
 
   private MainPane(Scene mainScene)
   {
+    // configuration overview
     super(mainScene, "Konfigurations-Übersicht");
   }
   
@@ -57,7 +58,9 @@ public class MainPane extends AWskPane
   {
     return createOverviewButton(
       GuiIcon.LAYER,
+      // go to layer overview
       "Wechselt zur Layer-Übersicht",
+      // layer overview
       "Layer-Übersicht",
       e -> {
         goToPane(LayerOverviewPane.create(getMainScene()));
@@ -68,7 +71,9 @@ public class MainPane extends AWskPane
   {    
     return createOverviewButton(
       GuiIcon.BOUNDING_BOX,
+      // to to boundingbox overview
       "Wechselt zur Boundingbox-Übersicht",
+      // boundingbox overview
       "Boundingbox-Übersicht",
       e -> {
         goToPane(BboxOverviewPane.create(getMainScene()));
@@ -79,7 +84,9 @@ public class MainPane extends AWskPane
   {    
     return createOverviewButton( 
       GuiIcon.INFO,
+      // information about this application
       "Informationen zu dieser Anwendung",
+      // application information
       "Anwendungs-Informationen",
       e -> {
         Alert info = WskAppInfo.getInfoAlert();

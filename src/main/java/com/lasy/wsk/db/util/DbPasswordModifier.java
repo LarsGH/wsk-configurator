@@ -57,6 +57,7 @@ public class DbPasswordModifier
     }
     catch (Exception e)
     {
+      // password could not be encrypted
       throw WskFrameworkException.failForReason(e, "Das Passwort konnte nicht verschlüsselt werden!");
     }
   }
@@ -72,6 +73,7 @@ public class DbPasswordModifier
     }
     catch (Exception e)
     {
+      // password could not be decrypted
       throw WskFrameworkException.failForReason(e, "Das Passwort konnte nicht entschlüsselt werden!");
     }
   }

@@ -24,7 +24,8 @@ public interface ILayerWriter
     boolean storeLocal = Check.notNull(layer, "layer").isStoreLocal();
     if(!storeLocal)
     {
-      throw WskFrameworkException.failForReason(new IllegalStateException(), 
+      throw WskFrameworkException.failForReason(new IllegalStateException(),
+        // layer configuration does not allow local saving
         "Die Konfiguration des Layers ('%s') erlaubt keine lokale Speicherung!", layer.getLocalName());
     }
     EWebServiceType webService = layer.getWebServiceType();

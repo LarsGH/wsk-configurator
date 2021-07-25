@@ -112,31 +112,37 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
     this.attrMinLon = createCoordinateAttrInputContainer(
       "Minimale Länge", 
       (txtField, bbox) -> txtField.setText(bbox.getMinLon()),
+      // west-east value of the 'lower left' corner of the boundingbox
       "West-Ost Wert der 'unteren linken Ecke' des Ausschnitts.");
     addAttributeInputContainer(attrMinLon);
     
     this.attrMinLat = createCoordinateAttrInputContainer(
       "Minimale Breite", 
       (txtField, bbox) -> txtField.setText(bbox.getMinLat()),
+      // north-south value of the 'lower left' corner of the boundingbox
       "Nord-Süd Wert der 'unteren linken Ecke' des Ausschnitts.");
     addAttributeInputContainer(attrMinLat);
     
     this.attrMaxLon = createCoordinateAttrInputContainer(
       "Maximale Länge", 
       (txtField, bbox) -> txtField.setText(bbox.getMaxLon()),
+      // west-east value of the 'upper right' corner of the boundingbox
       "West-Ost Wert der 'oberen rechten Ecke' des Ausschnitts.");
     addAttributeInputContainer(attrMaxLon);
     
     this.attrMaxLat = createCoordinateAttrInputContainer(
       "Maximale Breite", 
       (txtField, bbox) -> txtField.setText(bbox.getMaxLat()),
+      // north-south value of the 'upper right' corner of the boundingbox
       "Nord-Süd Wert der 'oberen rechten Ecke' des Ausschnitts.");
     addAttributeInputContainer(attrMaxLat);
   }
   
   private AttributeInputContainer<BboxModel, CheckBox, Boolean> createAttrIsMapBoundary()
   {
+    // default map boundary
     return AttributeInputContainer.<BboxModel, CheckBox, Boolean>builer("Standard Kartenbegrenzung")
+      // use as map bounday?
       .withGuiElement(new CheckBox("Als Kartenbegrenzung verwenden?"))
       .withGuiValueInitialization((cb, bbox) -> {
         boolean isMapBoundary = bbox != null
@@ -145,6 +151,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
         cb.setSelected(isMapBoundary);
       })
       .withGuiElementToModelAttributeFunc(CheckBox::isSelected)
+      // if activated, this boundary will be used as the default for the map in the app. There must be exactly one default boundary
       .withInfoAlertMessage("Wenn aktiviert, wird dieser Ausschnitt als Standardbegrenzung für die Karte in der App verwendet. "
         + "Es muss genau eine Standard-Kartenbegrenzung vorhanden sein!")
       .build();
@@ -180,6 +187,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
           ? null
           : Integer.valueOf(txt);
       })
+      // unique key for the coordinate system
       .withInfoAlertMessage("Eindeutiger Schlüssel für das Koordinatensystem.")
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
       .build();
@@ -187,6 +195,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
 
   private AttributeInputContainer<BboxModel, TextField, String> createAttrDescription()
   {
+    // description
     return AttributeInputContainer.<BboxModel, TextField, String>builer("Boundingbox-Beschreibung")
       .withGuiElement(PatternTextField.createAcceptAllTextField())
       .withGuiValueInitializationIfModelNotNull((txtField, bbox) -> {
@@ -205,6 +214,7 @@ public class BboxEditPane extends AModelEditPane<BboxModel>
       })
       .withGuiElementToModelAttributeFunc(TextField::getText)
       .withInputValidationError(AttributeInputValidator.createMandatoryInputFunction())
+      // the name is displayed in the layer configuration view
       .withInfoAlertMessage("Der Name wird bei der Layer-Konfiguration angezeigt.")
       .build();
   }

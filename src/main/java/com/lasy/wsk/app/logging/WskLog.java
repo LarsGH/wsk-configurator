@@ -32,6 +32,7 @@ public class WskLog
   
   public static void logFrameworkError(WskFrameworkException exception)
   {
+    // framework error
     String message = String.format("Framework-Fehler: %s", exception.getMessage());
     getInstance().logger.log(exception.getLevel(), message, exception);
   }
@@ -61,6 +62,7 @@ public class WskLog
     }
     catch (Exception e)
     {
+      // could not configure logger
       throw WskFrameworkException.failForReason(e, "Logger konnte nicht konfiguriert werden!");
     }
   }
@@ -72,6 +74,7 @@ public class WskLog
   public void setLogLevel(Level level)
   {
     this.logger.setLevel(level);
+    // new log level
     WskLog.log(Level.INFO, "Neues Log-Level: %s", level.getName());
   }
 
@@ -106,6 +109,7 @@ public class WskLog
       }
       catch (IOException e)
       {
+        // log could not be created
         throw WskFrameworkException.exitForReason(e, "Log ('%s') konnte nicht erstellt werden!", logFile.getAbsolutePath());
       }
     }

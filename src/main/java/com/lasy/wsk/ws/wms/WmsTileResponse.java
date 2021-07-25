@@ -38,7 +38,8 @@ public class WmsTileResponse
     String contentType = response.getContentType();
     if(!contentType.contains("image"))
     {
-      throw WskFrameworkException.failForReason(createIllegalStateException(response), 
+      throw WskFrameworkException.failForReason(createIllegalStateException(response),
+        // response error of GetMap-request. Expected an 'image/*' content type.
         "Fehlerhafte Antwort von GetMap-Request (Content type: '%s'). "
         + "Erwartet wird ein 'image/*' Content type.%n"
         + "URL: %s", contentType, this.url);

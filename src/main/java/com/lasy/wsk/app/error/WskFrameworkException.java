@@ -63,7 +63,9 @@ public class WskFrameworkException extends RuntimeException
    */
   public Alert getErrorAlert()
   {
+    // find details in the log
     String msg = String.join(System.lineSeparator(), getMessage(), "Details können dem Log entnommen werden.");
+    // error occurred
     return GuiUtil.createOkAlert(AlertType.ERROR, "Fehler aufgetreten", msg);
   }
   

@@ -42,6 +42,7 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends AWskPan
 
   private HBox createMainButtonBox()
   {
+    // overview. go to overview
     Button mainBtn = GuiUtil.createIconButtonWithText(GuiIcon.HOME_DB, "Übersicht", "Wechsel zu Übersicht");
     mainBtn.setOnAction(e -> {
       goToMainPane();
@@ -86,6 +87,7 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends AWskPan
         Optional<String> createNotAllowedReason = getCreateNotAllowedReason();
         if (createNotAllowedReason.isPresent())
         {
+          // creation not possible
           Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Erstellen nicht möglich", createNotAllowedReason.get());
           alert.show();
           return;
@@ -140,12 +142,14 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends AWskPan
     colList.addAll(additionalButtons);
 
     TableColumn<TModelType, Button> editCol = GuiUtil.createGridButtonColumn("Editieren",
+      // shows the edit mask
       () -> GuiUtil.createIconButton(GuiIcon.EDIT, "Ruft die Editieren-Maske auf"), 
       this::handleEditModel,
       null);
     colList.add(editCol);
 
     TableColumn<TModelType, Button> deleteCol = GuiUtil.createGridButtonColumn("Löschen",
+      // deletes the selection
       () -> GuiUtil.createIconButton(GuiIcon.DELETE, "Löscht die Auswahl"), 
       this::handleDeleteModel,
       null);
@@ -176,6 +180,7 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends AWskPan
       Optional<String> deleteNotAllowedReason = getDeleteNotAllowedReason(model);
       if (deleteNotAllowedReason.isPresent())
       {
+        // deletion not possible
         Alert alert = GuiUtil.createOkAlert(AlertType.WARNING, "Löschen nicht möglich", deleteNotAllowedReason.get());
         alert.show();
       }
@@ -211,8 +216,10 @@ public abstract class AOverviewPane<TModelType extends IGtModel> extends AWskPan
 
   private Alert createDeleteAlert(TModelType model)
   {
+    // delete *?
     String deleteMsg = String.format("'%s' wirklich löschen?", model.getName());
     Alert alert = new Alert(AlertType.CONFIRMATION, deleteMsg, ButtonType.YES, ButtonType.NO);
+    // delete selection
     alert.setTitle("Auswahl löschen");
     alert.setHeaderText(null);
     return alert;

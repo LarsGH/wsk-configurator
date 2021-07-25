@@ -57,11 +57,13 @@ public final class TileMatrixParams
         
         final TileMatrixParams matrixParam = new TileMatrixParams(zoomLevel, matrixBbox, matrixWidth, matrixHeight, tileWidth, tileHeight, metersPerPixel);
         matrixParams.add(matrixParam);
-        
+
+        // tile matrix creates for layer
         WskLog.log(Level.INFO, "TileMatrix erstellt für '%s': %n%s", layer.getName(), matrixParam);
       }
     } catch (Exception e)
     {
+      // tile matrix could not be created
       throw WskFrameworkException.failForReason(e, "Tilematrix konnte nicht erstellt werden.");
     }
     return matrixParams;

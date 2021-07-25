@@ -65,6 +65,7 @@ public abstract class AWskCrudService<TModel extends IGtModel, TBuilder extends 
     }
     catch (Exception e)
     {
+      // data could not be loaded
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
         .failForReason(t, "Daten ('%s') konnten nicht geladen werden.", getTableName()));
     }
@@ -81,6 +82,7 @@ public abstract class AWskCrudService<TModel extends IGtModel, TBuilder extends 
     }
     catch (IOException e)
     {
+      // data could not be loaded
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
         .failForReason(t, "Daten ('%s - ID: %s') konnten nicht geladen werden.", getTableName(), id));
     }
@@ -98,6 +100,7 @@ public abstract class AWskCrudService<TModel extends IGtModel, TBuilder extends 
     }
     catch (Exception e)
     {
+      // data could not be deleted
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
         .failForReason(t, "Daten ('%s - ID: %s') konnten nicht gelöscht werden.", getTableName(), id));
     }
@@ -112,6 +115,7 @@ public abstract class AWskCrudService<TModel extends IGtModel, TBuilder extends 
     }
     catch (Exception e)
     {
+      // accessing table failed
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
         .failForReason(t, "Zugriff auf Tabelle '%s' ist fehlgeschlagen.", getTableName()));
     }
@@ -134,6 +138,7 @@ public abstract class AWskCrudService<TModel extends IGtModel, TBuilder extends 
     }
     catch (Exception e)
     {
+      // new entry could not be created
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
         .failForReason(t, "Neuer Eintrag ('%s') konnte nicht erstellt werden.", getTableName()));
     }
@@ -148,6 +153,7 @@ public abstract class AWskCrudService<TModel extends IGtModel, TBuilder extends 
   private TModel reloadModel(TModel model)
   {
     Integer id = model.getId();
+    // data could not be reloaded
     model = readById(id)
       .orElseThrow(() -> WskFrameworkException
         .failForReason(null, "Daten ('%s - ID: %s') konnten nicht neu geladen werden.", getTableName(), id));
@@ -206,6 +212,7 @@ public abstract class AWskCrudService<TModel extends IGtModel, TBuilder extends 
     }
     catch (Exception e)
     {
+      // data could not be updated
       throw ErrorModule.createFrameworkException(e, t -> WskFrameworkException
           .failForReason(t, "Daten ('%s - ID: %s') konnten nicht aktualisiert werden.", getTableName(), id));
     }
